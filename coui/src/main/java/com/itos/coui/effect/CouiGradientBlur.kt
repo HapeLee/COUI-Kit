@@ -1,0 +1,172 @@
+package com.itos.coui.effect
+
+import android.graphics.RenderEffect
+import android.graphics.RuntimeShader
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.layer.CompositingStrategy
+import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import com.itos.coui.backdrop.CouiBackdrop
+import com.itos.coui.backdrop.drawCouiBackdrop
+import kotlin.math.ceil
+
+private const val BlurOffsetPx = 2f
+private const val SigmaScale = 0.57735f
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+fun Modifier.drawCouiGradientBackdrop(
+    backdrop: CouiBackdrop,
+    fadeHeightPx: Float,
+    referenceBlurRadiusPx: Float,
+): Modifier {
+    val horizontal = rememberGraphicsLayer()
+    val vertical = rememberGraphicsLayer()
+    val density = LocalDensity.current
+    val renderer = remember(fadeHeightPx, referenceBlurRadiusPx, density, horizontal, vertical) {
+        CouiGradientRenderer(fadeHeightPx, referenceBlurRadiusPx, density, listOf(horizontal, vertical))
+    }
+    return drawCouiBackdrop(
+        backdrop = backdrop,
+        shape = { RectangleShape },
+        effects = {
+            padding = renderer.padding
+            renderer.height = size.height
+        },
+        onDrawBackdrop = { drawBackdrop ->
+            renderer.draw(this, drawBackdrop)
+        },
+    )
+}
+
+/** 原厂渐进 Gaussian 先横后纵, 每遍保留原尺寸中间图, 不使用多级缩小图混合。 */
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+private class CouiGradientRenderer(
+    private val fadeHeightPx: Float,
+    referenceBlurRadiusPx: Float,
+    private val density: Density,
+    private val passes: List<GraphicsLayer>,
+) {
+    // 将宿主的参考半径换算为 COUI 核: 原权重 sigma=radius/3, 采样间距为 2px。
+    private val kernelRadius = ceil(
+        (referenceBlurRadiusPx * SigmaScale + 0.5f) * 3f / BlurOffsetPx,
+    ).toInt()
+    private val shaders = List(2) { index ->
+        RuntimeShader(gradientGaussianShader(kernelRadius)).apply {
+            setFloatUniform(
+                "in_blurOffset",
+                if (index == 0) BlurOffsetPx else 0f,
+                if (index == 1) BlurOffsetPx else 0f,
+            )
+        }
+    }
+    private var lastSize = IntSize.Zero
+    private var lastHeight = Float.NaN
+
+    var height: Float = 0f
+
+    // 覆盖最大采样偏移和线性插值的外沿, 不让边界 Clamp 进入可见区域。
+    val padding: Float = kernelRadius * BlurOffsetPx + 1f
+
+    init {
+        passes.forEach {
+            it.compositingStrategy = CompositingStrategy.Offscreen
+            it.clip = true
+        }
+    }
+
+    fun draw(scope: DrawScope, drawBackdrop: DrawScope.() -> Unit) {
+        if (scope.size.width <= 0f || scope.size.height <= 0f) return
+        val paddedSize = IntSize(scope.size.width.toInt(), scope.size.height.toInt())
+        updateEffects(paddedSize)
+        // 新 Canvas 不继承 CouiBackdrop 的 padding 平移; 独立 Density 避免 DrawScope 循环代理。
+        passes[0].record(density, scope.layoutDirection, paddedSize) {
+            translate(padding, padding) { drawBackdrop() }
+        }
+        // 独立图层落实两次栅格化, 不让第二遍在 Shader 内嵌套执行第一遍卷积。
+        passes[1].record(density, scope.layoutDirection, paddedSize) { drawLayer(passes[0]) }
+        scope.translate(-padding, -padding) { drawLayer(passes[1]) }
+    }
+
+    private fun updateEffects(size: IntSize) {
+        if (lastSize == size && lastHeight == height) return
+        shaders.forEachIndexed { index, shader ->
+            shader.setFloatUniform("inputSize", size.width.toFloat(), size.height.toFloat())
+            shader.setFloatUniform("gradientTop", padding + height - fadeHeightPx)
+            shader.setFloatUniform("gradientHeight", fadeHeightPx)
+            // RenderEffect 保存 uniform 快照; 仅几何改变时更新, 普通滚动复用。
+            passes[index].renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "child")
+                .asComposeRenderEffect()
+        }
+        lastSize = size
+        lastHeight = height
+    }
+}
+
+// libhwui.so: OplusGradientGaussianBlurEffect::make_blur_effect, 保留整数半径、权重和剩余中心权重。
+// shortcut: 噪声种子固定, 不复刻原厂逐次随机的时间变化; 需要动态噪声时再接入渲染时钟。
+private fun gradientGaussianShader(kernelRadius: Int): String = """
+    const int in_blurRadius = $kernelRadius;
+    const float PI = 3.1415926;
+    uniform shader child;
+    uniform float2 inputSize;
+    uniform float gradientTop;
+    uniform float gradientHeight;
+    uniform half2 in_blurOffset;
+
+    half4 sampleChild(float2 coord) {
+        return child.eval(clamp(coord, float2(0.5), inputSize - 0.5));
+    }
+
+    float getWeight(int i, int radius) {
+        float sigma = float(radius) / 3.0;
+        float value = (1.0 / sqrt(2.0 * PI * sigma * sigma))
+            * exp(float(-i * i) / (2.0 * sigma * sigma + 0.00000001));
+        return clamp(value, 0.0, 1.0);
+    }
+
+    float interleavedGradientNoise(float2 coord) {
+        const float3 magicNumbers = float3(0.06711056, 0.00583715, 52.9829189);
+        return fract(magicNumbers.z * fract(dot(coord, magicNumbers.xy)));
+    }
+
+    half4 main(float2 coord) {
+        half4 c = sampleChild(coord);
+        float position = clamp((coord.y - gradientTop) / gradientHeight, 0.0, 1.0);
+        // 清晰端缓慢起步, 两端斜率归零, 避免过早进入高模糊。
+        float ratio = smoothstep(0.0, 1.0, 1.0 - position);
+        int radius = int(float(in_blurRadius) * ratio);
+        if (radius <= 1) return c;
+        float2 offset = float2(0.0);
+        float sumWeight = 0.0;
+        half4 finalColor = half4(0.0);
+        for (int i = 1; i <= in_blurRadius; i++) {
+            if (i > radius) break;
+            float weight = getWeight(i, radius);
+            offset.x = min(in_blurOffset.x, float(radius)) * float(i);
+            offset.y = min(in_blurOffset.y, float(radius)) * float(i);
+            finalColor += sampleChild(coord - offset) * weight;
+            finalColor += sampleChild(coord + offset) * weight;
+            sumWeight += 2.0 * weight;
+        }
+        finalColor += c * (1.0 - sumWeight);
+        // 屏幕外没有页面采样; 恢复有效颜色但不扩张中心覆盖度, 避免顶边变暗或补成不透明。
+        if (finalColor.a <= 0.0) return half4(0.0);
+        finalColor = half4(finalColor.rgb * (c.a / finalColor.a), c.a);
+        float noise = interleavedGradientNoise(coord + 0.5) - 0.5;
+        finalColor.rgb = clamp(finalColor.rgb + noise * c.a / 200.0, half3(0.0), half3(c.a));
+        return finalColor;
+    }
+""".trimIndent()

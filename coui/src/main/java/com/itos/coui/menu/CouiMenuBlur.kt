@@ -1,0 +1,145 @@
+package com.itos.coui.menu
+
+import android.graphics.RenderEffect
+import android.graphics.RuntimeShader
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.layer.CompositingStrategy
+import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.unit.IntSize
+import com.itos.coui.backdrop.CouiBackdrop
+import kotlin.math.ceil
+
+@Composable
+fun rememberCouiMenuBlur(backdrop: CouiBackdrop, background: Color): CouiMenuBlur? {
+    if (Build.VERSION.SDK_INT < 33) return null
+    val layers = List(10) { rememberGraphicsLayer() }
+    return remember(backdrop, background, layers) {
+        CouiMenuBlur(backdrop, background, layers)
+    }
+}
+
+/** 移植 PJZ110 type2/radius160 的 Fast Kawase, 每轮保留独立像素网格。 */
+@RequiresApi(33)
+class CouiMenuBlur(
+    private val backdrop: CouiBackdrop,
+    private val background: Color,
+    private val layers: List<GraphicsLayer>,
+) {
+    private val downsampleShader = RuntimeShader(MenuDownsampleShader)
+    private val blurShaders = List(9) { RuntimeShader(MenuKawaseShader) }
+    private var firstSize = IntSize.Zero
+
+    init {
+        layers.forEach {
+            it.compositingStrategy = CompositingStrategy.Offscreen
+            it.clip = true
+        }
+    }
+
+    fun draw(scope: DrawScope, coordinates: LayoutCoordinates) {
+        val menuSize = scope.size
+        if (!coordinates.isAttached || menuSize.width <= 0f || menuSize.height <= 0f) return
+        val origin = coordinates.localToScreen(Offset.Zero)
+        val right = coordinates.localToScreen(Offset(menuSize.width, 0f))
+        val bottom = coordinates.localToScreen(Offset(0f, menuSize.height))
+        val deviceWidth = (right - origin).getDistance()
+        val deviceHeight = (bottom - origin).getDistance()
+        if (!deviceWidth.isFinite() || !deviceHeight.isFinite() || deviceWidth <= 0f || deviceHeight <= 0f) {
+            scope.drawRect(background)
+            return
+        }
+
+        // native 以设备像素决定网格, 而不是 dp 或未变形的菜单尺寸。
+        val blocksX = ceil(deviceWidth / 16f).toInt().coerceAtLeast(1)
+        val blocksY = ceil(deviceHeight / 16f).toInt().coerceAtLeast(1)
+        val captureSize = IntSize(blocksX * 8, blocksY * 8)
+        val blurSize = IntSize(blocksX * 2, blocksY * 2)
+        updateEffects(captureSize, blurSize)
+
+        layers[0].record(scope, scope.layoutDirection, captureSize) {
+            // 补底也进入采样链, 不能在材质混色之后再补不透明背景。
+            drawRect(background)
+            withTransform({
+                scale(captureSize.width / menuSize.width, captureSize.height / menuSize.height, Offset.Zero)
+            }) {
+                backdrop.draw(this, coordinates)
+            }
+        }
+        for (index in 1..9) {
+            layers[index].record(scope, scope.layoutDirection, blurSize) {
+                drawLayer(layers[index - 1])
+            }
+        }
+        scope.withTransform({
+            // native 使用输入区域与实际中间图尺寸的比值, 不是固定乘八。
+            scale(menuSize.width / blurSize.width, menuSize.height / blurSize.height, Offset.Zero)
+        }) {
+            drawLayer(layers[9])
+        }
+    }
+
+    private fun updateEffects(captureSize: IntSize, blurSize: IntSize) {
+        if (firstSize == captureSize) return
+        firstSize = captureSize
+        downsampleShader.setFloatUniform("inputSize", captureSize.width.toFloat(), captureSize.height.toFloat())
+        layers[0].renderEffect = RenderEffect.createRuntimeShaderEffect(downsampleShader, "child")
+            .asComposeRenderEffect()
+        blurShaders.forEachIndexed { index, shader ->
+            shader.setFloatUniform("inputSize", blurSize.width.toFloat(), blurSize.height.toFloat())
+            // fastKawase 的 radius160 分支先减十, p=10, 再执行 i=1..9。
+            shader.setFloatUniform("in_blurOffset", (index + 1) * (150f / (9f * 10f)) / 8f)
+            layers[index + 1].renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "child")
+                .asComposeRenderEffect()
+        }
+    }
+}
+
+// librenderengineextimpl.so: 0x2fd60; sampleChild 承接原 child shader 的 0.25 局部矩阵与 Clamp。
+private const val MenuDownsampleShader = """
+    uniform shader child;
+    uniform float2 inputSize;
+    half offset = 0.25;
+
+    half4 sampleChild(float2 xy) {
+        return child.eval(clamp(xy * 4.0, float2(0.5), inputSize - 0.5));
+    }
+
+    half4 main(float2 xy) {
+        half4 c = sampleChild(xy + float2(+offset, +offset));
+             c += sampleChild(xy + float2(+offset, -offset));
+             c += sampleChild(xy + float2(-offset, -offset));
+             c += sampleChild(xy + float2(-offset, +offset));
+        return half4(c.rgb * 0.25, 1.0);
+    }
+"""
+
+// librenderengineextimpl.so: 0x33f4a; 只增加逻辑图像边界 Clamp, 不采样 RenderNode 的对齐余量。
+private const val MenuKawaseShader = """
+    uniform shader child;
+    uniform float2 inputSize;
+    uniform float in_blurOffset;
+
+    half4 sampleChild(float2 xy) {
+        return child.eval(clamp(xy, float2(0.5), inputSize - 0.5));
+    }
+
+    half4 main(float2 xy) {
+        half4 c = sampleChild(xy);
+        c += sampleChild(xy + float2(+in_blurOffset, +in_blurOffset));
+        c += sampleChild(xy + float2(+in_blurOffset, -in_blurOffset));
+        c += sampleChild(xy + float2(-in_blurOffset, -in_blurOffset));
+        c += sampleChild(xy + float2(-in_blurOffset, +in_blurOffset));
+        return half4(c.rgb * 0.2, 1.0);
+    }
+"""

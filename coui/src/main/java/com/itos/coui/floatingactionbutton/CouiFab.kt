@@ -1,0 +1,100 @@
+package com.itos.coui.floatingactionbutton
+
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import com.itos.coui.backdrop.CouiBackdrop
+import com.itos.coui.effect.CouiFloatingMaterial
+import com.itos.coui.effect.CouiFloatingRenderer
+import com.itos.coui.effect.CouiFloatingShadow
+import com.itos.coui.effect.CouiFloatingSurface
+import com.itos.coui.effect.LocalCouiContourGlowEnabled
+import com.itos.coui.effect.SpotlightPreset
+import com.itos.coui.effect.couiFabFeedback
+import com.itos.coui.effect.couiFloatingSurface
+import com.itos.coui.effect.rememberCouiSpotlight
+import com.itos.coui.motion.CouiPressMotion
+import com.itos.coui.motion.couiPressMotion
+import com.itos.coui.motion.couiTouchMotion
+import com.itos.coui.motion.rememberCouiTouchMotion
+
+@RequiresApi(34)
+@Composable
+fun CouiFab(
+    modifier: Modifier = Modifier,
+    backdrop: CouiBackdrop,
+    renderer: CouiFloatingRenderer,
+    onClick: () -> Unit,
+    dark: Boolean,
+    shape: Shape,
+    material: CouiFloatingMaterial,
+    shadow: CouiFloatingShadow,
+    content: @Composable () -> Unit,
+) {
+    val density = LocalDensity.current.density
+    val contour = LocalCouiContourGlowEnabled.current
+    val contentLayer = rememberGraphicsLayer()
+    val motion = rememberCouiTouchMotion(true)
+    val scope = rememberCoroutineScope()
+    val press = remember(scope, density) { CouiPressMotion(scope, density) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val (lightInput, drawLight) = rememberCouiSpotlight(
+        interactive = true,
+        preset = SpotlightPreset.OpaqueSmall1,
+        dark = dark,
+    )
+    var boundsSize by remember { mutableStateOf(IntSize.Zero) }
+    Box(
+        modifier.size(56.dp).onSizeChanged { boundsSize = it }
+            .couiFloatingSurface(backdrop, renderer, material, shadow, shape,
+                contentLayer, contour) {
+                CouiFloatingSurface(
+                    Rect(Offset(motion.translationX.value, motion.translationY.value),
+                        Size(boundsSize.width.toFloat(), boundsSize.height.toFloat())),
+                    motion.scaleX.value * press.scale.value, motion.scaleY.value * press.scale.value,
+                    cornerWeight = 2f,
+                )
+            },
+    ) {
+        Box(
+            Modifier.fillMaxSize().graphicsLayer {
+                translationX = motion.translationX.value
+                translationY = motion.translationY.value
+                scaleX = motion.scaleX.value * press.scale.value
+                scaleY = motion.scaleY.value * press.scale.value
+            }.couiTouchMotion(motion, true).couiPressMotion(press).then(lightInput)
+                .drawWithContent { contentLayer.record { this@drawWithContent.drawContent() } }
+                .clip(shape).drawBehind { drawLight?.invoke(this) }
+                .couiFabFeedback(dark, interactionSource)
+                .clickable(interactionSource = interactionSource, indication = null, role = Role.Button, onClick = onClick),
+            contentAlignment = Alignment.Center,
+        ) {
+            content()
+        }
+    }
+}

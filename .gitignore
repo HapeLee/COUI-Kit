@@ -1,0 +1,26 @@
+# 本地配置与 IDE 状态
+.idea/
+.gradle/
+.kotlin/
+*.iml
+local.properties
+.DS_Store
+
+# 各模块的构建及分析产物
+build/
+.externalNativeBuild/
+.cxx/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.hprof
+
+# 本地签名材料
+*.jks
+*.keystore
+*.p12
+*.pfx
+keystore.properties
+signing.properties
