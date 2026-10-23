@@ -34,3 +34,12 @@ M3 装配参考 Metric：页面使用 `surfaceContainer` 层级，示例卡片�
 公共接口与装配限制见 [库说明](coui/README.md)。模块规则见 [AGENTS.md](AGENTS.md)，迁出决定见 [架构记录](.agents/notes/implemented/architecture/2026-10-23-standalone-coui-demo.md)。
 
 M3 装配与展示范围的决定见 [Demo 展示记录](.agents/notes/implemented/feature/2026-10-23-demo-material-and-gallery.md)。
+
+## 开发与接入
+
+- [接入指南](docs/INTEGRATION.md)：源码模块依赖、最小阴影示例、背景源、组件装配与底层算法。
+- [消费者兼容要求](docs/COMPATIBILITY.md)：工具链边界、依赖对齐、效果平台门槛及待验证范围。
+- [Developer 指南](DEVELOPER.md)：官方 1:1 对齐、代码风格、公开 API、核心 Note 和 PR 流程。
+- [实现分析与复刻指南](docs/coui-replication-guide.md)：从原厂页面追踪到实际算法、典型移植链路、排错方法及证据交接。
+
+重要变更通过功能分支提交 PR，禁止直接推送主分支。Note Skill 与静态校验随仓库提供；CI 只检查 Note，不执行 Android 构建或发布。仓库当前没有远端配置，分支保护需在后续配置远端时启用。

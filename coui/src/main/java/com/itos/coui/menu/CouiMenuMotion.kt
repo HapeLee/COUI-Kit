@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
-fun rememberCouiMenuMotion(expanded: Boolean): CouiMenuMotion {
+internal fun rememberCouiMenuMotion(expanded: Boolean): CouiMenuMotion {
     val inspecting = LocalInspectionMode.current
     val motion = remember(inspecting) { CouiMenuMotion(inspecting) }
     LaunchedEffect(expanded, motion) {
@@ -49,7 +49,7 @@ fun rememberCouiMenuMotion(expanded: Boolean): CouiMenuMotion {
     return motion
 }
 
-class CouiMenuMotion(private val inspecting: Boolean) {
+internal class CouiMenuMotion(private val inspecting: Boolean) {
     var visible by mutableStateOf(false)
     var path by mutableStateOf<CouiMenuMotionPath?>(null)
 
@@ -99,14 +99,14 @@ class CouiMenuMotion(private val inspecting: Boolean) {
     }
 }
 
-data class CouiMenuMotionFrame(
+internal data class CouiMenuMotionFrame(
     val translation: Offset,
     val scale: Float,
     val alpha: Float,
 )
 
 /** 保留 Material 的横向与普通锚点定位; 触点菜单纵向只按可见窗口避让。 */
-class CouiMenuMotionPositionProvider(
+internal class CouiMenuMotionPositionProvider(
     private val delegate: PopupPositionProvider,
     private val motion: CouiMenuMotion,
     private val anchorPosition: () -> Offset?,
@@ -166,7 +166,7 @@ class CouiMenuMotionPositionProvider(
 }
 
 /** 菜单中心相对最终位置的曲线; 中心缩放等价于 COUI 的锚点缩放加 pivot 补偿。 */
-data class CouiMenuMotionPath(
+internal data class CouiMenuMotionPath(
     private val start: Offset,
     private val control1: Offset,
     private val control2: Offset,

@@ -28,7 +28,10 @@ class CouiTopAppBarSearchState internal constructor(
 
 @RequiresApi(34)
 @Composable
-fun rememberCouiTopAppBarSearchState(expanded: Boolean, renderer: CouiFloatingRenderer): CouiTopAppBarSearchState {
+fun rememberCouiTopAppBarSearchState(
+    expanded: Boolean,
+    renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
+): CouiTopAppBarSearchState {
     val expandedState = rememberUpdatedState(expanded)
     val state = remember(renderer) { CouiTopAppBarSearchState(renderer, expandedState) }
     SideEffect { state.motion.updateTarget(expanded) }

@@ -26,6 +26,8 @@ Demo 负责主题、形状、受控状态和页面导航，展示全部现有组
 
 ## Consequences
 
+后续公开边界由 [API 收口](2026-10-23-public-api-boundary.md) 持有，团队开发流程由 [Developer 与 PR 决定](../process/2026-10-23-developer-guide-and-pr-notes.md) 持有；不改变本篇的独立迁出决定。
+
 库和 Demo 可在同一工程内开发。后续修改需要明确选择源码归属；Metric 尚未切换依赖，独立工程的改动不会自动进入 Metric。迁移后的当前职责和装配约束见根 README 与库 README，不复制原工程特有的规范链接。
 
 本轮静态检查通过：迁出的源码、资源和许可共 65 个文件与原文件逐字节一致；71 个 Kotlin/KTS 文件通过 PSI 语法解析；Demo 的 41 个 COUI 导入均可公开访问，62 处调用符合参数声明；14 个 XML 文件、54 组双语资源及格式参数、TOML、启动入口、模块依赖、文档链接和格式检查通过。公开调用检查不解析 Android 类型。未执行 Android 构建、Gradle Sync 或设备验证，不能据此确认插件兼容、GPU 行为或视觉效果。

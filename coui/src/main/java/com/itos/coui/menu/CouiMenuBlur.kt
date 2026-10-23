@@ -31,7 +31,7 @@ fun rememberCouiMenuBlur(backdrop: CouiBackdrop, background: Color): CouiMenuBlu
 
 /** 移植 PJZ110 type2/radius160 的 Fast Kawase, 每轮保留独立像素网格。 */
 @RequiresApi(33)
-class CouiMenuBlur(
+class CouiMenuBlur internal constructor(
     private val backdrop: CouiBackdrop,
     private val background: Color,
     private val layers: List<GraphicsLayer>,

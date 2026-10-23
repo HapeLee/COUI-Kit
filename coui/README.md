@@ -18,6 +18,23 @@
 | 跟随回弹及预设 | [rememberCouiMetaballFollowingTranslation](src/main/java/com/itos/coui/motion/CouiMetaballFollowing.kt)、[CouiSwipeRevealDefaults](src/main/java/com/itos/coui/swipereveal/CouiSwipeRevealDefaults.kt) |
 | 共用形状 | [CouiShape](src/main/java/com/itos/coui/shape/CouiShape.kt)、[CouiCapsuleShape](src/main/java/com/itos/coui/shape/CouiCapsuleShape.kt) |
 
+## 公开边界
+
+以上组件、配置及 Defaults 是常规接入入口。顶栏还公开 `CouiTopAppBarButtonGroup`、`CouiTopAppBarActionVisibility` 与 `CouiTopAppBarSearchAction`；菜单触点定位公开 `rememberCouiMenuAnchor` / `couiMenuAnchor`。顶栏按钮和搜索状态工厂可自行 remember 单主体 renderer，也保留显式传入方式；创建失败仍向上传播。
+
+高级自定义入口继续公开：
+
+- 背景和模糊：`CouiBackdrop.draw`、`drawCouiBackdrop` / `CouiBackdropEffectScope`、`drawCouiGradientBackdrop`、`CouiCoverageBlurEffect`、`rememberCouiMenuBlur` / `CouiMenuBlur.draw`。
+- 浮动表面：`CouiFloatingRenderer`、`CouiFloatingMaterial`、`CouiFloatingShadow`、`CouiFloatingSurface`、`couiFloatingSurface` / `couiFloatingSurfaces`。单主体与固定三主体的装配能力不同，不互相替代。
+- 光效：`CouiContour`、`CouiEdge` / `CouiEdgeStyle`、`rememberCouiMaterialEffect`、`rememberCouiSpotlight` / `SpotlightPreset` / `SpotlightDiagnostic` 及三个公共状态反馈 Modifier。
+- 动作与几何：`CouiTouchMotion`、`CouiPressMotion` 及其工厂和输入 Modifier；`CouiMetaballBody` / `CouiMetaballRenderer`、跟随回弹、`CouiCornerWeight` 与公共 Shape。公开菜单展开弹簧仍可引用。
+
+低层接口需要宿主管理单位、坐标、调用线程和生命周期，不能据此修改组件的内部状态。菜单滚动条、项遮罩、运动帧/定位、搜索运动实现及底栏附件控制器均为 `internal`；菜单模糊构造器为 `internal`，通过工厂管理中间图层。宿主不依赖这些实现细节。
+
+`CouiRenderDiagnostics` 与 `renderDiagnosticProbe` 保留为开发诊断入口，只在主线程按需启停，不作为业务状态来源。当前公开接口尚未发行；签名或行为变化仍须检查已知消费者、在 PR 说明，并同步接入文档。
+
+源码接入和最小示例见 [接入指南](../docs/INTEGRATION.md)，平台与工具链要求见 [兼容文档](../docs/COMPATIBILITY.md)。
+
 ## 装配契约
 
 - 一个 `CouiBackdrop` 只挂到一个内容节点。源子树不得采样自身。浮动材质源须包含不透明页面；顶栏、底栏和 FAB 放在采样子树外。菜单通过 `ProvideCouiMenuBackdrop` 提供所属窗口的源，Popup 本身不进入源子树。

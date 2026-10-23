@@ -6,7 +6,13 @@ plugins {
 android {
     namespace = "com.itos.coui"
     compileSdk = 37
-    defaultConfig { minSdk = 31 }
+    defaultConfig {
+        minSdk = 31
+        aarMetadata {
+            minCompileSdk = 37
+            minAgpVersion = "9.1.0"
+        }
+    }
     buildFeatures { compose = true }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

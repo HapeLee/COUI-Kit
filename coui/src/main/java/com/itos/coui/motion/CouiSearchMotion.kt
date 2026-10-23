@@ -15,7 +15,7 @@ import kotlin.math.PI
 
 /** 顶栏搜索与普通工具栏的连续展收, 不持有查询或 renderer。 */
 @Stable
-class CouiSearchMotion(
+internal class CouiSearchMotion(
     private val enabled: Boolean,
     private val expandedState: State<Boolean>,
 ) {

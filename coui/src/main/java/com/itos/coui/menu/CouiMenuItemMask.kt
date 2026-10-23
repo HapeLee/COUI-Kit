@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 /** 普通菜单项沿用 COUIMaskEffectDrawable 的色值、弹簧和短按最低进度。 */
 @Composable
-fun couiMenuItemMask(
+internal fun couiMenuItemMask(
     interactionSource: MutableInteractionSource,
     enabled: Boolean,
     sharedMaskVisible: Boolean,

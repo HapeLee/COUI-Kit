@@ -24,6 +24,8 @@ COUI 展示覆盖所有现有 UI 组件族及可独立观察的视觉效果：�
 
 ## Consequences
 
+后续 [公开 API 收口](../architecture/2026-10-23-public-api-boundary.md) 保留本篇的消费者和展示定位，[开发流程](../process/2026-10-23-developer-guide-and-pr-notes.md) 约束新增示例与依据记录；不撤销本次 M3 装配决定。
+
 App 展示源码按主题、公共控件、主要组件、视觉效果、阴影和运动分开，入口及展示范围由根 README 维护。平台条件沿用各公开 API；不为旧平台伪造 GPU 光效。低层调试探针与内部 Shader 辅助逻辑通过所属组件观察，不视作独立 UI 组件。
 
 静态检查覆盖 Kotlin/KTS 语法、COUI 公开导入及参数、Demo 内部调用、所有分组的搜索入口、双语资源及格式参数、M3 状态语义、文档引用和模块边界。Material3 接口按版本目录对应的本地源码核对。未执行 Android 构建、Gradle Sync 或设备验证；大字体、TalkBack、真实焦点、触摸、GPU 绘制及视觉结果仍由用户验证。

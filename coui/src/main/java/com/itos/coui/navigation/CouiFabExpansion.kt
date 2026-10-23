@@ -13,7 +13,7 @@ import com.itos.coui.effect.CouiFloatingSurface
 import kotlin.math.PI
 
 /** 对应 AccessorySideExpansionController 的固定槽位收放, 不改变导航菜单宽度。 */
-class CouiFabExpansion(initialVisible: Boolean) {
+internal class CouiFabExpansion(initialVisible: Boolean) {
     private var active = initialVisible
     private var layout: Pair<Rect, Rect>? = null
     private var hiddenTranslation = 0f
@@ -111,28 +111,28 @@ class CouiFabExpansion(initialVisible: Boolean) {
     }
 }
 
-fun couiFabHiddenTranslation(menu: Rect, fab: Rect, collapseToLeft: Boolean): Float =
+internal fun couiFabHiddenTranslation(menu: Rect, fab: Rect, collapseToLeft: Boolean): Float =
     (if (collapseToLeft) menu.left else menu.right - fab.width) - fab.left
 
-fun CouiFloatingSurface.couiDrawingBounds(): Rect = Rect(
+internal fun CouiFloatingSurface.couiDrawingBounds(): Rect = Rect(
     bounds.center.x - bounds.width * scaleX * 0.5f,
     bounds.center.y - bounds.height * scaleY * 0.5f,
     bounds.center.x + bounds.width * scaleX * 0.5f,
     bounds.center.y + bounds.height * scaleY * 0.5f,
 )
 
-fun couiFabOverlapRatio(fab: Rect, menu: Rect): Float {
+internal fun couiFabOverlapRatio(fab: Rect, menu: Rect): Float {
     val area = fab.width * fab.height
     if (area <= 0f) return 0f
     val intersection = fab.intersect(menu)
     return (intersection.width.coerceAtLeast(0f) * intersection.height.coerceAtLeast(0f) / area).coerceIn(0f, 1f)
 }
 
-fun couiFabOverlapAlpha(ratio: Float): Float =
+internal fun couiFabOverlapAlpha(ratio: Float): Float =
     if (ratio > 0.5f) 1f - (ratio - 0.5f) / 0.5f else 1f
 
 // 对应 Base 的 UP 子项 click, 再接 NavigationBarMenuView 的 pending dispatch。
-fun couiNavigationReleaseTarget(
+internal fun couiNavigationReleaseTarget(
     preview: Int, pending: Int?, down: Int?, up: Int?, cancelled: Boolean,
 ): Int? {
     if (!cancelled && up != null && up != down && up != preview) return up

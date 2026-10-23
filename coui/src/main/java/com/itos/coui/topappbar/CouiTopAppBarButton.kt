@@ -57,13 +57,13 @@ import com.itos.coui.motion.rememberCouiTouchMotion
 fun CouiTopAppBarButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    enabled: Boolean,
-    text: Boolean,
-    renderer: CouiFloatingRenderer,
+    enabled: Boolean = true,
+    text: Boolean = false,
+    renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
     style: CouiToolbarStyle,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val backdrop = checkNotNull(LocalCouiToolbarBackdrop.current) { "顶栏按钮必须位于 ProgressiveBlurTopAppBar 内" }
+    val backdrop = checkNotNull(LocalCouiToolbarBackdrop.current) { "顶栏按钮必须位于 CouiTopAppBar 内" }
     val density = LocalDensity.current.density
     val dark = style.dark
     val contour = style.contourGlowEnabled

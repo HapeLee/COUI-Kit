@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /** 移植 COUIScrollBar 的滑块几何; Drawable 内缩不改变实际可拖动范围。 */
-class CouiMenuScrollBar(val scroll: ScrollState) {
+internal class CouiMenuScrollBar(val scroll: ScrollState) {
     val alpha = Animatable(0f)
     var dragging by mutableStateOf(false)
     var coordinates: LayoutCoordinates? = null
@@ -90,7 +90,7 @@ class CouiMenuScrollBar(val scroll: ScrollState) {
 }
 
 @Composable
-fun couiMenuScrollBar(
+internal fun couiMenuScrollBar(
     bar: CouiMenuScrollBar,
     visible: Boolean,
     enabled: Boolean,
