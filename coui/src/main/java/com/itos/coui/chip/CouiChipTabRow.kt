@@ -161,21 +161,21 @@ fun CouiChipTabRow(
                     awaitEachGesture {
                         val down = awaitFirstDown(requireUnconsumed = false)
                         scroll.stopScroll()
-                        val tracker = VelocityTracker()
-                        tracker.addPosition(down.uptimeMillis, down.position)
-                        val dragged = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
-                            scroll.drag(-over.toInt(), screenWidth)
-                            change.consume()
-                        } ?: return@awaitEachGesture
-                        tracker.addPosition(dragged.uptimeMillis, dragged.position)
-                        var pointer = dragged.id
-                        var lastX = dragged.position.x.toInt()
-                        var cancelled = false
-                        var released = false
+                        var fingerVelocity = 0
                         try {
+                            val tracker = VelocityTracker()
+                            tracker.addPosition(down.uptimeMillis, down.position)
+                            val dragged = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
+                                scroll.drag(-over.toInt(), screenWidth)
+                                change.consume()
+                            } ?: return@awaitEachGesture
+                            tracker.addPosition(dragged.uptimeMillis, dragged.position)
+                            var pointer = dragged.id
+                            var lastX = dragged.position.x.toInt()
+                            var released = false
                             while (true) {
                                 val event = awaitPointerEvent(PointerEventPass.Main)
-                                if (event.isCouiTouchCancelled()) { cancelled = true; break }
+                                if (event.isCouiTouchCancelled()) break
                                 var change = event.changes.firstOrNull { it.id == pointer }
                                 if (change == null || !change.pressed) {
                                     val replacement = event.changes.firstOrNull { it.pressed }
@@ -189,20 +189,20 @@ fun CouiChipTabRow(
                                     lastX = change.position.x.toInt()
                                     tracker.resetTracking()
                                 }
-                                if (change.isConsumed) { cancelled = true; break }
+                                if (change.isConsumed) break
                                 tracker.addPosition(change.uptimeMillis, change.position)
                                 val x = change.position.x.toInt()
                                 scroll.drag(lastX - x, screenWidth)
                                 lastX = x
                                 change.consume()
                             }
+                            if (released) {
+                                fingerVelocity = tracker.calculateVelocity().x.roundToInt().coerceIn(
+                                    -configuration.scaledMaximumFlingVelocity, configuration.scaledMaximumFlingVelocity)
+                            }
                         } finally {
-                            if (cancelled || !released) scroll.release(0, configuration.scaledMinimumFlingVelocity, screenWidth)
-                        }
-                        if (!cancelled) {
-                            val velocity = tracker.calculateVelocity().x.roundToInt().coerceIn(
-                                -configuration.scaledMaximumFlingVelocity, configuration.scaledMaximumFlingVelocity)
-                            scroll.release(velocity, configuration.scaledMinimumFlingVelocity, screenWidth)
+                            // 未超过拖动阈值的 UP/CANCEL 也必须恢复被 DOWN 中断的越界回弹。
+                            scroll.release(fingerVelocity, configuration.scaledMinimumFlingVelocity, screenWidth)
                         }
                     }
                 },
@@ -379,7 +379,8 @@ private class ChipRowScroll(animationLevel: Int, initialPosition: Int = 0, priva
     }
 
     fun release(fingerVelocity: Int, minimumVelocity: Int, screenWidth: Int) {
-        if (disposed || maximum == 0) return
+        // 同一帧的点击可能已启动选中露出，不能再启动一条竞争的回弹。
+        if (disposed || maximum == 0 || selection.isRunning) return
         this.screenWidth = screenWidth.coerceAtLeast(1)
         val speed = abs(fingerVelocity.toLong())
         val fling = speed > minimumVelocity && (position in 1 until maximum ||

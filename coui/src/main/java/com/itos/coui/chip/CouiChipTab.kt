@@ -182,7 +182,7 @@ private fun ChipSurface(
         .then(sizeModifier)
         .onSizeChanged { bounds = it }
         // 输入区域保持原尺寸，避免按压缩放使靠边触点在移动时越界。
-        .couiPressMotion(press, enabled)
+        .couiPressMotion(press, enabled, cancelOnConsumedMove = true)
         .then(lightInput)
         .then(interactionModifier)
         .couiFloatingSurface(

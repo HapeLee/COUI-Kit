@@ -31,19 +31,36 @@ fun rememberCouiTouchMotion(expanded: Boolean): CouiTouchMotion {
     return motion
 }
 
-/** 只观察按下与取消, 不消费 FAB 点击, 与 rubber/deform 分开驱动。 */
-fun Modifier.couiPressMotion(press: CouiPressMotion, enabled: Boolean = true): Modifier =
-    pointerInput(press, enabled) {
+/** 只观察按下与取消；分类项可在父容器消费移动后释放，直到本次触摸结束都不重新按压。 */
+fun Modifier.couiPressMotion(
+    press: CouiPressMotion,
+    enabled: Boolean = true,
+    cancelOnConsumedMove: Boolean = false,
+): Modifier =
+    pointerInput(press, enabled, cancelOnConsumedMove) {
         if (!enabled) return@pointerInput
         var pressed = false
+        var cancelled = false
         try {
             awaitPointerEventScope {
                 while (true) {
                     val event = awaitPointerEvent(PointerEventPass.Initial)
-                    val nowPressed = !event.isCouiTouchCancelled() && event.changes.any { it.pressed }
+                    val hasPointers = event.changes.any { it.pressed }
+                    val nowPressed = !cancelled && !event.isCouiTouchCancelled() && hasPointers
                     if (nowPressed && !pressed) press.press(size)
                     if (!nowPressed && pressed) press.release()
                     pressed = nowPressed
+                    if (!hasPointers) cancelled = false
+                    if (cancelOnConsumedMove) {
+                        val finalEvent = awaitPointerEvent(PointerEventPass.Final)
+                        if (pressed && finalEvent.changes.any {
+                                it.isConsumed && it.pressed && it.position != it.previousPosition
+                            }) {
+                            press.release()
+                            pressed = false
+                            cancelled = true
+                        }
+                    }
                 }
             }
         } finally {

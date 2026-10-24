@@ -30,7 +30,7 @@ internal class CouiChipScrollPhysics(private val animationLevel: Int) {
         private set
     val current: Int get() = Math.round(position).toInt()
 
-    fun stop() { running = false; velocity = 0.0 }
+    fun stop() { running = false; velocity = 0.0; tempPosition = position }
 
     fun fling(from: Int, initialVelocity: Int, frameSeconds: Float) {
         // 水平宿主的 Y 速度为零，原厂依次处理 X/Y 后会清空连续 fling 增速计数。
@@ -83,7 +83,8 @@ internal class CouiChipScrollPhysics(private val animationLevel: Int) {
     fun returnToBounds(from: Int, maximum: Int, preserveVelocity: Boolean = false, initialVelocity: Int? = null) {
         position = from.toDouble()
         target = from.coerceIn(0, maximum).toDouble()
-        tempPosition = target
+        // 只有惯性触边先执行 notifyEdgeReached；直接松手回弹保留积分临时位置。
+        if (preserveVelocity) tempPosition = target
         if (initialVelocity != null) velocity = initialVelocity.toDouble()
         else if (!preserveVelocity) velocity = 0.0
         springBack = position != target
