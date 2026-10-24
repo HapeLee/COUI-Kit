@@ -61,11 +61,8 @@
     <string name="chip_category_number">Category %1$d</string>
     <string name="chip_enable">Enable ChipTab</string>
     <string name="chip_show_icon_button">Show icon tab</string>
-    <string name="chip_long_label">An example category with a very long name</string>
-    <string name="chip_use_long_label">Use a long category name</string>
+    <string name="chip_solid_background">Solid background</string>
     <string name="chip_categories">Select category</string>
-    <string name="chip_selected">Selected: %1$s</string>
-    <string name="chip_close">Close</string>
     <string name="record_title">Sample record %1$d</string>
     <string name="record_detail">COUI Demo · %1$d min %2$d s</string>
     <string name="record_delete">Delete sample</string>
