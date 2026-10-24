@@ -48,7 +48,7 @@
 
 融合入口只支持同色、横向双主体 CONIC 融合。主体中心、尺寸、圆角与融合范围使用绘制节点本地像素；RTL、布局、裁剪和输入归宿主。内容遮罩使用同一组几何、`Color.White` 和 `BlendMode.DstIn`，先在独立离屏层画内容，再画遮罩。背景和遮罩分别持有 renderer。库不提供侧滑容器、删除确认或业务提交。
 
-平台门槛见各入口的 `RequiresApi` 与内部版本分支。宿主应在创建渲染器前检查版本，并明确处理创建失败；不得吞掉错误或将失败视为成功。Demo 的完整装配见 [DemoApp](../demo/src/main/java/com/itos/coui/demo/DemoApp.kt) 与 [DemoSamples](../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)。
+平台门槛见各入口的 `RequiresApi` 与内部版本分支。宿主应在创建渲染器前检查版本，并明确处理创建失败；不得吞掉错误或将失败视为成功。Demo 的完整装配见 [DemoApp](../demo/src/main/java/com/itos/coui/demo/DemoApp.kt) 、[DemoSamples](../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt) 与 [融合侧滑装配](../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt)。
 
 ## 实现来源与限制
 

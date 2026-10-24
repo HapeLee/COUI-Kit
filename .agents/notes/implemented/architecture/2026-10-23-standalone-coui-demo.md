@@ -26,6 +26,12 @@ Demo 负责主题、形状、受控状态和页面导航，展示全部现有组
 
 ## Consequences
 
+[记录侧滑示例](../feature/2026-10-24-demo-record-swipe.md) 部分取代滑条驱动融合的展示方式，手势和示例删除只在 Demo；本篇的算法库边界不变。
+
+[Demo release 优化](../process/2026-10-24-demo-release-optimization.md) 补充最终 App 的 R8 策略，保留本篇的模块边界、构建基线与测试签名。
+
+当前 [Demo 展示范围](../feature/2026-10-24-demo-focused-showcase.md) 部分取代本篇的全量展示目标，独立工程、公开接口消费与算法职责不变。
+
 后续公开边界由 [API 收口](2026-10-23-public-api-boundary.md) 持有，团队开发流程由 [Developer 与 PR 决定](../process/2026-10-23-developer-guide-and-pr-notes.md) 持有；不改变本篇的独立迁出决定。
 
 库和 Demo 可在同一工程内开发。后续修改需要明确选择源码归属；Metric 尚未切换依赖，独立工程的改动不会自动进入 Metric。迁移后的当前职责和装配约束见根 README 与库 README，不复制原工程特有的规范链接。

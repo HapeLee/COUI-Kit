@@ -4,9 +4,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.GenericShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.itos.coui.shape.CouiCapsuleShape
@@ -24,8 +21,6 @@ internal object DemoShapes {
     val couiCircle = CouiShape(999.dp, cornerWeight = 2f)
     val couiCapsule = CouiCapsuleShape
     val effect = CouiShape(24.dp)
-    val roundRect = CouiShape(24.dp, cornerWeight = 2f)
-    val oval = GenericShape { size, _ -> addOval(Rect(Offset.Zero, size)) }
 }
 
 @Composable
