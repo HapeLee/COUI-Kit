@@ -97,4 +97,14 @@
     <string name="fab_feedback">FAB state layer</string>
     <string name="toolbar_feedback">Top bar state layer</string>
     <string name="feedback_count">Feedback target clicks: %1$d</string>
+    <string name="chip_tab_title">ChipTab</string>
+    <string name="chip_category_number">Category %1$d</string>
+    <string name="chip_enable">Enable ChipTab</string>
+    <string name="chip_show_icon_button">Show icon tab</string>
+    <string name="chip_long_label">An example category with a very long name</string>
+    <string name="chip_use_long_label">Use a long category name</string>
+    <string name="chip_categories">Select category</string>
+    <string name="chip_selected">Selected: %1$s</string>
+    <string name="chip_close">Close</string>
+    <string name="spotlight_chip_tab">ChipTab</string>
 </resources>

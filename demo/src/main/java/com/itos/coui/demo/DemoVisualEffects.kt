@@ -195,6 +195,7 @@ private fun SpotlightSample(dark: Boolean) {
                 SpotlightPreset.OpaqueMedium1 -> R.string.spotlight_medium_1
                 SpotlightPreset.OpaqueSmall2 -> R.string.spotlight_small_2
                 SpotlightPreset.OpaqueMedium2 -> R.string.spotlight_medium_2
+                SpotlightPreset.ChipTab -> R.string.spotlight_chip_tab
             })
             DemoChoiceRow(label, preset == option, { preset = option })
         }

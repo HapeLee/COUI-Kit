@@ -23,8 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.layer.CompositingStrategy
 import androidx.compose.ui.graphics.layer.GraphicsLayer
@@ -100,6 +102,8 @@ class CouiFloatingRenderer private constructor(internal val standalone: Boolean)
 /**
  * 单主体 BaseShader; 不绑定底栏, 不创建融球资源。
  * foregroundComposition 为 true 时材质和光晕仅输出前景; 共用 backdrop, 源须覆盖不透明 SDR 页面。
+ * beforeContent 在材质之后、内容之前直接混合到目标；接收内容的缓存裁剪路径，调用方不得修改。
+ * 回调坐标仍为节点本地坐标，变换及裁剪由调用方提供。
  */
 @RequiresApi(34)
 @Composable
@@ -112,11 +116,12 @@ fun Modifier.couiFloatingSurface(
     contentLayer: GraphicsLayer,
     contourGlowEnabled: Boolean,
     foregroundComposition: Boolean = false,
+    beforeContent: (DrawScope.(Path) -> Unit)? = null,
     surface: () -> CouiFloatingSurface,
 ): Modifier {
     require(renderer.standalone)
     return floatingSurfaces(backdrop, renderer, listOf(material), listOf(shadow), listOf(shape),
-        listOf(contentLayer), contourGlowEnabled, foregroundComposition) { listOf(surface()) }
+        listOf(contentLayer), contourGlowEnabled, foregroundComposition, beforeContent) { listOf(surface()) }
 }
 
 /** 三主体按宿主子项顺序传入; 菜单使用 index 1, 两侧附件均使用 index 2。 */
@@ -149,6 +154,7 @@ private fun Modifier.floatingSurfaces(
     contentLayers: List<GraphicsLayer>,
     contourGlowEnabled: Boolean,
     foregroundComposition: Boolean = false,
+    beforeContent: (DrawScope.(Path) -> Unit)? = null,
     surfaces: () -> List<CouiFloatingSurface>,
 ): Modifier {
     val recordingDensity = LocalDensity.current
@@ -215,6 +221,12 @@ private fun Modifier.floatingSurfaces(
                     shape.createOutline(outlineSize, layoutDirection, this)
                 }
             }
+            val beforeContentClip = if (beforeContent != null) {
+                when (val outline = outlines.single()) {
+                    is Outline.Generic -> outline.path
+                    else -> Path().apply { addOutline(outline) }
+                }
+            } else null
             val metrics = DisplayMetrics()
             @Suppress("DEPRECATION")
             checkNotNull(view.display).getRealMetrics(metrics)
@@ -356,7 +368,12 @@ private fun Modifier.floatingSurfaces(
                         }
                     }
                 }
-                drawCommands.forEach { drawLayer(it) }
+                drawCommands.forEach { layer ->
+                    if (beforeContentClip != null && layer === contentLayers[0]) {
+                        beforeContent?.invoke(this, beforeContentClip)
+                    }
+                    drawLayer(layer)
+                }
             }
         } else {
             onDrawWithContent { drawContent() }

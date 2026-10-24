@@ -40,12 +40,17 @@ enum class SpotlightPreset(
     internal val darkIntensity: Float,
     internal val endRadius: Float,
     internal val darkBlendMode: BlendMode = BlendMode.OVERLAY,
+    internal val lightBlendMode: BlendMode = BlendMode.OVERLAY,
+    internal val ambient: Float = 0.4f,
+    internal val diffuse: Float = 0.4f,
+    internal val noise: Float = 0.08f,
 ) {
     TranslucentLarge1(0.6f, 0.1f, 800f),
     OpaqueSmall1(0.6f, 0.5f, 500f),
     OpaqueMedium1(0.6f, 0.8f, 500f),
     OpaqueSmall2(1f, 0.15f, 500f, BlendMode.PLUS),
     OpaqueMedium2(1f, 0.15f, 500f, BlendMode.PLUS),
+    ChipTab(0.2f, 0.3f, 600f, BlendMode.SRC_OVER, BlendMode.PLUS, 0.1f, 0.5f, 0f),
 }
 
 private data class SpotlightStyle(
@@ -71,6 +76,7 @@ sealed interface SpotlightDiagnostic {
  * 只观察触摸, 不拦截点击、滑选或滚动。绘制回调应置于透明前景层, 熄灭后为 null。
  * 必须选择预设和深浅色; 可选参数为 null 时继承预设, 非 null 时只覆盖该项。
  * inputTarget 接收本地触点及是否已有光效会话; 返回 null 时取消会话。
+ * cancelOnConsumedMove 用于分类项：父容器接管移动后取消当前会话，后续移动不重新点亮。
  */
 @Composable
 fun rememberCouiSpotlight(
@@ -88,22 +94,23 @@ fun rememberCouiSpotlight(
     endRadius: Float? = null,
     color: Color? = null,
     inputTarget: ((Offset, Boolean) -> LayoutCoordinates?)? = null,
+    cancelOnConsumedMove: Boolean = false,
     onDiagnostic: (SpotlightDiagnostic) -> Unit = {},
 ): Pair<Modifier, (DrawScope.() -> Unit)?> =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         val style = SpotlightStyle(
             intensity = intensity ?: if (dark) preset.darkIntensity else preset.lightIntensity,
-            ambient = ambient ?: 0.4f,
-            diffuse = diffuse ?: 0.4f,
+            ambient = ambient ?: preset.ambient,
+            diffuse = diffuse ?: preset.diffuse,
             lightHeight = lightHeight ?: 200f,
-            noise = noise ?: 0.08f,
+            noise = noise ?: preset.noise,
             dither = dither ?: 0f,
-            blendMode = blendMode ?: if (dark) preset.darkBlendMode else BlendMode.OVERLAY,
+            blendMode = blendMode ?: if (dark) preset.darkBlendMode else preset.lightBlendMode,
             startRadius = startRadius ?: 100f,
             endRadius = endRadius ?: preset.endRadius,
             color = color ?: Color.White,
         )
-        runtimeSpotlight(interactive, style, inputTarget, onDiagnostic)
+        runtimeSpotlight(interactive, style, inputTarget, cancelOnConsumedMove, onDiagnostic)
     } else {
         Modifier to null
     }
@@ -114,6 +121,7 @@ private fun runtimeSpotlight(
     interactive: Boolean,
     style: SpotlightStyle,
     inputTarget: ((Offset, Boolean) -> LayoutCoordinates?)?,
+    cancelOnConsumedMove: Boolean,
     onDiagnostic: (SpotlightDiagnostic) -> Unit,
 ): Pair<Modifier, (DrawScope.() -> Unit)?> {
     val diagnostic = rememberUpdatedState(onDiagnostic)
@@ -133,7 +141,7 @@ private fun runtimeSpotlight(
     val touchModifier = Modifier
         .onGloballyPositioned { inputCoordinates = it }
         .onSizeChanged { if (inputTarget == null) light.setSize(it) }
-        .pointerInput(interactive, inputTarget == null) {
+        .pointerInput(light, interactive, inputTarget == null, cancelOnConsumedMove) {
             if (!interactive) return@pointerInput
             try {
                 awaitPointerEventScope {
@@ -179,6 +187,14 @@ private fun runtimeSpotlight(
                         if (!change.pressed) {
                             activePointer = null
                             light.release()
+                        }
+                        if (cancelOnConsumedMove) {
+                            val finalEvent = awaitPointerEvent(PointerEventPass.Final)
+                            if (finalEvent.changes.any { it.id == activePointer && it.isConsumed &&
+                                    it.pressed && it.position != it.previousPosition }) {
+                                activePointer = null
+                                light.release()
+                            }
                         }
                     }
                 }
