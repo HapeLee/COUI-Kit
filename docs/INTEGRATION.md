@@ -88,7 +88,7 @@ fun ShadowSample(dark: Boolean) {
 
 `CouiMetaballBody` 使用绘制节点本地像素，传入主体中心、尺寸和圆角。`CouiMetaballRenderer` 处理横向同色双主体 CONIC 场；背景和内容遮罩使用相同几何及融合参数，各自持有 renderer。遮罩先将内容录制到独立离屏层，再用 `Color.White` 与 `BlendMode.DstIn` 绘制。不要把背景 renderer 与遮罩共享为同一可变实例。
 
-`rememberCouiMetaballFollowingTranslation` 提供跟随回弹，参数预设在 `CouiSwipeRevealDefaults`。RTL、布局、输入、业务确认和提交属于宿主；库没有侧滑容器。交互示例见 [DemoSamples](../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)。
+`rememberCouiMetaballFollowingTranslation` 提供跟随回弹，参数预设在 `CouiSwipeRevealDefaults`。RTL、布局、输入、业务确认和提交属于宿主；库没有侧滑容器。交互示例见 [DemoRecordSamples](../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt)、[DemoRecordSwipeRow](../demo/src/main/java/com/itos/coui/demo/DemoRecordSwipeRow.kt) 和 [背景与遮罩](../demo/src/main/java/com/itos/coui/demo/DemoRecordMetaball.kt)。这些手势与删除状态只属于 Demo，不是库接口。
 
 ## 自定义与内部边界
 

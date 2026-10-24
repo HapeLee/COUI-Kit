@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Palette
@@ -102,7 +101,6 @@ internal fun DemoApp(dark: Boolean, onToggleTheme: () -> Unit) {
     var rightAccessory by rememberSaveable { mutableStateOf(true) }
     var toolbarEnabled by rememberSaveable { mutableStateOf(true) }
     var preset by rememberSaveable { mutableStateOf(CouiFabColor.Notes) }
-    var clicks by rememberSaveable { mutableIntStateOf(0) }
     var query by rememberSaveable { mutableStateOf("") }
     val rendering = remember {
         if (Build.VERSION.SDK_INT >= 34) runCatching { DemoRenderers() } else null
@@ -121,9 +119,7 @@ internal fun DemoApp(dark: Boolean, onToggleTheme: () -> Unit) {
 
     val sections = when (page) {
         0 -> listOf(R.string.slider_title, R.string.checkbox_title, R.string.menu_title, R.string.chip_tab_title)
-        1 -> listOf(R.string.shadow_title, R.string.fusion_title, R.string.backdrop_title, R.string.material_title,
-            R.string.contour_title, R.string.edge_title, R.string.spotlight_title, R.string.shape_title,
-            R.string.motion_title, R.string.feedback_title)
+        1 -> listOf(R.string.shadow_title, R.string.fusion_title, R.string.backdrop_title, R.string.material_title)
         else -> listOf(R.string.presets_title)
     }.map { stringResource(it) }
     CompositionLocalProvider(LocalCouiContourGlowEnabled provides contour,
@@ -146,7 +142,6 @@ internal fun DemoApp(dark: Boolean, onToggleTheme: () -> Unit) {
                         verticalArrangement = Arrangement.spacedBy(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Text(stringResource(R.string.demo_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (Build.VERSION.SDK_INT < 34) {
                             Text(stringResource(R.string.requires_api_34), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
@@ -154,7 +149,6 @@ internal fun DemoApp(dark: Boolean, onToggleTheme: () -> Unit) {
                             Text(stringResource(R.string.renderer_error, failure.message ?: failure.javaClass.simpleName),
                                 color = MaterialTheme.colorScheme.error)
                         }
-                        Text(stringResource(R.string.click_count, clicks), style = MaterialTheme.typography.labelLarge)
                         if (query.isNotBlank() && sections.none { it.contains(query.trim(), ignoreCase = true) }) {
                             Text(stringResource(R.string.no_matches))
                         }
@@ -165,7 +159,7 @@ internal fun DemoApp(dark: Boolean, onToggleTheme: () -> Unit) {
                                 leftAccessory = leftAccessory, onLeftAccessoryChange = { leftAccessory = it },
                                 rightAccessory = rightAccessory, onRightAccessoryChange = { rightAccessory = it },
                                 toolbarEnabled = toolbarEnabled, onToolbarEnabledChange = { toolbarEnabled = it },
-                                preset = preset, onPresetChange = { preset = it }, onToggleTheme = onToggleTheme)
+                                preset = preset, onPresetChange = { preset = it })
                         }
                     }
                 }
@@ -176,7 +170,7 @@ internal fun DemoApp(dark: Boolean, onToggleTheme: () -> Unit) {
                     if (Build.VERSION.SDK_INT >= 34 && renderers != null) {
                         DemoToolbar(renderers = renderers, dark = dark, contour = contour, query = query,
                             actionsEnabled = toolbarEnabled, onQueryChange = { query = it },
-                            onToggleTheme = onToggleTheme, onReset = { clicks = 0 })
+                            onToggleTheme = onToggleTheme, onReset = { preset = CouiFabColor.Notes })
                     } else {
                         MaterialDemoToolbar(query = query, onQueryChange = { query = it },
                             actionsEnabled = toolbarEnabled, onToggleTheme = onToggleTheme)
@@ -187,18 +181,18 @@ internal fun DemoApp(dark: Boolean, onToggleTheme: () -> Unit) {
                     CouiFab(
                         modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp,
                             bottom = with(density) { bottomHeight.toDp() } + 16.dp),
-                        backdrop = backdrop, renderer = renderers.fab, onClick = { clicks++ }, dark = dark,
+                        backdrop = backdrop, renderer = renderers.fab, onClick = { selectPage(2) }, dark = dark,
                         shape = DemoShapes.couiCircle, material = CouiFabDefaults.material(color, dark),
                         shadow = CouiFabDefaults.shadow(color, density.density, contour),
-                    ) { Icon(Icons.Default.Add, stringResource(R.string.count_click), tint = Color.White) }
+                    ) { Icon(Icons.Default.Palette, stringResource(R.string.open_presets), tint = Color.White) }
                     CouiBottomBar(
                         modifier = Modifier.align(Alignment.BottomCenter).onSizeChanged { bottomHeight = it.height },
                         backdrop = backdrop, renderer = renderers.bottom,
                         items = titles.mapIndexed { index, title -> CouiNavigationItem(title, navigation[index], navigation[index]) },
                         selectedIndex = page, leftIcon = Icons.Default.DarkMode, leftDescription = stringResource(R.string.toggle_theme),
-                        rightIcon = Icons.Default.Add, rightDescription = stringResource(R.string.count_click),
+                        rightIcon = Icons.Default.Palette, rightDescription = stringResource(R.string.open_presets),
                         leftVisible = leftAccessory, rightVisible = rightAccessory,
-                        onLeftClick = onToggleTheme, onRightClick = { clicks++ }, rightContainerColor = color,
+                        onLeftClick = onToggleTheme, onRightClick = { selectPage(2) }, rightContainerColor = color,
                         dark = dark, lightColor = Color.White, themeTint = MaterialTheme.colorScheme.surface,
                         circleShape = DemoShapes.couiCircle, capsuleShape = DemoShapes.couiCapsule, onSelection = selectPage,
                     )

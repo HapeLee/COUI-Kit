@@ -13,15 +13,17 @@
 
 `demo` 的 debug 与 release 构建均使用 Android Gradle Plugin 默认的 debug 测试签名。构建时由插件使用或创建本机默认 debug keystore，不需要在工程内填写签名密码。此配置只用于 Demo 测试；本地 keystore、IDE 状态及构建产物由 `.gitignore` 排除，Gradle Wrapper 保留在版本控制中。
 
+Demo 的 release 启用 R8 代码压缩、优化、混淆及资源裁剪，使用 AGP 默认优化规则和依赖自带的 consumer rules；debug 保留默认调试配置。COUI 库由最终 App 统一优化，不单独预混淆。定位 release 崩溃时保留对应构建的 mapping 文件。
+
 Demo 包含三个页面：
 
 | 页面 | 示例 |
 | --- | --- |
 | 组件 | 连续滑条、可见分段、隐式步进与禁用态；复选框各状态；带图标、选中项、独立勾选、分隔线、禁用项及子菜单的菜单；长菜单与滚动条；ChipTab 的单选、可选图标按钮、长标签、禁用态与横向滚动 |
-| 效果 | 三种阴影轮廓及便捷 / 底层入口；双主体融合、内容遮罩和跟随回弹；背景采样与模糊；材质混色；普通及浮动表面轮廓；背景感知轮廓；全部跟手光预设；形状、按压形变及悬停 / 焦点反馈 |
-| 预设 | 全部 FAB 固定配色、深浅色、轮廓光、左右附件独立收放及顶栏按钮禁用态 |
+| 效果 | 胶囊阴影及便捷 / 底层入口；双主体融合、内容遮罩和跟随回弹；背景采样与模糊；材质混色 |
+| 预设 | 全部 FAB 固定配色、轮廓光、左右附件独立收放及顶栏按钮禁用态 |
 
-顶栏演示渐进模糊、图标按钮、文字按钮和搜索，搜索时同时展示退场动作与常驻动作的布局。搜索仅匹配当前页的分组标题。底栏切换示例页；独立 FAB 与右侧附件累加点击次数；顶栏“重置”清零次数。切页和筛选保留示例的受控值。融合示例由滑条控制距离，不包含侧滑手势或记录业务。
+顶栏演示渐进模糊、图标按钮、文字按钮和搜索，搜索时同时展示退场动作与常驻动作的布局。搜索仅匹配当前页的分组标题。底栏切换示例页；独立 FAB 与右侧附件打开外观预设页；顶栏“重置”恢复默认 FAB 配色。深浅色通过顶栏或左侧附件切换。全部数值滑条使用 CouiSlider，切页和筛选保留受控值。融合示例使用三条独立的示例记录，展示侧滑、跟随回弹、内容遮罩、删除确认和离场动画；删除只改变 Demo 内存状态，清空后可恢复。侧滑装配只在 Demo，库继续提供算法。滑条占满分组的可用宽度；长菜单限制高度并保留四组三项。
 
 M3 装配参考 Metric：页面使用 `surfaceContainer` 层级，示例卡片使用 `surfaceBright`，前景按配套语义颜色绘制。Demo 独立使用系统动态色；G2 形状和开关装配留在 App，`capsule` 依赖也只进入 App。设置使用整行开关，预设使用单选组，复选框只用于复选框示例；子控件不重复创建点击节点。M3 导航在竖屏使用底栏、横屏使用侧栏，选中项保留可用状态。COUI 始终保留底栏。
 
@@ -33,7 +35,7 @@ M3 装配参考 Metric：页面使用 `surfaceContainer` 层级，示例卡片�
 
 公共接口与装配限制见 [库说明](coui/README.md)。模块规则见 [AGENTS.md](AGENTS.md)，迁出决定见 [架构记录](.agents/notes/implemented/architecture/2026-10-23-standalone-coui-demo.md)。
 
-M3 装配与展示范围的决定见 [Demo 展示记录](.agents/notes/implemented/feature/2026-10-23-demo-material-and-gallery.md)。
+M3 装配见 [Demo 展示记录](.agents/notes/implemented/feature/2026-10-23-demo-material-and-gallery.md)，当前展示范围的取舍见 [Demo 精简记录](.agents/notes/implemented/feature/2026-10-24-demo-focused-showcase.md)。
 
 ChipTab 的状态与装配决定见 [ChipTab 记录](.agents/notes/implemented/feature/2026-10-24-chip-tab.md)。
 

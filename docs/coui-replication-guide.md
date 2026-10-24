@@ -151,7 +151,7 @@ Java 入口、参数与 native 模糊片段分别有证据；这不表示所有�
 
 当前 [CouiSlider](../coui/src/main/java/com/itos/coui/slider/CouiSlider.kt) 分离逻辑值与视觉位置，业务范围及保存仍由宿主负责。宿主选择的 G2 轨道是外观适配，不是提取版本的原厂默认；专用马达波形及完整物理引擎没有跨平台等价保证。见[滑条决策](../.agents/notes/implemented/feature/2026-10-21-coui-slider.md)。
 
-通知侧滑的同色横向双主体 CONIC 场已抽到 [CouiMetaballRenderer](../coui/src/main/java/com/itos/coui/effect/CouiMetaballRenderer.kt)。[Demo 融合示例](../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)中的背景与内容遮罩使用相同算法、分别持有 renderer。它不提供背景采样或输入，也不替代底栏的多主体分层材质。名称都叫“融球”，不是整段替换的依据。
+通知侧滑的同色横向双主体 CONIC 场已抽到 [CouiMetaballRenderer](../coui/src/main/java/com/itos/coui/effect/CouiMetaballRenderer.kt)。[Demo 融合示例](../demo/src/main/java/com/itos/coui/demo/DemoRecordMetaball.kt)中的背景与内容遮罩使用相同算法、分别持有 renderer。它不提供背景采样或输入，也不替代底栏的多主体分层材质。名称都叫“融球”，不是整段替换的依据。
 
 ## 4. 移植前要写清的边界
 
@@ -275,7 +275,7 @@ Java 入口、参数与 native 模糊片段分别有证据；这不表示所有�
 | 普通投影 | [网格、覆盖率与缓存决定](../.agents/notes/implemented/bug-fix/2026-10-18-coui-native-shadow.md)、[菜单投影装配](../coui/src/main/java/com/itos/coui/menu/CouiMenuShadow.kt) |
 | 顶栏与搜索 | [渐进模糊](../.agents/notes/implemented/bug-fix/2026-10-18-coui-topbar-gradient-blur.md)、[overlay 与搜索边界](../.agents/notes/implemented/bug-fix/2026-10-20-topappbar-search-transition-boundaries.md) |
 | 滑条 | [接入与物理边界](../.agents/notes/implemented/feature/2026-10-21-coui-slider.md)、[公开组件](../coui/src/main/java/com/itos/coui/slider/CouiSlider.kt) |
-| 横向双主体融合 | [算法接入](INTEGRATION.md)、[生产算法](../coui/src/main/java/com/itos/coui/effect/CouiMetaballRenderer.kt)、[Demo](../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt) |
+| 横向双主体融合 | [算法接入](INTEGRATION.md)、[生产算法](../coui/src/main/java/com/itos/coui/effect/CouiMetaballRenderer.kt)、[Demo](../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt) |
 | 开发与验证流程 | [Developer 指南](../DEVELOPER.md)、[消费者兼容要求](COMPATIBILITY.md)、[执行约束](../AGENTS.md) |
 
 后续增加新组件时，先检查已有消费者、算法和决策，再恢复缺少的定点证据。不要因一个局部差异，自动重开已停止的整套研究或重写可用链路。

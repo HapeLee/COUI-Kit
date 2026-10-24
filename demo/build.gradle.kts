@@ -16,6 +16,9 @@ android {
     buildFeatures { compose = true }
     buildTypes {
         release {
+            optimization {
+                enable = true
+            }
             signingConfig = signingConfigs.getByName("debug")
         }
     }
