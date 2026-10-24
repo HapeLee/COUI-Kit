@@ -26,6 +26,8 @@ Demo 负责主题、形状、受控状态和页面导航，展示全部现有组
 
 ## Consequences
 
+[分类栏示例](../feature/2026-10-24-chip-tab.md) 通过公开 API 装配，沿用独立消费者的接入方式。
+
 [记录侧滑示例](../feature/2026-10-24-demo-record-swipe.md) 部分取代滑条驱动融合的展示方式，手势和示例删除只在 Demo；本篇的算法库边界不变。
 
 [Demo release 优化](../process/2026-10-24-demo-release-optimization.md) 补充最终 App 的 R8 策略，保留本篇的模块边界、构建基线与测试签名。

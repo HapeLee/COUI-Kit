@@ -14,6 +14,7 @@
 | 菜单 | [CouiMenu / CouiMenuItem](src/main/java/com/itos/coui/menu/CouiMenu.kt)、[CouiMenuStyle / CouiMenuDefaults](src/main/java/com/itos/coui/menu/CouiMenuStyle.kt)、[ProvideCouiMenuBackdrop](src/main/java/com/itos/coui/menu/CouiMenuBackdrop.kt) |
 | 滑动选择条 | [CouiSlider](src/main/java/com/itos/coui/slider/CouiSlider.kt)、[CouiSliderDefaults](src/main/java/com/itos/coui/slider/CouiSliderDefaults.kt) |
 | 复选框 | [CouiCheckbox](src/main/java/com/itos/coui/checkbox/CouiCheckbox.kt)、[CouiCheckboxDefaults](src/main/java/com/itos/coui/checkbox/CouiCheckboxDefaults.kt) |
+| ChipTab | [CouiChipTab / CouiChipTabButton](src/main/java/com/itos/coui/chip/CouiChipTab.kt)、[CouiChipTabRow / CouiChipTabItem](src/main/java/com/itos/coui/chip/CouiChipTabRow.kt)、[CouiChipTabDefaults](src/main/java/com/itos/coui/chip/CouiChipTabDefaults.kt) |
 | 横向双主体融合与遮罩 | [CouiMetaballBody / CouiMetaballRenderer](src/main/java/com/itos/coui/effect/CouiMetaballRenderer.kt) |
 | 跟随回弹及预设 | [rememberCouiMetaballFollowingTranslation](src/main/java/com/itos/coui/motion/CouiMetaballFollowing.kt)、[CouiSwipeRevealDefaults](src/main/java/com/itos/coui/swipereveal/CouiSwipeRevealDefaults.kt) |
 | 共用形状 | [CouiShape](src/main/java/com/itos/coui/shape/CouiShape.kt)、[CouiCapsuleShape](src/main/java/com/itos/coui/shape/CouiCapsuleShape.kt) |
@@ -25,7 +26,7 @@
 高级自定义入口继续公开：
 
 - 背景和模糊：`CouiBackdrop.draw`、`drawCouiBackdrop` / `CouiBackdropEffectScope`、`drawCouiGradientBackdrop`、`CouiCoverageBlurEffect`、`rememberCouiMenuBlur` / `CouiMenuBlur.draw`。
-- 浮动表面：`CouiFloatingRenderer`、`CouiFloatingMaterial`、`CouiFloatingShadow`、`CouiFloatingSurface`、`couiFloatingSurface` / `couiFloatingSurfaces`。单主体与固定三主体的装配能力不同，不互相替代。
+- 浮动表面：`CouiFloatingRenderer`、`CouiFloatingMaterial`、`CouiFloatingShadow`、`CouiFloatingSurface`、`couiFloatingSurface` / `couiFloatingSurfaces`。单主体的 `beforeContent` 在材质之后、内容之前绘制，并提供只读使用的缓存裁剪路径；调用方负责变换及裁剪。单主体与固定三主体的装配能力不同，不互相替代。
 - 光效：`CouiContour`、`CouiEdge` / `CouiEdgeStyle`、`rememberCouiMaterialEffect`、`rememberCouiSpotlight` / `SpotlightPreset` / `SpotlightDiagnostic` 及三个公共状态反馈 Modifier。
 - 动作与几何：`CouiTouchMotion`、`CouiPressMotion` 及其工厂和输入 Modifier；`CouiMetaballBody` / `CouiMetaballRenderer`、跟随回弹、`CouiCornerWeight` 与公共 Shape。公开菜单展开弹簧仍可引用。
 
@@ -42,6 +43,8 @@
 - 每个独立绘制节点持有自己的可变 renderer。单主体按钮及 FAB 使用 `CouiFloatingRenderer.standalone()`，底栏使用三主体 `CouiFloatingRenderer()`；不要跨节点复用实例。
 - 底栏自己处理底部系统安全区。宿主用测得的底栏高度给内容留白，不再重复叠加底部系统 inset。
 - `CouiCheckbox` 只绘制状态。宿主负责点击和无障碍语义；整行可点击时不再添加第二个点击节点。
+- `CouiChipTabRow` 接收稳定且唯一的项目 key、受控选中值和回调。非空列表必须有有效选中项；重复点击保持选择。`leadingAction` 装配单选组外的独立动作，传 null 时只显示分类列表。需要显隐过渡时，保留该槽位的内容，通过 `leadingActionVisible` 切换可见性；动作宽度、透明度和列表留白会同步过渡。点击、键盘焦点和选中值变化会将对应项目移出边缘渐隐区；可用宽度改变时重新露出选中项，首次布局保留初始或恢复的滚动位置。长项目按完整可见宽度测量，文字超出时省略。间距和动画等级由对应参数控制。
+- 分类项和图标按钮各持有独立的单主体 renderer，栏内的 `renderers` 按项目顺序传入。列表的横向裁剪同时限制绘制和点击，纵向保留阴影空间。采样源必须是不透明兄弟节点。宿主提供字体、内容色、图标和业务动作，默认样式由 `CouiChipTabDefaults` 提供。
 - `LocalCouiContourGlowEnabled` 控制公共轮廓与光晕。深浅色、主色和 Shape 由宿主显式传入；固定参数直接引用各组件族的 Defaults，不在宿主复制数值。
 
 阴影保留便捷 Modifier 和高自定义程度的 Canvas 接口。便捷入口处理本地坐标和 dp 换算，不改变布局；普通 RoundRect 不支持 inverse clipping。窗口坐标、缩放、透明度和多主体由低层接口装配。
@@ -53,3 +56,5 @@
 ## 实现来源与限制
 
 迁移保留原源码中的厂商行为依据及实现限制。顶栏预设包含原项目已采用的强度调整，不将其称为未经适配的原厂值；公开 GPU 承载也不证明与厂商渲染逐像素等价。阴影相关的既有 Skia 许可保留在 [coui-skia-LICENSE](src/main/resources/META-INF/coui-skia-LICENSE)。
+
+ChipTab 的实现取舍见 [ChipTab 记录](../.agents/notes/implemented/feature/2026-10-24-chip-tab.md)，完整示例见 [DemoChipSamples](../demo/src/main/java/com/itos/coui/demo/DemoChipSamples.kt)。

@@ -24,6 +24,8 @@ COUI 展示覆盖所有现有 UI 组件族及可独立观察的视觉效果：�
 
 ## Consequences
 
+[分类栏](2026-10-24-chip-tab.md) 加入组件页和标题搜索。Demo 持有名称、图标、选择状态及独立动作。
+
 当前展示范围由 [Demo 精简](2026-10-24-demo-focused-showcase.md) 部分取代：取消全量独立效果分组和阴影形状选择，统一数值滑条并精简计数与文案；本篇的 M3 语义、状态 owner 和背景分层决定保留。
 
 后续 [公开 API 收口](../architecture/2026-10-23-public-api-boundary.md) 保留本篇的消费者和展示定位，[开发流程](../process/2026-10-23-developer-guide-and-pr-notes.md) 约束新增示例与依据记录；不撤销本次 M3 装配决定。

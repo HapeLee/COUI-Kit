@@ -57,6 +57,12 @@
     <string name="backdrop_position">Move the background</string>
     <string name="shadow_elevation">Shadow elevation</string>
     <string name="low_level_shadow">Use the low-level Canvas renderer</string>
+    <string name="chip_tab_title">ChipTab</string>
+    <string name="chip_category_number">Category %1$d</string>
+    <string name="chip_enable">Enable ChipTab</string>
+    <string name="chip_show_icon_button">Show icon tab</string>
+    <string name="chip_solid_background">Solid background</string>
+    <string name="chip_categories">Select category</string>
     <string name="record_title">Sample record %1$d</string>
     <string name="record_detail">COUI Demo · %1$d min %2$d s</string>
     <string name="record_delete">Delete sample</string>

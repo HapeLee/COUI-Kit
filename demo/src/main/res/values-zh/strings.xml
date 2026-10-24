@@ -57,6 +57,12 @@
     <string name="backdrop_position">移动背景</string>
     <string name="shadow_elevation">投影高度</string>
     <string name="low_level_shadow">使用底层 Canvas 渲染接口</string>
+    <string name="chip_tab_title">ChipTab</string>
+    <string name="chip_category_number">分类 %1$d</string>
+    <string name="chip_enable">启用 ChipTab</string>
+    <string name="chip_show_icon_button">显示图标标签</string>
+    <string name="chip_solid_background">纯色背景</string>
+    <string name="chip_categories">选择分类</string>
     <string name="record_title">示例记录 %1$d</string>
     <string name="record_detail">COUI Demo · %1$d 分 %2$d 秒</string>
     <string name="record_delete">删除示例</string>
