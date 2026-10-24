@@ -16,7 +16,7 @@ CouiTopAppBar 在相应平台通过 CouiGradientBlur 移植位置可变 Gaussian
 
 ## Evidence
 
-来源为 Metric 同名 Note 与 SPEC 的“顶部栏渐进模糊”契约。原厂基准是 PJZ110 Contacts、OppoNote2、Calendar 的 AppBarBlurHelper.applyGradientBlurRenderEffect，经 framework 的 GradientBlur 进入 libhwui 的 OplusGradientGaussianBlurEffect。对应起止强度不同分支先横后纵，两遍共用竖向半径场，并绕过普通 Gaussian 的降采样分支。原厂独立背景 Drawable 的 positions/alphas 不是卷积核。
+来源为原宿主的同名 Note 与顶部栏渐进模糊契约。原厂基准是 PJZ110 Contacts、OppoNote2、Calendar 的 AppBarBlurHelper.applyGradientBlurRenderEffect，经 framework 的 GradientBlur 进入 libhwui 的 OplusGradientGaussianBlurEffect。对应起止强度不同分支先横后纵，两遍共用竖向半径场，并绕过普通 Gaussian 的降采样分支。原厂独立背景 Drawable 的 positions/alphas 不是卷积核。
 
 此证据仅限定该材料与分支，不证明任意画布矩阵或厂商缓存始终为屏幕原分辨率。原材料不作为本仓库运行依赖。当前算法与参数位置见 [CouiGradientBlur](../../../../coui/src/main/java/com/itos/coui/effect/CouiGradientBlur.kt)。
 

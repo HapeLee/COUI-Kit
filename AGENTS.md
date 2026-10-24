@@ -1,16 +1,50 @@
-# 工程修改约束
+# AI 开发执行规则
 
-- 用户输出、文档和提交说明使用简体中文。文件使用 UTF-8，无 BOM。
-- `coui` 只持有通用 COUI 组件、效果、输入、几何、动画及预设，只依赖 Android、Compose 和 AndroidX。不得引用 Demo、Metric、应用主题、业务状态或第三方 Backdrop。
-- `demo` 是公开 API 的消费者。主题、页面、受控状态、错误提示和示例交互由 Demo 装配，不为示例需要公开库内部接口。包和目录保持一致。
-- Demo 的 M3 语义、表面层级、G2 形状和设置行参考 Metric 的现有实现。设置开关、单选预设和复选框示例分别使用对应语义；整行处理交互时子控件不重复添加点击。Material 导航横屏使用侧栏，COUI 保持底栏；搜索和切页保留示例状态。展示范围以 README 和当前任务为准，不因库接口仍公开就恢复已移除的独立效果分组；全部数值滑条使用 CouiSlider。
-- 模块职责与装配契约见 [README](README.md) 和 [库说明](coui/README.md)。当前构建配置与代码是参数的唯一来源；文档只维护职责、契约和理由。契约改变时同步文档。
-- 开发和评审必须遵守 [DEVELOPER.md](DEVELOPER.md)。新增 COUI 能力必须以指定版本的官方实现为依据，效果至少 1:1，尽可能复用相同算法与执行结构；不能用近似效果或静态检查冒充验收。已有批准特化、公开承载限制及证据边界按相关 Note 保留。
-- 分析原厂实现、复刻新组件或排查效果差异时，先读 [实现分析与复刻指南](docs/coui-replication-guide.md)，再查对应代码和 Note。研究材料由开发者独立管理，禁止把本机资料路径或原宿主业务装配当作本库依赖。
-- 非平凡变更使用仓库内的 [write-notes-like-deepseek](.agents/skills/write-notes-like-deepseek/SKILL.md)，先检索活跃决定，再更新或新增 Note，与实现同一个 PR。纯机械修改不新建 Note；当前授权与本文件优先于 Skill 的通用确认流程。
+## 开始前按任务阅读
+
+开发与文档维护从[贡献指南](CONTRIBUTING.md)进入，专题导航见[开发文档](docs/development/README.md)。流程、原厂分析与 1:1 复刻、代码规范及 component / effect 文档写法按下面的任务表阅读。
+
+| 任务                        | 必须先读                                                                                           |
+|---------------------------|------------------------------------------------------------------------------------------------|
+| 实现、修复、重构或性能改动             | 完整阅读[开发流程](docs/development/workflow.md)和[代码规范](docs/development/coding-style.md)              |
+| 新增组件/效果，修改视觉、动画、手势或排查原厂差异 | 继续阅读[原厂分析与 1:1 复刻方法](docs/development/replication-guide.md)的相关完整章节、当前调用链与对应 Note               |
+| 修改模块职责或公开接口               | [架构](docs/development/architecture.md)、[API 设计](docs/development/api-design.md)及受影响的使用页        |
+| 新增、修改或移动普通文档              | [文档维护规则](docs/development/documentation.md)及对应组件/效果页面                                          |
+| 修改 Demo                   | [Demo 指南](docs/guide/demo.md)、[架构的 Demo 契约](docs/development/architecture.md#demo-契约)及所用公开 API |
+
+所有任务先检查工作区及目标文件的当前内容，保留用户已有修改。不能用旧快照、摘要或其他代理结论替代核心文档、原厂关键入口和即将修改的实现。
+
+## 原厂分析与实现流程
+
+- 新增 COUI 能力以指定版本的 COUI/Oplus 原厂实现为基准，效果至少 1:1，尽可能使用相同算法、参数语义、执行顺序和状态转换。流程细则由[开发流程](docs/development/workflow.md)持有。
+- 先确认目标页面实际使用的组件、主题覆盖与运行分支，再沿参数生产、状态变化和真实绘制消费者追踪。算法进入 JNI / 系统扩展时继续追实际 native 分支；不按 setter 名称或截图猜实现。
+- 对含输入与动画的改动，核对受影响的正常完成、反向、未达到拖动阈值的 UP、CANCEL、父容器接管、移除及再次进入。复用公共实现时同步检查其调用方。
+- 实现整条链后做原厂 → 移植、移植 → 原厂的双向核查。主实现者亲自复核核心依据和代码，再选择能暴露差异的输入验证；参数一致、终点收敛或静态检查不等于 1:1 验收。
+- 原厂行为、公开平台适配、项目主动特化分别说明。保留已批准特化；公开接口表达不了的路径写明差异，按当前授权处理，不自行换近似算法或新增静默降级。
+- 使用公开 Android / Compose API，不依赖 OEM 私有 SDK、HWUI 符号或厂商 SO。研究材料独立管理，不把本机路径、厂商二进制或外部宿主装配写入依赖。
+
+## 代码与模块边界
+
+- coui 只持有通用 COUI 组件、效果、采样、几何、输入、动画及预设，依赖 Android、Compose 和 AndroidX；不得引用 demo、外部宿主模块、应用主题、业务状态、日志框架或第三方 Backdrop。
+- demo 只消费公开 API，主题、页面、受控状态、错误提示和示例交互由 Demo 装配。不为示例公开内部状态，包和目录保持一致。
+- 公开入口默认收窄为 internal 或 private，具体规则由[API 设计](docs/development/api-design.md)持有。Modifier 为组件第一个参数并默认 Modifier；保留受控状态、单一业务提交 owner、无障碍与取消收尾。
+- 固定参数归所属 Defaults；每个独立绘制节点持有自己的可变 renderer。完整实现习惯由[代码规范](docs/development/coding-style.md)持有。
 - COUI 只提供融合算法和跟随回弹，不加入记录侧滑、删除确认或业务提交。基础阴影同时保留便捷入口和低层接口。
-- 不自行加入 Maven 发布、远端仓库、Metric 消费切换或公开发行配置。当前 App 通过本工程的 `:coui` 依赖库。
-- 只修改当前需求范围，保留用户更改；未经用户明确要求，不执行 Git 初始化、分支、提交、推送或合并。
-- 开发通过功能分支与 PR 进入主分支，禁止直接 push 到 main；创建 PR、推送和合并仍需对应授权，不因文档规定 PR 流程就自行执行远端操作。PR 内容按 [模板](.github/pull_request_template.md) 填写。
-- 默认不新增测试。完成修改后执行差异、引用与针对性静态检查。不得自行运行 Android 构建、Gradle Sync、Preview、安装、签名、发布或设备操作；这些由用户执行。必须报告未验证的内容。
-- 用户可见文案使用所属模块资源，默认英文并维护已有语言；Demo 同步维护简体中文。库注释和错误消息沿用现有中文规范。
+- 输出、文档和提交说明使用简体中文；UTF-8 无 BOM。用户文案进入所属模块资源，默认英文并同步已有语言，Demo 维护简体中文。
+
+## 普通文档必须同步
+
+- 新增或修改 component / effect 的使用契约时，按[文档维护规则](docs/development/documentation.md)在同一个 PR 更新普通使用文档。Note 与 Demo 都不能替代使用说明。
+- 新增入口：建立对应页面并加入[组件目录](docs/components/README.md)或[效果目录](docs/effects/README.md)。重命名、移动或移除入口：同步示例、目录、入站链接与迁移说明。
+- 状态、回调、参数语义、平台、失败行为、采样、坐标或资源生命周期变化：同步对应页面和受影响消费者；公共要求在所属页面完整维护，其他位置链接。
+- 实现参数由代码和构建配置持有。仅调参且契约不变时不复制数值表；纯内部修改在 PR 说明无需更改普通文档的原因。
+- 文档示例必须调用当前公开 API，说明宿主依赖和作用域，不调用 Demo 私有函数。PR 列出文档路径及使用影响。
+- 根 README 提供项目介绍与使用导航，AGENTS 提供开发任务的阅读入口；贡献流程见 CONTRIBUTING。普通文档当前使用 Markdown，不自行加入网站、Maven 发布或发行配置。
+
+## Note 与交付
+
+- 非平凡变更使用仓库内 [write-notes-like-deepseek](.agents/skills/write-notes-like-deepseek/SKILL.md)，先检索活跃决定，再更新或新增 Note。纯机械修改不新建；已有用户授权不因 Skill 通用确认流程失效。
+- 只修改当前任务范围。未经用户明确要求，不执行 Git 初始化、创建分支、commit、push、rebase、reset 或 merge。贡献流程要求 PR 不代表代理已获 Git 操作授权。
+- 开发通过功能分支与 PR 进入主分支，使用 [PR 模板](.github/pull_request_template.md)。维护者另行授权的直接操作按该授权执行；不自行合并或推送。
+- 默认不新增测试，按风险执行必要的差异、引用及针对性静态检查，参见[验证与评审](docs/development/validation.md)。报告真实结果与未验证行为。
+- 不得自行运行 Android 构建、Gradle Sync、Preview、安装、签名、发布或设备操作；这些由用户执行。不自行增加外部宿主消费切换。

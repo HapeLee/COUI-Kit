@@ -18,7 +18,7 @@ Android 15 起，正常 fast 胶囊使用公开 Canvas.clipShader 表达独立�
 
 ## Evidence
 
-从 Metric 的同名 Note、2026-10-22-coui-shadow-single-pass Note 及 SPEC 的普通投影契约合并整理。原始基准为 PJZ110 组件 OutlineProvider、ShadowUtils、COUIFABShadowUtils 和 libhwui 的 drawFastShadow/ShadowRRectOp，结合对应 Skia 源码核对。公开接口依据为 Canvas.clipShader 与 RenderNode.hasDisplayList 契约。
+从原宿主的同名 Note、2026-10-22-coui-shadow-single-pass Note 及普通投影契约合并整理。原始基准为 PJZ110 组件 OutlineProvider、ShadowUtils、COUIFABShadowUtils 和 libhwui 的 drawFastShadow/ShadowRRectOp，结合对应 Skia 源码核对。公开接口依据为 Canvas.clipShader 与 RenderNode.hasDisplayList 契约。
 
 当前实现见 [CouiShadowRenderer](../../../../coui/src/main/java/com/itos/coui/effect/CouiShadowRenderer.kt)。菜单使用独立 LV4、普通 RoundRect 和关闭的 clipping；FAB 使用 Oval，底栏使用 fullsmooth Outline。用户已降低的透明附件强度继续保留，不作为原厂默认。
 

@@ -20,7 +20,7 @@ CouiTopAppBar 建立局部 SharedTransitionScope。完整槽位通过 CouiTopApp
 
 ## Evidence
 
-合并整理 Metric 的同名搜索 Note、2026-10-20-coui-toolbar-clipping-backdrop、topappbar-sibling-shadow-compositing 及 SPEC 顶栏/搜索契约。对应 AndroidX AppBarLayout 的祖先 clipToBounds、SharedTransitionScope 的捕获/绘制、PlacementScope 的真实坐标与 Pager BringIntoView 行为是承载依据。原厂转场来源为便签 COUISearchBar.showInToolBar/hideInToolBar，不等比缩放整条输入。
+合并整理原宿主的同名搜索 Note、2026-10-20-coui-toolbar-clipping-backdrop、topappbar-sibling-shadow-compositing 及顶栏/搜索契约。对应 AndroidX AppBarLayout 的祖先 clipToBounds、SharedTransitionScope 的捕获/绘制、PlacementScope 的真实坐标与 Pager BringIntoView 行为是承载依据。原厂转场来源为便签 COUISearchBar.showInToolBar/hideInToolBar，不等比缩放整条输入。
 
 当前实现见 [搜索组件](../../../../coui/src/main/java/com/itos/coui/topappbar/CouiTopAppBarSearch.kt) 和 [按钮组](../../../../coui/src/main/java/com/itos/coui/topappbar/CouiTopAppBarButtonGroup.kt)。本项目为常驻操作避让而加快搜索收起、调整部分光效强度，属于已有特化，不称为原厂全部曲线逐项一致。
 
