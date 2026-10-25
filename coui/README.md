@@ -11,4 +11,4 @@ coui 是独立 Android Library，包名 com.itos.coui，依赖 Android、Compose
 
 组件装配要求由对应使用页维护，完整参数见链接的公开声明。示例 App 通过 project 依赖消费本模块，见 [Demo 指南](../docs/guide/demo.md)。
 
-既有 Skia 许可保留于 [coui-skia-LICENSE](src/main/resources/META-INF/coui-skia-LICENSE)。
+本模块自有源码使用 [MPL 2.0](../LICENSE)，许可通知与第三方范围见 [NOTICE](../NOTICE)。既有 Skia 许可保留于 [coui-skia-LICENSE](src/main/resources/META-INF/coui-skia-LICENSE)，名称和 Logo 的使用见[名称与标识政策](../TRADEMARKS.md)。

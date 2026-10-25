@@ -22,3 +22,7 @@
 验证方式见[验证与评审](docs/development/validation.md)。构建与设备操作按当前任务授权执行，填写实际结果。
 
 指向 main 的 PR 自动执行 Note、Lint 和 Demo debug/release 构建，不运行单测，不需要固定签名凭据。失败时查看 Actions 诊断，修复后再请求合并。Demo 的按需打包与附件下载见 [CI 指南](docs/development/ci.md)。自动检查成功不替代维护者审核或原厂效果验收。
+
+## 许可与第三方内容
+
+提交自有源码时遵循本项目 [MPL 2.0](LICENSE)。引入第三方代码或资源时，保留其许可、版权与来源声明，并同步 [NOTICE](NOTICE)，不得将第三方内容直接改标为本项目许可。分叉发行的名称和 Logo 使用见[名称与标识政策](TRADEMARKS.md)。

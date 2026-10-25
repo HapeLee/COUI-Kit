@@ -17,3 +17,9 @@
 | 修改 COUI 或提交文档    | [贡献指南](CONTRIBUTING.md)               |
 
 当前通过源码模块接入，尚未提供 Maven 发行坐标。工程包含 coui 库和 demo App；包名为 com.itos.coui。
+
+## 许可与名称使用
+
+本项目自有源码采用 [MPL 2.0](LICENSE)，第三方内容保留各自许可与版权声明，具体范围见 [NOTICE](NOTICE)。
+
+修改版和分叉版的发行名称、Logo 及来源说明遵循[名称与标识使用政策](TRADEMARKS.md)。该政策独立于代码许可，不增加或改变 MPL 2.0 授予的代码权利。

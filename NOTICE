@@ -1,0 +1,27 @@
+COUI-Kit 许可与来源说明
+
+除另有声明的第三方内容外，本项目自有源代码适用 Mozilla Public License,
+version 2.0（SPDX: MPL-2.0）。完整许可见根目录 LICENSE。
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+第三方代码、工具、依赖和资源不因本声明而改用 MPL-2.0；其已有许可、
+版权及来源声明继续适用。本声明不授予本项目无权授予的第三方权利。
+
+现有 Skia BSD 声明
+-----------------
+
+以下文件保留 Google 版权与 Skia BSD 许可声明：
+  coui/src/main/java/com/itos/coui/effect/CouiShadowFastGeometry.kt
+  coui/src/main/java/com/itos/coui/effect/CouiShadowTessellator.kt
+
+对应许可原文位于：
+  coui/src/main/resources/META-INF/coui-skia-LICENSE
+
+名称与标识
+----------
+
+名称和标识的使用政策见根目录 TRADEMARKS.md。该政策独立于代码许可，
+不增加或改变 MPL-2.0 授予的代码权利。
