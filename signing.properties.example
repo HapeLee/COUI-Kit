@@ -1,0 +1,5 @@
+# 此处为 Demo 测试签名示例，若有需要请自行更改
+KEYSTORE_FILE=demo-test.jks
+KEYSTORE_PASSWORD=android
+KEYSTORE_ALIAS=coui-demo
+KEYSTORE_ALIAS_PASSWORD=android
