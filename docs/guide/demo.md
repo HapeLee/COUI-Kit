@@ -29,7 +29,7 @@ Demo 包含三个页面：
 
 | 页面 | 示例                                                                                                  |
 |----|-----------------------------------------------------------------------------------------------------|
-| 组件 | 连续滑条、可见分段、隐式步进与禁用态；复选框各状态；带图标、选中项、独立勾选、分隔线、禁用项及子菜单的菜单；长菜单与滚动条；ChipTab 的单选、分类菜单、可选图标按钮与纯色背景、禁用态及横向滚动 |
+| 组件 | 连续滑条、可见分段、隐式步进与禁用态；复选框各状态；开关的点击/拖动、加载状态示例和禁用状态；带图标、选中项、独立勾选、分隔线、禁用项及子菜单的菜单；长菜单与滚动条；ChipTab 的单选、分类菜单、可选图标按钮与纯色背景、禁用态及横向滚动 |
 | 效果 | 胶囊阴影及便捷 / 底层入口；双主体融合、内容遮罩和跟随回弹；背景采样与模糊；材质混色                                                         |
 | 预设 | 全部 FAB 固定配色、轮廓光、左右附件独立收放及顶栏按钮禁用态                                                                    |
 
@@ -48,6 +48,7 @@ Demo 使用系统动态色。M3 导航在竖屏使用底栏、横屏使用侧栏
 - [DemoDialogSamples](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)：弹窗、材质开关与宿主受控回调。
 - [DemoDialogInputSample](../../demo/src/main/java/com/itos/coui/demo/DemoDialogInputSample.kt)：输入型预设、重命名草稿与宿主校验策略。
 - [DemoChipSamples](../../demo/src/main/java/com/itos/coui/demo/DemoChipSamples.kt)：ChipTab 与分类菜单。
+- [DemoSwitchSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSwitchSamples.kt)：普通开关、加载状态示例和禁用状态，位置及装配见[开关说明](../components/switch.md#demo-示例)。
 - [DemoVisualEffects](../../demo/src/main/java/com/itos/coui/demo/DemoVisualEffects.kt)：采样模糊与材质混色。
 - [DemoShadowSamples](../../demo/src/main/java/com/itos/coui/demo/DemoShadowSamples.kt)：便捷和底层阴影。
 - [DemoRecordSamples](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt)：侧滑驱动融合、确认和示例删除。
