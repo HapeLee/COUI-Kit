@@ -1,6 +1,6 @@
 # 接入 GitHub Packages 预览版
 
-需要在自己的 App 中验证尚未正式发行的 COUI 时，从“发布库预览版”的成功运行摘要复制依赖坐标。先确认[兼容要求](compatibility.md)，再配置下载凭据。
+需要在自己的 App 中验证 COUI 开发快照时，从“发布库预览版”的成功运行摘要复制依赖坐标。先确认[兼容要求](compatibility.md)，再配置下载凭据。Maven Central 版本的接入方式见[快速开始](getting-started.md)。
 
 ## 准备下载凭据
 
@@ -37,7 +37,7 @@ maven {
 implementation("io.github.itoseo:coui:<从发布摘要复制的版本>")
 ```
 
-保留宿主的 Android 与 Compose 插件，并启用 `buildFeatures.compose`。同一模块不要同时依赖源码版 `project(":coui")` 和这个包，以免重复定义类。显示第一个组件的代码见[快速开始](getting-started.md#显示第一个组件)。
+保留宿主的 Android 与 Compose 插件，并启用 `buildFeatures.compose`。同一模块只选择一种 COUI 依赖，以免重复定义类。显示第一个组件的代码见[快速开始](getting-started.md#显示第一个组件)。
 
 预览版本由库的开发版本与提交 SHA 组成，带 `-SNAPSHOT` 后缀。SHA 用于定位源码；相同提交重新发布仍可能生成新的 SNAPSHOT 产物。需要精确回看一次发布时，同时保留 Actions run 地址。
 
@@ -55,4 +55,4 @@ env:
 
 出现 `401` 时检查令牌类型、有效期和凭据；`403` 时检查账号及仓库权限；解析不到版本时，先确认对应发布运行成功并复制了完整坐标。
 
-发布者操作见[预览版发布](../development/publishing.md)，源码接入仍见[快速开始](getting-started.md#添加模块)。认证要求以 [GitHub 官方文档](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry)为准。
+发布者操作见[预览版发布](../development/publishing.md)，源码接入仍见[快速开始](getting-started.md#源码模块)。认证要求以 [GitHub 官方文档](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry)为准。

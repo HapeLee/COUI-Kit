@@ -1,10 +1,10 @@
-# FAB
+# ➕FAB
 
-CouiFab 是独立浮动操作按钮。它使用单主体材质与投影，不依赖底栏，也不创建假附件。
+`CouiFab` 适合放置新建、编辑等页面操作，可以单独使用，也可以与底栏一起使用。
 
-## 使用配色预设
+## 显示一个 FAB
 
-下面函数接收页面背景源、配色预设、点击动作和图标内容。宿主在调用前检查 API 34，并为图标提供无障碍说明。
+FAB 需要 API 34 和页面背景源。下面使用内置配色创建一个按钮：
 
 ~~~kotlin
 import androidx.annotation.RequiresApi
@@ -49,14 +49,46 @@ fun PresetFab(
 }
 ~~~
 
-## 颜色与资源
+`preset` 可以选择 `Notes`、`Phone`、`InfraredRemote` 或 `Recorder`。按钮内容通过 `content` 传入，点击时调用 `onClick`。
 
-使用同一个最终 color 构造材质和阴影。自定义底色时也遵守这一条件，不在两处独立取色。
+位置和安全区由页面控制。例如，可以将 FAB 放在 `Box` 右下角并添加边距。父容器需要为投影留出空间。
 
-固定配色由 CouiFabColor 与 CouiFabDefaults 持有。普通投影、有色 caustic 和轮廓属于不同绘制部分；关闭轮廓时使用该状态生成对应 shadow 预设，不能仅隐藏一层前景。
+## 使用自定义底色
 
-每个独立 FAB 持有自己的 standalone renderer；构造失败与[公共资源规则](../effects/backdrop.md#资源与失败处理)一致。FAB 放在不透明采样源外，父级为投影保留绘制空间。
+需要使用自己的颜色时，将同一个颜色传给材质和阴影：
 
-## 入口与示例
+~~~kotlin
+import androidx.compose.ui.graphics.Color
 
-[CouiFab](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFab.kt)、[配色](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabColor.kt)、[Defaults](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabDefaults.kt)。完整示例见 [DemoApp](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt)。
+val color = Color(0xFF0080FF)
+val renderer = remember { CouiFloatingRenderer.standalone() }
+val density = LocalDensity.current.density
+val contour = LocalCouiContourGlowEnabled.current
+
+CouiFab(
+    backdrop = backdrop,
+    renderer = renderer,
+    onClick = onClick,
+    dark = dark,
+    shape = CouiShape(999.dp, cornerWeight = 2f),
+    material = CouiFabDefaults.material(color, dark),
+    shadow = CouiFabDefaults.shadow(color, density, contour),
+    content = content,
+)
+~~~
+
+这段代码使用上一节的导入；`backdrop`、`onClick` 和 `content` 由页面提供。
+
+## 图标和轮廓光
+
+FAB 不会修改图标颜色，使用图标时请根据底色设置 `tint`。示例使用 `CouiShape` 创建圆形，也可以传入自己的 Shape。
+
+轮廓光由 `LocalCouiContourGlowEnabled` 控制；关闭后，`CouiFabDefaults.shadow` 使用普通有色投影。
+
+## 版本和绘制空间
+
+每个 FAB 使用独立的 `CouiFloatingRenderer.standalone()`，不要与其他绘制节点共用。
+
+`backdrop` 应覆盖不透明的页面内容，FAB 放在源节点之外。背景源的创建方式见[背景采样](../effects/backdrop.md)。
+
+源码见 [CouiFab](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFab.kt)、[配色](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabColor.kt)、[Defaults](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabDefaults.kt)，完整页面见 [DemoApp](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt)。

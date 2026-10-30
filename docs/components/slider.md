@@ -1,10 +1,10 @@
-# 滑动选择条
+# 🎚️滑动选择条
 
-CouiSlider 用于调节音量、强度等数值，支持连续选择、可见分段和隐藏点位的逻辑步进。完整连续示例见[快速开始](../guide/getting-started.md)。
+使用 `CouiSlider` 调节音量、亮度等数值。滑条支持连续调节，也可以设置固定的档位。
 
-## 分段选择
+## 显示一个滑条
 
-下面的函数放入 Compose 页面，由宿主持有 value，并提供深浅色与强调色。steps 表示内部等分点数，端点仍属于可选值：
+下面的滑条接收页面的当前值，并在拖动时通过 `onValueChange` 更新：
 
 ~~~kotlin
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,37 +16,59 @@ import com.itos.coui.slider.CouiSlider
 import com.itos.coui.slider.CouiSliderDefaults
 
 @Composable
-fun SteppedSlider(
+fun VolumeSlider(
     modifier: Modifier = Modifier,
     value: Float,
     onValueChange: (Float) -> Unit,
     dark: Boolean,
     accent: Color,
-    onFinished: () -> Unit,
 ) {
     CouiSlider(
         modifier = modifier.fillMaxWidth(),
         value = value,
         onValueChange = onValueChange,
-        onValueChangeFinished = onFinished,
-        valueRange = 0f..4f,
-        steps = 3,
-        showTickMarks = true,
-        colors = CouiSliderDefaults.colors(accent, dark),
+        colors = CouiSliderDefaults.colors(primary = accent, dark = dark),
         dark = dark,
         shape = CouiCapsuleShape,
     )
 }
 ~~~
 
-## 状态与外观
+页面需要在 `onValueChange` 中更新 `value`。需要保存到设置或发送给服务时，可以在调整结束后处理，见下文的 `onValueChangeFinished`。
 
-- onValueChange 更新当前逻辑值，保存或确认仍由宿主完成；onValueChangeFinished 用于结束本次数值调整。
-- steps 保留逻辑步进；showTickMarks 决定是否展示 Section 点位及对应吸附。关闭点位不删除内部步进。
-- enabled 控制交互。输入值、范围端点须为有限数，范围不能反向，steps 必须有效。
-- Modifier.fillMaxWidth 让轨道适应可用宽度；组件本身有最小尺寸，不自动占满父级。
-- 配色从 CouiSliderDefaults.colors 获取，轨道 Shape 由宿主选择。G2 外观属于宿主适配；专用马达波形及完整厂商物理表现仍需设备确认。
+## 分段选择
 
-## 入口与示例
+设置 `valueRange` 和 `steps` 可以限制可选档位。例如，在前面的页面中提供一个无参数的 `saveValue` 回调，并在 0 到 4 之间选择整数：
 
-[CouiSlider](../../coui/src/main/java/com/itos/coui/slider/CouiSlider.kt)、[Defaults](../../coui/src/main/java/com/itos/coui/slider/CouiSliderDefaults.kt)；完整受控与禁用示例见 [DemoSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)。平台要求见[兼容要求](../guide/compatibility.md)。
+~~~kotlin
+CouiSlider(
+    modifier = Modifier.fillMaxWidth(),
+    value = value,
+    onValueChange = onValueChange,
+    onValueChangeFinished = saveValue,
+    valueRange = 0f..4f,
+    steps = 3,
+    showTickMarks = true,
+    colors = CouiSliderDefaults.colors(primary = accent, dark = dark),
+    dark = dark,
+    shape = CouiCapsuleShape,
+)
+~~~
+
+`steps` 表示两个端点之间的等分点数。这里的可选值是 0、1、2、3、4；把 `showTickMarks` 设为 `false` 可以隐藏点位，同时保留五个档位。
+
+## 结束回调与禁用
+
+`onValueChangeFinished` 在一次调整结束时触发，适合保存或提交。拖动过程中通过 `onValueChange` 更新显示；键盘方向键、Home 和 End 也支持调整。
+
+禁用滑条时，同时把 `enabled = false` 传给组件和 `CouiSliderDefaults.colors`。前者关闭交互，后者提供禁用配色。
+
+## 轨道配色
+
+`CouiSliderDefaults.colors(primary = accent, dark = dark)` 根据强调色和深浅色生成配色。轨道的 `shape` 由页面提供。
+
+## 参数校验
+
+`value` 和范围端点必须是有限值，范围不能反向；`steps` 不能是负数或 `Int.MAX_VALUE`。参数不符合要求时会抛出异常。
+
+滑条不需要背景源。更多示例见 [DemoSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)，公开参数见 [CouiSlider](../../coui/src/main/java/com/itos/coui/slider/CouiSlider.kt) 和 [Defaults](../../coui/src/main/java/com/itos/coui/slider/CouiSliderDefaults.kt)。
