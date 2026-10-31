@@ -2,6 +2,18 @@
 
 `CouiCheckbox` 显示勾选状态。它只负责绘制，需要由外层添加点击和无障碍语义。
 
+## 最小调用
+
+页面提供当前勾选状态：
+
+~~~kotlin
+import com.itos.coui.checkbox.CouiCheckbox
+
+CouiCheckbox(checked = checked)
+~~~
+
+组件没有点击回调或 `dark` 参数。默认配色使用 COUI checkbox 角色；原生保留原强调色，M3 适配在浅色使用 primary、深色使用 inversePrimary。交互由外层提供。通用主题规则见[外观与预设](../guide/appearance.md)。
+
 ## 显示一个整行复选框
 
 给整行添加 `toggleable`，点击文字或复选框都可以切换：

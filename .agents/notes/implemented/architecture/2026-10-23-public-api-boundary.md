@@ -32,6 +32,10 @@ CouiMenuBlur 保留公开 draw 和 remember 工厂，构造器收为 internal，
 
 ## Existing-note audit
 
+[可选 M3 策略](2026-10-31-optional-material3-style.md)公开跨模块适配所需的最小契约，内部文字、图标及组件状态仍不公开。
+
+[原生主题与默认值](2026-10-30-native-theme-and-component-defaults.md)在原入口增加默认参数，并移除核心 M3 装配依赖；本篇的资源所有权与内部状态收口继续有效。
+
 [普通弹簧持久通道](2026-10-29-persistent-motion-channels.md)进一步将 Touch/Press 轴改为只读 State，保留构造和读取；其迁移与二进制边界由该篇持有。
 
 - [独立工程](2026-10-23-standalone-coui-demo.md)：部分重叠；保留初次原样迁移和工具链决定，本篇记录后续收口，互链。

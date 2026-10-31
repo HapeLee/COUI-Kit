@@ -2,6 +2,23 @@
 
 `CouiChipTabRow` 用于横向排列单选分类。分类较多时可以左右滚动，也可以在分类栏前放一个独立按钮。
 
+## 最小调用
+
+分类项、选中 key、选择回调和背景源由宿主提供：
+
+~~~kotlin
+import com.itos.coui.chip.CouiChipTabRow
+
+CouiChipTabRow(
+    items = items,
+    selectedKey = selectedKey,
+    onSelectedKeyChange = onSelectedKeyChange,
+    backdrop = backdrop,
+)
+~~~
+
+`dark` 默认跟随 `LocalCouiDarkTheme` 或系统；局部 `CouiTheme` 会提供自身模式。通用主题规则见[外观与预设](../guide/appearance.md)。
+
 ## 显示一个分类栏
 
 下面创建三个分类，并在点击时更新选中项。分类栏需要 API 34，以及一个覆盖页面内容的背景源。
@@ -24,7 +41,6 @@ import com.itos.coui.chip.CouiChipTabRow
 fun Categories(
     modifier: Modifier = Modifier,
     backdrop: CouiBackdrop,
-    dark: Boolean,
 ) {
     val items = listOf(
         CouiChipTabItem("all", "全部"),
@@ -39,12 +55,11 @@ fun Categories(
         selectedKey = selectedKey,
         onSelectedKeyChange = { selectedKey = it },
         backdrop = backdrop,
-        dark = dark,
     )
 }
 ~~~
 
-`backdrop` 和 `dark` 由页面提供。示例在组件内保存 `selectedKey`；需要用分类筛选内容时，可以将状态提到页面中。每个分类的 `key` 必须唯一，并在重排时保持稳定。非空列表的 `selectedKey` 必须属于列表；空列表传 `null`。重复点击不会取消选择。
+`backdrop` 由页面提供。示例在组件内保存 `selectedKey`；需要用分类筛选内容时，可以将状态提到页面中。每个分类的 `key` 必须唯一，并在重排时保持稳定。非空列表的 `selectedKey` 必须属于列表；空列表传 `null`。重复点击不会取消选择。
 
 背景源应覆盖不透明的页面内容，分类栏放在源节点之外。创建方法见[快速开始](../guide/getting-started.md#浮动组件的背景源)。
 
@@ -64,13 +79,11 @@ CouiChipTabRow(
     selectedKey = selectedKey,
     onSelectedKeyChange = { selectedKey = it },
     backdrop = backdrop,
-    dark = dark,
     leadingAction = {
         CouiChipTabButton(
             onClick = onOpenCategories,
             contentDescription = categoriesLabel,
             backdrop = backdrop,
-            dark = dark,
         ) {
             Icon(Icons.Default.Menu, contentDescription = null)
         }
@@ -79,11 +92,13 @@ CouiChipTabRow(
 )
 ~~~
 
-`onOpenCategories`、`categoriesLabel` 和 `categoriesVisible` 由页面提供。需要退出动画时，保留 `leadingAction` 的内容，只切换 `leadingActionVisible`。Material `Icon` 默认跟随按钮提供的内容色；显式设置 `tint` 时使用传入的颜色。应用需要声明示例使用的 Material3 和图标依赖。
+`onOpenCategories`、`categoriesLabel` 和 `categoriesVisible` 由页面提供。需要退出动画时，保留 `leadingAction` 的内容，只切换 `leadingActionVisible`。示例假定已接入可选 M3 适配，ChipSurface 自动同步最终内容色，M3 `Icon` 可直接继承；leadingAction 本身只转发内容。应用需要声明示例使用的 Material3 和图标依赖。
 
 ## 文字、间距和动画
 
 可以通过 `textStyle` 和 `contentColor` 修改文字样式与颜色。`itemSpacing` 控制分类间距；`animationLevel` 从 1 到 4，1 的动画最明显，4 最弱。
+
+M3 自动模式仅从 labelLarge 接入字体族，保留 Chip 的原字号、字重和排版。显式 textStyle 仍完整生效，图标显式 tint 优先。
 
 每个分类项和独立图标按钮各自持有单主体 renderer。显式传 `renderers` 时，数量要和 `items` 一致，实例不能重复。
 

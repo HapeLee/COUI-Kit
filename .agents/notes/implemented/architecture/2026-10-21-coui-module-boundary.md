@@ -23,6 +23,10 @@ Status: implemented
 
 ## Consequences
 
+[可选 M3 策略](2026-10-31-optional-material3-style.md)增加独立适配模块，核心继续不读取 MaterialTheme；宿主的偏好、动态色创建、HCT 与业务职责不变。
+
+[原生主题与默认值](2026-10-30-native-theme-and-component-defaults.md)部分取代“全部主题由宿主装配”的决定；宿主应用偏好、动态取色、HCT 和业务职责继续保持原边界。
+
 [分类栏](../feature/2026-10-24-chip-tab.md) 沿用同一边界：材质、输入和滚动归库，内容、选择状态及动作由宿主提供。
 
 库的可复用性来自职责边界，不来自清除所有宿主 COUI import。宿主可以直接使用背景源和底层算法，不增加无职责的代理层。代价是宿主必须明确装配主题、布局与错误处理。

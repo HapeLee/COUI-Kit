@@ -12,11 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.minimumInteractiveComponentSize
+import com.itos.coui.theme.Coui
+import com.itos.coui.theme.ProvideCouiContent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +56,7 @@ fun CouiTopAppBarButton(
     enabled: Boolean = true,
     text: Boolean = false,
     renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
-    style: CouiToolbarStyle,
+    style: CouiToolbarStyle = CouiTopAppBarButtonDefaults.style(),
     content: @Composable RowScope.() -> Unit,
 ) {
     val backdrop = checkNotNull(LocalCouiToolbarBackdrop.current) { "顶栏按钮必须位于 CouiTopAppBar 内" }
@@ -81,7 +79,7 @@ fun CouiTopAppBarButton(
     val contentColor = style.contentColor
     Box(
         modifier
-            .minimumInteractiveComponentSize()
+            .then(Coui.defaultStyle.minimumInteractiveComponentSize())
             .then(if (text) Modifier.widthIn(min = 60.dp).height(40.dp) else Modifier.size(40.dp))
             .onSizeChanged { boundsSize = it }
             .drawWithCache {
@@ -146,11 +144,10 @@ fun CouiTopAppBarButton(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            CompositionLocalProvider(
-                LocalContentColor provides if (enabled) contentColor else contentColor.copy(alpha = contentColor.alpha * 0.38f),
-            ) {
-                ProvideTextStyle(style.textStyle) { content() }
-            }
+            ProvideCouiContent(
+                color = if (enabled) contentColor else contentColor.copy(alpha = contentColor.alpha * 0.38f),
+                textStyle = style.textStyle,
+            ) { content() }
         }
     }
 }
