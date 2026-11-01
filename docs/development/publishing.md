@@ -1,12 +1,12 @@
 # 发布渠道与开发快照
 
-本文区分面向使用者的 Maven Central 发行版、供开发验证的 GitHub Packages 快照，以及仅用于产物检查的本地 Maven 仓库。**当前仓库 Actions 自动化管理 GitHub Packages 的快照发布，不包含 Maven Central 的上传流程。** 不要把“没有 Central 自动上传工作流”理解为“Central 没有已发布版本”。
+推送 `v` 开头的发行 Tag 后，GitHub Actions 自动构建、签名并发布 Maven Central 的两个模块。开发快照继续通过独立的 GitHub Packages 工作流手动发布。
 
 ## 渠道与版本来源
 
 | 渠道 | 用途 | 来源与注意事项 |
 | --- | --- | --- |
-| Maven Central | 公开发行的预览版/正式版 | [核心包](https://central.sonatype.com/artifact/io.github.itoseo/coui)与[适配包](https://central.sonatype.com/artifact/io.github.itoseo/coui-material3)；接入版本见 [README](../../README.md)，以实际远端解析和发行元数据为准 |
+| Maven Central | 公开发行的预览版/正式版 | [publish-central.yml](../../.github/workflows/publish-central.yml) 响应发行 Tag；接入版本见 [README](../../README.md)，以实际远端解析和发行元数据为准 |
 | GitHub Packages | 手动发布当前提交的开发快照 | 仓库 [publish-preview.yml](../../.github/workflows/publish-preview.yml) 生成带短 SHA 的 `-SNAPSHOT`，接入需认证 |
 | 本地文件仓库 | CI/开发检查 AAR、POM、Module Metadata、源码包及 Dokka | 两模块各自的 `build/repository`；不上传远端，不视为真实发行 |
 
@@ -16,45 +16,58 @@
 
 需要让宿主验证当前 COUI 提交时，在 Actions 手动运行“发布库预览版”。成功后，从运行摘要复制 Maven 坐标交给接入者；用户侧配置见[GitHub Packages 接入](../guide/github-packages.md)。
 
-## 手动发布
+### 手动发布步骤
 
 1. 将发布配置合入 main，使 GitHub 注册[发布工作流](../../.github/workflows/publish-preview.yml)。
 2. 打开 Actions → 发布库预览版 → Run workflow，选择已经评审的受信任分支。日常使用 main；手动选择分支等于授权执行该分支的构建脚本。
 3. 等待本地 Maven 产物检查、上传和远端元数据读取全部成功。
 4. 从运行摘要复制完整依赖坐标，并记录对应源码提交与 Actions run 地址。
 
-普通 push 和 `[ci]` push 均不触发库发布。Demo 打包仍按 [CI 指南](ci.md)执行。发布工作流只允许在上游仓库运行，不使用 PR 事件，不把包写入凭据提供给 fork PR。
+普通分支 push 和 `[ci]` push 均不触发库发布；发行 Tag 触发 Central 工作流。Demo 打包仍按 [CI 指南](ci.md)执行。两个发布工作流只允许在上游仓库运行，不使用 PR 事件，不把发布凭据提供给 fork PR。
 
 ## 版本与产物
 
 从适配模块首次发行起，`coui` 与 `coui-material3` 始终同版本、同步发布，正式版、预览版和开发快照均遵守此规则。即使某个模块没有代码变化，也随另一模块发布对应版本。适配模块依赖同版本核心；只有两个坐标均可下载，才视为该版本发布完成。
 
-库 group、核心 artifactId 和共享版本由根目录 [gradle.properties](../../gradle.properties) 的 GROUP、POM_ARTIFACT_ID 和 VERSION_NAME 持有。可选模块在[自身配置](../../coui-material3/build.gradle.kts)显式指定 `coui-material3`，不继承核心的 artifactId。当前 VERSION_NAME 仅用于开发快照的基础版本，不代表已验证的 Central 发行。工作流加入当前提交的短 SHA；库版本不读取 Demo versionCode 或显示版本名。
+库 group、核心 artifactId 和开发基础版本由根目录 [gradle.properties](../../gradle.properties) 持有。可选模块在[自身配置](../../coui-material3/build.gradle.kts)显式指定 `coui-material3`，不继承核心的 artifactId。GitHub Packages 在开发版本中加入提交短 SHA；Central 从 Tag 去掉首字母 `v`，通过 `-PVERSION_NAME` 同时覆盖两个模块的版本，不修改开发基础版本。库版本不读取 Demo versionCode 或显示版本名。
 
 [核心配置](../../coui/build.gradle.kts)与[可选模块配置](../../coui-material3/build.gradle.kts)均只发布 release 变体，包含 AAR、源码包、Dokka HTML 文档包、POM 和 Gradle Module Metadata。两个模块的源码与文档归档附带根许可、来源与名称声明；核心继续附带既有 Skia/AndroidX 声明与 AAR 资源。不发布 Demo、不提前混淆库，也不上传 Demo 密钥。
 
-工作流先生成两模块的本地 Maven 文件仓库，调用与 PR 相同的[真实产物检查](../../.github/scripts/verify-maven-artifacts.cjs)。脚本检查独立坐标、非空产物、源码与 HTML、许可、两模块 Compose BOM 的元数据与 POM 导入、核心动画严格约束，以及核心无 M3、适配器依赖同版本核心与 M3。全部通过后再上传两个 artifact，并分别确认远端元数据可读。POM 不具备完整表达 Gradle 严格约束的能力，不能用 POM 存在代替 `.module` 检查。每次发行仍须确认对应运行结果，不能以历史成功代替当前版本验收。
+两个发布工作流先生成两模块的本地 Maven 文件仓库，调用与 PR 相同的[真实产物检查](../../.github/scripts/verify-maven-artifacts.cjs)。脚本检查独立坐标、非空产物、源码与 HTML、许可、两模块 Compose BOM 的元数据与 POM 导入、核心动画严格约束，以及核心无 M3、适配器依赖同版本核心与 M3。全部通过后再上传两个 artifact。Packages 检查远端版本元数据；Central 检查发行文件及签名可匿名下载。POM 不具备完整表达 Gradle 严格约束的能力，不能用 POM 存在代替 `.module` 检查。每次发行仍须确认对应运行结果，不能以历史成功代替当前版本验收。
 
-同一分支的发布串行执行，不取消正在上传的任务。重新运行相同提交仍是 SNAPSHOT 发布；SHA 只能标识源码，不把 SNAPSHOT 当作不可变发行版本。
+Packages 按分支、Central 按 Tag 串行执行，不取消正在上传的任务。重新运行相同提交的 Packages 任务仍是 SNAPSHOT 发布；SHA 只能标识源码，不把 SNAPSHOT 当作不可变发行版本。
 
 ## Maven Central 发行与变更记录
 
-Maven Central 使用 Central Portal 手动上传已签名 bundle，GitHub Packages 仍使用独立快照工作流。Central 发行不需要为消费者配置下载凭据，也不改变普通 PR 的验证和权限。
+先将发布工作流与待发行改动合入 main，确认该提交的 CI 和所需验收通过，再创建尚未发布的版本 Tag。Tag 必须指向 main 历史中的提交；不要在未合入的开发分支发布。
 
-获得本次发行授权后，在干净的发行源码上执行：
+例如准备发布 `0.0.1-alpha4`：
 
-1. 使用已备份并分发公钥的项目 GPG 密钥，按 [Vanniktech 签名配置](https://vanniktech.github.io/gradle-maven-publish-plugin/central/#secrets)在进程环境提供 `ORG_GRADLE_PROJECT_signingInMemoryKey` 与 `ORG_GRADLE_PROJECT_signingInMemoryKeyPassword`。不把私钥、口令写进项目或日志。
-2. 生成两个同版本的签名产物；以下版本必须与待发布 Tag 一致：
+```sh
+git switch main
+git pull --ff-only
+git tag -a v0.0.1-alpha4 -m "发布 0.0.1-alpha4"
+git push origin v0.0.1-alpha4
+```
 
-   ```sh
-   ./gradlew :coui:publishAllPublicationsToLocalRepository :coui-material3:publishAllPublicationsToLocalRepository \
-     -PVERSION_NAME=0.0.1-alpha3 -PsignAllPublications=true --no-configuration-cache
-   PACKAGE_VERSION=0.0.1-alpha3 node .github/scripts/verify-maven-artifacts.cjs
-   ```
+支持 `v主版本.次版本.补丁版本`，以及 `-alphaN`、`-betaN`、`-rcN` 后缀，例如 `v0.1.0`、`v0.1.0-rc1`。版本数字不带多余前导零。不接受 SNAPSHOT、构建元数据或 Commit 标题作为 Central 版本；具体校验由 [Tag 脚本](../../.github/scripts/central-release-version.cjs)持有。
 
-3. 校验两个模块的 AAR、POM、`.module`、sources/javadoc 的 GPG 签名及校验和。将各自 `build/repository` 中的版本目录合并为一个 ZIP，保留 `io/github/itoseo/<artifactId>/<version>/` 层级；只包含这两个模块的目标版本，不包含仓库级 `maven-metadata.xml`、构建日志或密钥。
-4. 在 [Central Deployments](https://central.sonatype.com/publishing/deployments) 上传 ZIP。确认两个坐标都通过校验后提交 Publish；公开版本不可覆盖。
-5. 等待状态成为 `PUBLISHED`，并匿名下载两个坐标的发行文件，与本地产物核对。仅出现 `VALIDATED` 或 `PUBLISHING` 不表示消费者已经可以下载。
+在 Actions 查看“发布 Maven Central”。工作流先执行两个库的 Release Lint 和本地发行检查，再通过已有 Vanniktech 插件签名、上传并自动发布。Central 配置只在发布命令中启用，普通 PR、Demo 与 Packages 构建不需要 Central 凭据或 GPG 私钥。
+
+工作流等待 `PUBLISHED` 后，匿名下载两个模块的 AAR、POM、`.module`、源码包、文档包及对应签名。所有下载检查通过后才输出成功摘要和坐标。无需手动打 ZIP 或在 Portal 点击 Publish。Central 校验和索引需要时间，`VALIDATED` 或 `PUBLISHING` 都不代表已完成。
+
+### Central 凭据
+
+在仓库 Actions Secrets 配置下列字段；现有字段可直接复用：
+
+| Secret | 内容 |
+| --- | --- |
+| `MAVEN_CENTRAL_USERNAME` | Central Portal User Token 的 username，不是网页登录名 |
+| `MAVEN_CENTRAL_PASSWORD` | 同一 User Token 的 password |
+| `GPG_SIGNING_KEY` | ASCII-armored 完整签名私钥文本，不是 Base64；公钥须已分发 |
+| `GPG_PASSPHRASE` | 私钥口令；无口令的密钥可为空 |
+
+工作流仅在签名发布步骤注入这些值，并关闭 Gradle configuration cache 与 Gradle 缓存。缺少必需凭据直接失败；不写入仓库、构建附件或日志。插件参数见 [Central 官方接入说明](https://vanniktech.github.io/gradle-maven-publish-plugin/central/)。
 
 建立新版本时，至少完成：
 
@@ -68,7 +81,7 @@ alpha3 起以发行 Tag 记录源码映射；历史版本缺少对应 Tag，不�
 
 ## 凭据与本地检查入口
 
-工作流使用自身的 `GITHUB_TOKEN`，仅上传与远端读取步骤接收凭据；job 授予 contents: read、packages: write。无需新增 PAT、Demo 签名或 GPG Secrets。带凭据的 Gradle 任务关闭 configuration cache，发布工作流不缓存 Gradle 状态。
+GitHub Packages 工作流使用自身的 `GITHUB_TOKEN`，仅上传与远端读取步骤接收凭据；job 授予 contents: read、packages: write。该渠道不使用 Central、Demo 签名或 GPG Secrets。Central 工作流仅需 contents: read，发布认证使用上文的 User Token。带凭据的 Gradle 任务关闭 configuration cache，发布工作流不缓存 Gradle 状态。
 
 获得当前任务的本地构建授权后，可在根目录仅生成文件仓库，不需要任何上传凭据：
 
@@ -83,6 +96,8 @@ node .github/scripts/verify-maven-artifacts.cjs
 
 ## 失败处理
 
-构建或产物检查失败时不会上传。上传失败可能已留下部分文件，先检查失败步骤、包页面和诊断附件，再决定重跑；不以工作流启动或局部上传成功作为已发布。上传后读取失败时保留失败状态，核对远端版本，避免误报成功。
+构建或产物检查失败时不会上传。上传失败可能已留下部署或部分文件，先检查失败步骤和远端状态，再决定重跑；不以工作流启动或局部上传成功作为已发布。上传后读取失败时保留失败状态，核对远端版本，避免误报成功。
 
-构建配置及静态检查不代表远端权限和实际下载已经验证。私有包消耗仓库所有者的存储与下载额度，重复快照的保留和清理按实际使用处理。这里的工作流只上传 GitHub Packages；Maven Central 发行坐标见[快速开始](../guide/getting-started.md)，不把 SNAPSHOT 与 Central 版本等同，也不推断其提交对应关系。当前不提供 JitPack 流程。
+Central 已发布版本不可覆盖。发布步骤失败或超时时，先用日志中的 deployment ID 检查 [Central Deployments](https://central.sonatype.com/publishing/deployments)。若仍在发布，等待原部署完成；若已发布而只有匿名下载检查失败，可重跑下载命令确认，不重新上传同一版本，也不移动旧 Tag。需要改变源码时使用新版本 Tag。工作流不自动撤销部署或重发，以免把超时误判为上传失败。
+
+构建配置及静态检查不代表远端权限和实际下载已经验证。私有包消耗仓库所有者的存储与下载额度，重复快照的保留和清理按实际使用处理。Maven Central 已发行坐标见[快速开始](../guide/getting-started.md)，不把 SNAPSHOT 与 Central 版本等同，也不推断其提交对应关系。当前不提供 JitPack 流程。

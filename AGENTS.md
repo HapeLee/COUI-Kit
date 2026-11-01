@@ -52,4 +52,4 @@
 - 只修改当前任务范围。未经用户明确要求，不执行 Git 初始化、创建分支、commit、push、rebase、reset 或 merge。贡献流程要求 PR 不代表代理已获 Git 操作授权。
 - 开发通过功能分支与 PR 进入主分支，使用 [PR 模板](.github/pull_request_template.md)。维护者另行授权的直接操作按该授权执行；不自行合并或推送。
 - 默认不新增测试，PR 工作流执行 Note、Lint、Demo debug/release 和库本地 Maven 发行构建，不加入单测、模拟器或远端上传任务。按风险执行必要的差异、引用及针对性静态检查，参见[验证与评审](docs/development/validation.md)，报告真实结果与未验证行为。
-- 已配置的 GitHub CI 可按其触发规则执行构建与 Demo 测试签名；库上传独立手动触发，只向上传及远端确认步骤传入包凭据。本地不得自行运行 Android 构建、Gradle Sync、Preview、安装、签名、发布或设备操作；用户当前明确授权的验证按该授权执行。不自行增加外部宿主消费切换。
+- 已配置的 GitHub CI 可按其触发规则执行构建与 Demo 测试签名；Packages 上传独立手动触发，Central 上传由发行 Tag 触发，具体流程见发布指南。发行 Tag 的创建与推送须有当前任务授权；发布凭据只传入实际需要的签名、上传或认证读取步骤。本地不得自行运行 Android 构建、Gradle Sync、Preview、安装、签名、发布或设备操作；用户当前明确授权的验证按该授权执行。不自行增加外部宿主消费切换。

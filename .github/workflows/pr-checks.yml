@@ -45,6 +45,8 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || 'HEAD^' }}
         run: git diff --check "$BASE_SHA" HEAD
+      - name: 检查 Central Tag 版本规则
+        run: node .github/scripts/central-release-version.cjs --self-check
       - name: 执行 Lint、Demo 构建与库发行构建
         run: |
           set -euo pipefail

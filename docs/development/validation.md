@@ -27,7 +27,7 @@ Note 校验只检查结构、状态、相对链接和归档封印；代码与效
 
 ## Android 与远端检查
 
-PR 自动执行 Note、库与 Demo Lint、Demo debug/release 构建及库本地 Maven 发行构建，不执行单测或设备测试。Demo 的固定签名打包独立按需触发，具体规则、凭据和附件见 [CI 与 PR 检查](ci.md)。库发行验证与手动上传见[预览版发布](publishing.md)。
+PR 自动执行 Note、库与 Demo Lint、Demo debug/release 构建及库本地 Maven 发行构建，不执行单测或设备测试。Demo 的固定签名打包独立按需触发，具体规则、凭据和附件见 [CI 与 PR 检查](ci.md)。库发行验证、Tag 自动发布及 Packages 手动上传见[发布指南](publishing.md)。
 
 本地需要执行同一检查时，先获得当前任务授权，再运行：
 

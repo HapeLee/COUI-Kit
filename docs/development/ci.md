@@ -11,6 +11,7 @@
 | Actions 手动运行 Demo 打包 | 构建所选受信任分支，日常使用 main |
 | 指向 main 的 PR | 自动执行 Note、库与 Demo Lint、Demo debug/release 与库发行构建 |
 | Actions 手动运行发布库预览版 | 构建并检查库产物，上传 GitHub Packages；见[发布指南](publishing.md) |
+| 推送发行 Tag | 构建、签名并自动发布 Maven Central 双模块；版本规则与凭据见[发布指南](publishing.md#maven-central-发行与变更记录) |
 
 前缀判断使用本次 push 最后一个提交的标题，不扫描之前的提交。GitHub 的 startsWith 比较不区分大小写。条件在 job 层执行，因此普通 push 仍可能显示 skipped 工作流记录。PR 检查不受此前缀限制，也不按文档路径整体跳过，避免必需检查一直 Pending。
 
@@ -40,6 +41,7 @@ Demo 工作流将密钥放在 Runner 临时目录，仅在签名步骤传入同�
 ## 检查与失败处理
 
 - [PR Android 工作流](../../.github/workflows/pr-checks.yml)持有实际 Gradle 命令，不执行单测、模拟器或真机测试。
+- PR 同时执行 Central Tag 解析器的无凭据自检；Central 发布工作流不由 PR 触发。
 - [Note 工作流](../../.github/workflows/verify-notes.yml)检查目录、格式、链接与归档封印，归档比较使用 PR base SHA。
 - [Demo 打包工作流](../../.github/workflows/demo-ci.yml)构建 release、检查 APK 签名并上传产物，不创建 Release，不发布库。
 - PR Android 检查对 coui 与 coui-material3 分别执行 Lint，生成两个同版本的本地 Maven 产物及源码、API 文档，并运行共用的[发行检查脚本](../../.github/scripts/verify-maven-artifacts.cjs)。检查覆盖独立坐标、非空归档、核心无 M3、适配器依赖同版本核心与 M3、许可及严格版本约束。不上传远端，不读取包写入凭据；[预览发布](publishing.md)独立手动触发。

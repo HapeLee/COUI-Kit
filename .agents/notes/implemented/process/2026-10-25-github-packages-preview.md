@@ -28,6 +28,8 @@ Status: implemented
 
 ## Consequences
 
+[Central Tag 自动发行](2026-11-01-central-tag-publishing.md)补充公开发行渠道；本篇继续持有 Packages 的手动快照、认证与可重复发布边界。
+
 宿主可通过完整 Maven 坐标验证指定源码提交，代价是本地和跨仓库 CI 需要读取认证；公开 Maven 包也不支持匿名下载。SNAPSHOT 包可重复发布，提交 SHA 不保证产物不可变，回看一次发布还需 Actions run；私有包需要考虑存储和下载额度。
 
 Vanniktech 与 Dokka 是新的构建依赖，PR 会增加库发行与文档生成时间。源码、公开 API、绘制行为及 Demo 消费方式不改变。Maven Central 与 JitPack 不属于当前接线范围。
