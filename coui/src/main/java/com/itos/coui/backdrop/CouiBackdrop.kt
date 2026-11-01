@@ -3,6 +3,7 @@ package com.itos.coui.backdrop
 import android.os.SystemClock
 import android.view.ViewTreeObserver
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
@@ -82,13 +83,22 @@ class CouiBackdrop internal constructor(
         updateCompositingStrategy()
     }
 
-    internal fun retain() {
+    /** 材质组合在退出动画期间仍须存在, 源及父链随该组合成对保留和释放。 */
+    @Composable
+    internal fun RetainWhileComposed() {
+        DisposableEffect(this) {
+            retain()
+            onDispose { release() }
+        }
+    }
+
+    private fun retain() {
         activeConsumers++
         parent?.retain()
         updateCompositingStrategy()
     }
 
-    internal fun release() {
+    private fun release() {
         check(activeConsumers > 0) { "背景源消费者必须成对释放" }
         activeConsumers--
         parent?.release()

@@ -92,10 +92,7 @@ internal fun CouiDialogWindow(
     if (material != null) {
         check(Build.VERSION.SDK_INT >= 33) { "弹窗项目材质要求 Android 13 或更高版本" }
         checkNotNull(windowBackdrop) { "弹窗项目材质需要宿主提供不包含弹窗自身的窗口背景源" }
-        DisposableEffect(windowBackdrop) {
-            windowBackdrop.retain()
-            onDispose { windowBackdrop.release() }
-        }
+        windowBackdrop.RetainWhileComposed()
     }
     val context = LocalContext.current
     // 原厂读取 Activity 的导航 inset；在进入 Dialog 窗口前读取，避免重复消费后的零值。
