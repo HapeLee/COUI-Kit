@@ -59,6 +59,20 @@ backgroundColor 需不透明，background 绘制实际图案或页面内容。�
 
 材质弹窗采样宿主窗口里不包含弹窗自身的背景源，不能只在 Dialog 内新建一个源来代替宿主背景，装配见[弹窗](../components/dialog.md#使用背景材质)。弹窗窗口里的内容若还要供菜单或其他面板采样，再为该窗口挂源。[菜单](../components/menu.md)使用 ProvideCouiMenuBackdrop 返回的 Modifier 挂到窗口页面内容，Popup 自身不进入该采样树。
 
+## 菜单窗口的离屏策略
+
+普通 `rememberCouiBackdrop` 和 `ProvideCouiMenuBackdrop(content)` 保持内容离屏隔离。只有明确使用 `ProvideCouiMenuBackdrop(isolateContent = false, content = ...)` 的窗口源，在没有材质消费者时使用 `CompositingStrategy.Auto`。接入片段见[菜单](../components/menu.md#空闲时按需离屏)。
+
+菜单和材质弹窗在消费期间保留该源及其全部 parent 源，最后一个消费者结束后，各源恢复自己的空闲策略。菜单退场仍属于消费期间。源节点、布局坐标、裁剪、绘制指令录制和跨窗口更新继续存在；这不是暂停采样或缓存旧背景的开关。
+
+选择 `false` 前，宿主需要确认以下条件：
+
+- 内容中的 `Clear`、`DstIn`、`DstOut` 等目标混合在其所属组件内完成隔离。不能依赖这个窗口源为任意子内容提供隔离。
+- 优先用于不透明、静态的页面根。取消强制离屏后，文字与矢量可能在最终变换下直接栅格化；先栅格化再变换纹理与直接绘制，在分数位移或缩放时可能产生不同的抗锯齿结果。
+- 透明窗口、移动的面板和存在额外变换的容器，需要单独核对颜色、覆盖率及动画中段。未经核对时保留单参数入口。
+
+`Auto` 由 Android / Compose 决定实际合成方式，其他效果仍可能要求离屏缓冲。此选项不改变模糊算法、菜单内容的独立隔离或最低平台要求；性能收益需要在实际设备和操作序列上测量。
+
 ## 资源与失败处理
 
 每个独立绘制节点持有自己的可变 renderer。单主体使用 CouiFloatingRenderer.standalone()，底栏使用 CouiFloatingRenderer()；不要跨节点共享。融合背景和遮罩也分别持有 renderer。
