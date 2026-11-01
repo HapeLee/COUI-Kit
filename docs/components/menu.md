@@ -132,6 +132,25 @@ ProvideCouiMenuBackdrop { source ->
 
 这里的 `background` 和 `pageContent` 由页面提供，`MenuButton` 沿用前面的示例。菜单放在背景源之外；弹窗和页面遮罩也不要录入背景源。`style.themeTint` 可以传页面表面色。
 
+### 空闲时按需离屏
+
+上面的单参数入口保留内容隔离，现有调用无需迁移。对于已经核对的不透明、静态页面根，可以显式使用 `isolateContent = false`，让没有菜单或材质弹窗消费背景时的源使用 `CompositingStrategy.Auto`。下面沿用前面的 import、参数和 `MenuButton`：
+
+~~~kotlin
+ProvideCouiMenuBackdrop(isolateContent = false) { source ->
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().then(source).background(background)) {
+            pageContent()
+        }
+        MenuButton(style = style, label = label, items = items, onSelect = onSelect)
+    }
+}
+~~~
+
+库在菜单进入、显示和退出期间保持源及其父窗口源的离屏隔离。材质弹窗按实际存活期持有背景；最后一个消费者释放后，源恢复所选的空闲策略。普通菜单、子菜单和嵌套窗口共用这套管理，宿主不要按 `expanded` 手动切换背景策略。
+
+此模式保留源节点、裁剪、坐标和绘制指令录制，只取消空闲时强制建立的离屏隔离。`Auto` 不保证底层完全没有离屏缓冲，也不保证固定比例的 GPU 收益。内容的目标混合必须自行隔离；透明窗口、移动的 BottomSheet、缩放或分数位移容器应先保留原入口。完整的合成要求见[背景源的离屏策略](../effects/backdrop.md#菜单窗口的离屏策略)，公开声明见 [ProvideCouiMenuBackdrop](../../coui/src/main/java/com/itos/coui/menu/CouiMenuBackdrop.kt)。
+
 ## 菜单样式
 
 `CouiMenuStyle` 设置菜单的颜色、形状和文字。下面根据页面颜色创建一份样式：

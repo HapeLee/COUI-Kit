@@ -64,6 +64,8 @@ class CouiBackdrop internal constructor(
     private var recordCallbackCount = 0L
     private var sampleCount = 0L
     private var lastRecordMs = 0L
+    private var isolateWhenIdle = true
+    private var activeConsumers = 0
     private val redrawSignal = mutableStateOf(Unit, neverEqualPolicy())
     private val sourceToTarget = Matrix()
     // 首次采样可能先于源绘制, 就绪状态必须唤醒已等待的消费者。
@@ -73,6 +75,34 @@ class CouiBackdrop internal constructor(
     init {
         layer.compositingStrategy = CompositingStrategy.Offscreen
         layer.clip = true
+    }
+
+    internal fun setIsolateWhenIdle(isolate: Boolean) {
+        isolateWhenIdle = isolate
+        updateCompositingStrategy()
+    }
+
+    internal fun retain() {
+        activeConsumers++
+        parent?.retain()
+        updateCompositingStrategy()
+    }
+
+    internal fun release() {
+        check(activeConsumers > 0) { "背景源消费者必须成对释放" }
+        activeConsumers--
+        parent?.release()
+        updateCompositingStrategy()
+    }
+
+    private fun updateCompositingStrategy() {
+        if (layer.isReleased) return
+        // 保留源的指令、坐标和裁剪; 有消费者时仍先按原分辨率栅格化一次。
+        layer.compositingStrategy = if (isolateWhenIdle || activeConsumers > 0) {
+            CompositingStrategy.Offscreen
+        } else {
+            CompositingStrategy.Auto
+        }
     }
 
     /** 目标 DrawScope 原点须对应 target; 扩展采样区由调用方平移。 */
@@ -147,6 +177,8 @@ class CouiBackdrop internal constructor(
         .put("translationY", layer.translationY.toDouble())
         .put("blendMode", layer.blendMode.toString())
         .put("compositingStrategy", layer.compositingStrategy.toString())
+        .put("isolateWhenIdle", isolateWhenIdle)
+        .put("activeConsumers", activeConsumers)
         .put("drawPassCount", drawPassCount)
         .put("recordCallbackCount", recordCallbackCount)
         .put("sampleCount", sampleCount)

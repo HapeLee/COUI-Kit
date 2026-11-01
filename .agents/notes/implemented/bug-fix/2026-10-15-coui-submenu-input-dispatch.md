@@ -37,6 +37,8 @@ Fast Kawase 使用变换后的设备像素建立各轮独立网格，原源先�
 
 固定模糊指令复用与预选位移延后读取见[绘制工作省略](../simplification/2026-11-01-render-work-elision.md)；九轮网格、内容离屏隔离和本篇输入会话保持。
 
+窗口源的显式按需离屏策略见[菜单背景使用期](../architecture/2026-11-01-menu-backdrop-isolation-lifetime.md)。主、子材质在退出动画结束后释放源及其父链，消费期间保留原尺寸栅格化；该策略不改变菜单自身的内容隔离或输入会话。
+
 [原生主题](../architecture/2026-10-30-native-theme-and-component-defaults.md)使默认 Style 的额外页面染色按宿主显式适配启用；本篇的组合光效、输入会话与层序不变。
 
 保留原厂会话和层序约束，代价是根节点必须显式处理面板归属与退出时序。内部状态收为 internal，公共绘制算法与固定预设仍可复用。

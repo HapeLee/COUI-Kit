@@ -2,6 +2,7 @@ package com.itos.coui.menu
 
 import android.os.Build
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
@@ -45,6 +46,11 @@ internal fun couiMenuMaterial(
     transitionProgress: (() -> Float)? = null,
     parentTouchMotion: CouiTouchMotion? = null,
 ): CouiMenuMaterial {
+    // 材质组合覆盖进入、退出和反向动画, 不按 expanded 提前释放背景。
+    DisposableEffect(backdrop) {
+        backdrop.retain()
+        onDispose { backdrop.release() }
+    }
     val surface = LocalCouiMenuStyle.current.colors.surface
     val dark = LocalCouiMenuStyle.current.isDark
     // 固定使用 COUI RoundFrameLayout 的普通材质模式 4, 不按 HDR 状态切换。
