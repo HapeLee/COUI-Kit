@@ -5,8 +5,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Tune
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,11 +23,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.itos.coui.backdrop.couiBackdrop
 import com.itos.coui.backdrop.rememberCouiBackdrop
-import com.itos.coui.chip.CouiChipTabButton
+import com.itos.coui.layout.Group
+import com.itos.coui.layout.Divider
+import com.itos.coui.chip.ChipTabButton
 import com.itos.coui.chip.CouiChipTabItem
-import com.itos.coui.chip.CouiChipTabRow
+import com.itos.coui.chip.ChipTabRow
+import com.itos.coui.theme.LocalCouiContentColor
 import com.itos.coui.effect.CouiFloatingRenderer
-import com.itos.coui.menu.CouiMenu
+import com.itos.coui.menu.Menu
 import com.itos.coui.menu.CouiMenuItem
 import com.itos.coui.menu.couiMenuAnchor
 import com.itos.coui.menu.rememberCouiMenuAnchor
@@ -57,36 +60,41 @@ private fun ChipTabMaterialSample(dark: Boolean) {
     val backgroundColor = if (solidBackground) {
         if (dark) Color.Black else Color.White
     } else MaterialTheme.colorScheme.surfaceBright
-    DemoSwitchRow(stringResource(R.string.chip_enable), enabled, { enabled = it })
-    DemoSwitchRow(stringResource(R.string.chip_show_icon_button), showIconButton, { showIconButton = it })
-    DemoSwitchRow(stringResource(R.string.chip_solid_background), solidBackground, { solidBackground = it })
+    Group {
+        DemoSwitchPreference(title = stringResource(R.string.chip_enable), checked = enabled, onCheckedChange = { enabled = it })
+        Divider()
+        DemoSwitchPreference(title = stringResource(R.string.chip_show_icon_button), checked = showIconButton, onCheckedChange = { showIconButton = it })
+        Divider()
+        DemoSwitchPreference(title = stringResource(R.string.chip_solid_background), checked = solidBackground, onCheckedChange = { solidBackground = it })
+    }
     if (renderers == null || (showIconButton && buttonRenderer == null)) {
         val failure = checkNotNull(rendering.exceptionOrNull() ?: buttonResult?.exceptionOrNull())
         Text(stringResource(R.string.renderer_error, failure.message ?: failure.javaClass.simpleName),
             color = MaterialTheme.colorScheme.error)
         return
     }
-    Box(Modifier.fillMaxWidth()) {
+    // 卡片只在完整示意区域裁剪；不能用 48dp 行高把分类项的投影上下截断。
+    Group { Box(Modifier.fillMaxWidth().height(144.dp)) {
         Box(Modifier.matchParentSize().couiBackdrop(backdrop).background(backgroundColor))
-        CouiChipTabRow(
-            modifier = Modifier.fillMaxWidth(),
+        ChipTabRow(
+            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
             items = labels.mapIndexed { index, label ->
-                CouiChipTabItem(index, label, icon = { Icon(Icons.Default.Tune, null) })
+                CouiChipTabItem(index, label, icon = { Icon(DemoIcons.Tune, null, tint = LocalCouiContentColor.current) })
             },
-            selectedKey = selected, onSelectedKeyChange = { selected = it as Int }, backdrop = backdrop,
+            selectedKey = selected, onSelectedKeyChange = { selected = it as Int }, backdrop = backdrop, dark = dark,
             enabled = enabled, itemSpacing = 8.dp, renderers = renderers,
             leadingActionVisible = showIconButton,
             leadingAction = if (buttonRenderer != null) {
                 {
                     Box {
-                        CouiChipTabButton(modifier = Modifier.couiMenuAnchor(anchor),
+                        ChipTabButton(modifier = Modifier.couiMenuAnchor(anchor),
                             onClick = { anchor.open { categoriesOpen = true } },
                             contentDescription = stringResource(R.string.chip_categories), backdrop = backdrop,
-                            enabled = enabled && showIconButton, renderer = buttonRenderer) {
-                            Icon(Icons.Default.Tune, null)
+                            dark = dark, enabled = enabled && showIconButton, renderer = buttonRenderer) {
+                            Icon(DemoIcons.Tune, null, tint = LocalCouiContentColor.current)
                         }
-                        CouiMenu(expanded = categoriesOpen, onDismissRequest = { categoriesOpen = false },
-                            anchor = anchor, style = demoMenuStyle(), headerText = stringResource(R.string.chip_categories),
+                        Menu(expanded = categoriesOpen, onDismissRequest = { categoriesOpen = false },
+                            anchor = anchor, style = demoMenuStyle(dark), headerText = stringResource(R.string.chip_categories),
                             items = labels.mapIndexed { index, label -> CouiMenuItem(index, label, selected = selected == index) },
                             onItemClick = { item -> selected = item.value; categoriesOpen = false })
                     }
@@ -94,4 +102,5 @@ private fun ChipTabMaterialSample(dark: Boolean) {
             } else null,
         )
     }
+}
 }

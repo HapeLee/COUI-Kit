@@ -52,7 +52,7 @@ fun MetaballPair(
 
 [运动与跟随回弹](motion.md)提供随距离移动与释放回弹。距离、布局、RTL、裁剪和手势由宿主装配；库不提供侧滑容器、删除确认或业务提交。
 
-需要观察侧滑驱动效果时，运行 Demo 的融合分组。示例列表及其手势属于 Demo：[记录入口](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt)、[侧滑装配](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSwipeRow.kt)。
+侧滑驱动效果见 Demo 的融合页，操作说明见 [Demo 指南](../guide/demo.md#主要示例)。示例列表及其手势属于 Demo：[记录入口](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt)、[侧滑装配](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSwipeRow.kt)。
 
 ## 公开入口
 

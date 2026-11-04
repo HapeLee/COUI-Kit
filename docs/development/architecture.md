@@ -14,17 +14,26 @@ coui 持有通用 COUI 组件、原生主题与固定预设、效果、背景采
 
 demo 只消费公开 API，负责页面、主题和示例交互；示例不读取或删除真实记录。不能为演示公开内部状态，也不能让库引用 demo、外部业务模块、宿主日志框架或第三方 Backdrop。
 
+## 页面与独立组件
+
+宿主选择页面容器。可选 Scaffold 负责栏位测量、正文 Padding、安全区和默认背景，其他组件不依赖它。导航、返回栈、业务状态、滚动与采样由宿主组合；核心不增加专用设置页或页面管理层。
+
+Group、Item、Divider、Footer 处理局部分组和行布局。Item.onClick 为空时只排列内容；选择、开关或独立尾部操作由宿主提供。普通布局和文字不创建背景源。默认外观读取现有 CouiTheme，显式配色只作用于声明的组件区域，不隐式改写任意内容槽。
+
+局部几何与交互可共享必要作用域，例如顶栏按钮的渐进背景和搜索转场；这种关系不扩大为全页依赖。当前取舍见[可选轻量页面容器](../../.agents/notes/implemented/architecture/2026-11-03-optional-coui-scaffold.md)和[宿主页面所有权](../../.agents/notes/implemented/architecture/2026-11-03-host-owned-page-layout.md)。
+
 ## 库内职责
 
-| 包                                                                   | 职责                        |
-|---------------------------------------------------------------------|---------------------------|
-| topappbar、navigation、floatingactionbutton、menu、slider、checkbox、switch、chip、dialog | 组件的布局、状态装配、语义与公开 Defaults |
-| backdrop                                                            | 所属窗口的内容源、绘制录制与采样坐标映射      |
-| effect                                                              | 普通投影、模糊、材质、光效与融合绘制        |
-| shape                                                               | 公共 Shape 与几何约定            |
-| motion、input、swipereveal                                            | 动画、触摸观察与公开运动预设            |
-| diagnostic                                                          | 按需启停的开发诊断                 |
-| theme                                                               | 可选外观上下文、原生配色、普通字体与内容局部样式 |
+| 包 | 职责 |
+| --- | --- |
+| layout | 可选页面容器、分组与行布局，不持有业务状态或背景源 |
+| topappbar、search、navigation、floatingactionbutton、menu、slider、checkbox、switch、chip、dialog、picker、text | 局部组件的布局、状态装配、语义与公开 Defaults |
+| backdrop | 所属窗口的内容源、绘制录制与采样坐标映射 |
+| effect | 普通投影、模糊、材质、光效与融合绘制 |
+| shape | 公共 Shape 与几何约定 |
+| motion、input、scroll、swipereveal | 动画、触摸、滚动物理与公开运动预设 |
+| diagnostic | 按需启停的开发诊断 |
+| theme | 可选外观上下文、原生配色、普通字体与内容局部样式 |
 
 这些是现有 coui 模块内的职责划分。新入口放到实际负责的组件族；共享算法按职责复用，不按导入或文件名搬迁。不要新增只转发参数的包装层。
 
@@ -38,9 +47,9 @@ demo 只消费公开 API，负责页面、主题和示例交互；示例不读�
 
 ## Demo 契约
 
-展示范围见 [Demo 指南](../guide/demo.md)。Demo 独立维护 M3 语义、页面与卡片层级和 G2 形状；设置开关、单选与复选分别使用相应语义，整行交互时子控件不重复点击。数值滑条使用 CouiSlider。
+展示范围见 [Demo 指南](../guide/demo.md)。Demo 独立维护 M3 语义、页面与卡片层级和 G2 形状；设置开关、单选与复选分别使用相应语义，整行交互时子控件不重复点击。数值滑条使用 Slider。
 
-Material 导航在横屏使用侧栏，COUI 使用底栏。切页和搜索筛选保留示例状态。
+首页使用底部导航，API 34 以下使用普通底栏。目录搜索负责筛选可导航条目，详情由独立 Activity 展示；切页和搜索期间保留相应页面状态。
 
 ## 依据
 

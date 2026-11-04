@@ -5,30 +5,44 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import com.itos.coui.menu.ProvideCouiMenuBackdrop
 
-class MainActivity : ComponentActivity() {
+class MainActivity : DemoHostActivity() {
+    @androidx.compose.runtime.Composable
+    internal override fun Page(dark: Boolean, preferences: DemoPreferences) {
+        DemoApp(dark, preferences, onToggleTheme = { preferences.dark(!dark) }, openPage = { DemoSecondaryActivity.open(this, it) })
+    }
+}
+
+/** 普通不透明 Activity，不覆盖 ROM 的 Window 动画，不截获 Activity 根级返回。 */
+abstract class DemoHostActivity : ComponentActivity() {
+    @androidx.compose.runtime.Composable
+    internal abstract fun Page(dark: Boolean, preferences: DemoPreferences)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val systemDark = isSystemInDarkTheme()
-            var dark by rememberSaveable { mutableStateOf(systemDark) }
-            var materialTheme by rememberSaveable { mutableStateOf(true) }
+            val preferences = androidx.compose.runtime.remember { DemoPreferences.get(this) }
+            val dark = preferences.darkOverride ?: systemDark
             SideEffect {
                 WindowCompat.getInsetsController(window, window.decorView).apply {
                     isAppearanceLightStatusBars = !dark
                     isAppearanceLightNavigationBars = !dark
                 }
             }
-            DemoTheme(dark = dark, materialTheme = materialTheme) {
-                DemoApp(dark = dark, onToggleTheme = { dark = !dark }, materialTheme = materialTheme,
-                    onMaterialThemeChange = { materialTheme = it })
+            DemoTheme(dark = dark, materialTheme = preferences.materialTheme) {
+                ProvideCouiMenuBackdrop(isolateContent = false) { windowSource ->
+                    Box(Modifier.fillMaxSize().then(windowSource)) {
+                        Page(dark, preferences)
+                    }
+                }
             }
         }
     }

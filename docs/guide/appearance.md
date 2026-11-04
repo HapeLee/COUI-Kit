@@ -7,9 +7,9 @@
 在 Compose 中直接使用原生默认值，`checked` 和回调由宿主持有：
 
 ~~~kotlin
-import com.itos.coui.switch.CouiSwitch
+import com.itos.coui.switch.Switch
 
-CouiSwitch(checked = checked, onCheckedChange = onCheckedChange)
+Switch(checked = checked, onCheckedChange = onCheckedChange)
 ~~~
 
 底层 Effect 不要求主题。原生主题使用中性表面、文字与 Theme.COUI 的蓝色强调色，不读取动态色。
@@ -38,6 +38,8 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 
 `CouiTypography` 管普通内容、标签、菜单项及可选字体族。Shape 仍由各组件 Defaults 提供，适配器不把 COUI 几何改成 M3。
 
+`CouiColorScheme.background` 是页面底色，`surface` 是组件表面，`container` 是分组卡片。原生预设区分页面与卡片；自定义色板省略 `background` 时沿用 `surface`。`CouiPageDefaults.themeColors()` 分别读取 `background` 和 `container`，宿主将页面底色传给自己的页面容器。`CouiPageDefaults.colors(accent, dark)` 从对应的原生浅色或深色预设生成 `CouiPageColors`，再应用显式强调色；它不会读取或创建主题作用域。
+
 ## Material 颜色与字体角色
 
 | COUI 用途 | M3 来源 |
@@ -46,10 +48,15 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 | 菜单 selected | `primary` |
 | 普通与菜单 checkbox | 浅色 `primary`，深色 `inversePrimary` |
 | 表面、文字、次要文字、分隔线 | `surface`、`onSurface`、`onSurfaceVariant`、`outlineVariant` |
+| 页面背景 / 分组卡片 | `background` / `surfaceBright` |
 | 菜单模糊补底 / 无 Backdrop 的容器 | `surface` / `surfaceBright` |
-| 普通内容与菜单项 / 标签 | `bodyLarge` / `labelLarge` |
+| 普通内容 / 菜单项 / 菜单头部标签 | `bodyLarge` / `labelLarge` / `bodySmall` |
 
 Chip 从 `labelLarge` 取字体族。Dialog 从 `titleLarge`、`bodyMedium`、`labelLarge`、`bodyLarge`、`labelSmall` 分别取得标题、正文、按钮、输入与计数字体族。两者的字号、字重和排版由组件控制；未启用 M3 适配时使用系统字体策略。
+
+`com.itos.coui.text.Text` 提供固定 COUI 排版角色，`kind` 必填。文字颜色依次取显式 `color`、已提供的 `LocalCouiContentColor`、当前 `CouiTheme.colorScheme.onSurface`。省略颜色即可在独立布局中跟随主题，详见[分组与行布局](../components/settings.md#配色与文字)。菜单项则读取 `CouiTheme.typography.menuItem` 的字号、字重与字体族。
+
+`LocalCouiContentColor` 的缺省值为 `Color.Unspecified`，表示未提供内容色。直接读取该 Local 的宿主应在未指定时取当前主题颜色；COUI 的文字和图标已经在消费处解析。显式颜色优先，包括透明色；图标显式传入 `tint = Color.Unspecified` 时保留不染色语义。
 
 ## 菜单、底栏与 FAB 的染色
 
@@ -63,7 +70,7 @@ Chip 从 `labelLarge` 取字体族。Dialog 从 `titleLarge`、`bodyMedium`、`l
 
 启用 M3 策略后，顶栏按钮、搜索表面、Chip 和 FAB 的内容插槽提供对应的 M3 内容 Local，普通 M3 `Text`、`Icon` 可直接继承。组件部分 TextStyle 按 M3 `ProvideTextStyle` 顺序与宿主 ambient 合并；`CouiTheme` 的完整基线替换外层样式。子 Text 的显式颜色/样式、Icon tint 和内层 Local 优先。
 
-仅转发的顶栏 title、buttonGroup、Chip leadingAction 和 Dialog 自定义正文不会被强设新样式。BottomBar 自有文字继承宿主 ambient 字体属性，同时保留自己的字号、行高与字重。内部 `CouiText`、`CouiIcon`、`ProvideCouiTextStyle` 不作为公共组件。
+仅转发的顶栏 title、buttonGroup、Chip leadingAction 和 Dialog 自定义正文不会被强设新样式。BottomBar 自有文字继承宿主 ambient 字体属性，同时保留自己的字号、行高与字重。`com.itos.coui.theme` 包中的 `CouiText`、`CouiIcon` 和 `ProvideCouiTextStyle` 是内部实现；普通文字组件使用公开的 `com.itos.coui.text.Text`。
 
 顶栏按钮的 M3 路径使用 `minimumInteractiveComponentSize()`，遵守宿主尺寸 Local 与 alignment lines；原生策略使用组件的最小布局尺寸。搜索按钮使用固定容器，不受该 Local 控制。
 

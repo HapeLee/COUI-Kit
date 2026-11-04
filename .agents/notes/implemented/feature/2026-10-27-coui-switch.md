@@ -4,15 +4,17 @@ Status: implemented
 
 审查发现的拖动期间按压提前取消与键盘焦点描边修正见[开关反馈复核](../bug-fix/2026-10-28-switch-review-feedback.md)，以目标 Settings 实际消费者复核，保留本篇的物理、资源和受控取消决定。
 
+Demo 的整行装配与共享触觉入口见[整行开关输入](../bug-fix/2026-11-03-switch-row-drag.md)。该决定部分取代下文的私有触觉封装；开关运动和原厂触觉码不变。
+
 ## Problem
 
 主线缺少普通 COUI 开关；Demo 自己的 M3 配置开关不能表达原厂的轨道、滑块拉伸、拖动吸附与加载动画。用户完成真实系统控件的同页视觉审核后，要求单独准备开关 PR，沿原 Demo 增加示例，不带入完整页面重构或系统反射对照。
 
 ## Decision
 
-[CouiSwitch](../../../../coui/src/main/java/com/itos/coui/switch/CouiSwitch.kt)是唯一基础组件，宿主持有 checked、loading、主题与业务回调。库公开 CouiSwitchColors 和 CouiSwitchDefaults；运动和加载绘制保持 internal，触觉辅助为 private，不另公开按钮、设置行或通用触觉枚举。
+[Switch](../../../../coui/src/main/java/com/itos/coui/switch/Switch.kt)是唯一基础组件，宿主持有 checked、loading、主题与业务回调。库公开 CouiSwitchColors 和 CouiSwitchDefaults；运动和加载绘制保持 internal，触觉辅助为 private，不另公开按钮、设置行或通用触觉枚举。
 
-加载和禁用都是同一个 CouiSwitch 的状态。[DemoSwitchSamples](../../../../demo/src/main/java/com/itos/coui/demo/DemoSwitchSamples.kt)直接传入 loading 或 enabled 展示，仅模拟业务等待，不提供额外预设或包装组件。Demo 沿原 ControlsDemo 增加一个分组和搜索标题，保留原页面、dock、配置开关和其他示例。
+加载和禁用都是同一个 Switch 的状态。[DemoSettingsSamples](../../../../demo/src/main/java/com/itos/coui/demo/DemoSettingsSamples.kt)直接传入 loading 或 enabled 展示，仅模拟业务等待。开关详情通过 Demo 的行布局装配，目录与页面组织见[设置式 Demo](2026-11-01-demo-catalog-and-system-icons.md)，业务等待不进入库。
 
 ### 原厂依据与移植
 
@@ -41,7 +43,7 @@ SpringData 的构造顺序为 bounce、response、velocity，已经由 smali 字
 - [Demo 材质与语义](2026-10-23-demo-material-and-gallery.md)：部分重叠；原 M3 配置开关继续由 App 装配，本篇新增库内 COUI 控件及独立分组，不全局替换 Demo。
 - [模块边界](../architecture/2026-10-21-coui-module-boundary.md)、[API 收口](../architecture/2026-10-23-public-api-boundary.md)：保持主题/业务归宿主、可变绘制节点独立、内部状态不公开，新增实际组件包。
 - [ChipTab](2026-10-24-chip-tab.md)：保留原有输入与示例，没有共享修改其物理算法或页面。
-- 主线没有同范围 CouiSwitch 决定，也没有需要归档或删除的同范围 proposed/rejected。
+- 主线没有同范围 Switch 决定，也没有需要归档或删除的同范围 proposed/rejected。
 
 ## Alternatives considered
 

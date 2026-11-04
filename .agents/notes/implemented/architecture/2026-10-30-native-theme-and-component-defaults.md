@@ -12,13 +12,13 @@ Status: implemented
 
 原生主题保留灰白表面、黑白文字和 Theme.COUI 的蓝色强调色。菜单与底栏的额外页面色相染色仅在宿主适配明确提供 tint 时启用；有色 FAB 预设是另一条原厂能力，保留显式颜色和材质/投影的一致性。FAB 默认材质使用主题强调色，默认投影使用 material.firstColor，不自动叠加菜单式染色。Material 映射由 Demo 与使用示例承载，核心不引用 M3 类型。
 
-当前入口为 [CouiTheme](../../../../coui/src/main/java/com/itos/coui/theme/CouiTheme.kt)、[菜单 Defaults](../../../../coui/src/main/java/com/itos/coui/menu/CouiMenuStyle.kt)、[顶栏 Defaults](../../../../coui/src/main/java/com/itos/coui/topappbar/CouiTopAppBarButtonDefaults.kt)、[默认 FAB](../../../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFab.kt)与[底栏](../../../../coui/src/main/java/com/itos/coui/navigation/CouiBottomBar.kt)。[外观指南](../../../../docs/guide/appearance.md)持有颜色优先级、插槽迁移、宿主桥接和染色契约。
+当前入口为 [CouiTheme](../../../../coui/src/main/java/com/itos/coui/theme/CouiTheme.kt)、[菜单 Defaults](../../../../coui/src/main/java/com/itos/coui/menu/CouiMenuStyle.kt)、[顶栏 Defaults](../../../../coui/src/main/java/com/itos/coui/topappbar/CouiTopAppBarButtonDefaults.kt)、[默认 FAB](../../../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)与[底栏](../../../../coui/src/main/java/com/itos/coui/navigation/BottomBar.kt)。[外观指南](../../../../docs/guide/appearance.md)持有颜色优先级、插槽迁移、宿主桥接和染色契约。
 
 ## Evidence
 
 原厂基准为已有 PJZ110 录音 APK 的 Theme.COUI、values/values-night 中的 coui_color_primary_blue、coui_color_surface、coui_color_surface_top、coui_color_primary_neutral、coui_color_secondary_neutral 和 coui_color_divider。Theme.COUI 的 Android colorAccent 是另一条白色资源链，不能代替 COUI 控件的 couiColorPrimary；Switch 的 switch_custom_track_on 和 SeekBar 的 coui_seekbar_progress_selector 证明控件读取 COUI 蓝色角色。录音 AppTheme 继承 Red 变体，不能用应用红色覆盖基础蓝色默认。
 
-菜单 COUIPopupListWindow.createContentView 读取 coui_popup_window_background 的 couiColorBackgroundTop，DefaultAdapter.setTitle 使用 couiTextBodyL，后者与旧 couiTextAppearanceBodyL 的字号不同。原生菜单使用顶层中性表面和真实菜单字体角色；菜单组合轮廓、当前几何及顶栏增强参数保留已有项目特化，不将其称为全部原厂默认。Dialog 保留原先独立排版。
+菜单 COUIPopupListWindow.createContentView 读取 coui_popup_window_background 的 couiColorBackgroundTop，DefaultAdapter.setTitle 使用 couiTextBodyL，后者与旧 couiTextAppearanceBodyL 的字号不同。菜单使用顶层中性表面；当前菜单字号与排版按用户指定的 Metric / M3 菜单调整，见[可选 M3 策略](2026-10-31-optional-material3-style.md)。菜单组合轮廓、当前几何及顶栏增强参数保留已有项目特化，不将其称为全部原厂默认。Dialog 保留原先独立排版。
 
 原始材料沿[复刻指南](../../../../docs/development/replication-guide.md)恢复，不加入工程依赖。去 M3 对照 Compose BOM 缓存对应的 Material3 1.5.0-alpha27 MenuAnchorPosition.Below / DropdownMenuPositionProvider / minimumInteractiveComponentSize / Text / Icon。菜单自有定位器保持起终点、窗口边候选、安全区、offset 与 RTL；全窗口 Popup 原点和触点纵向避让仍归 CouiMenuMotionPositionProvider。顶栏保留最小布局占位与居中，不再读取 M3 Local 或提供 M3 对齐线。
 

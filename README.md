@@ -15,46 +15,32 @@ COUI-Kit 参考 ColorOS 17 的「凝光视效」，提供背景模糊、材质�
 ## 特点
 
 - 组件和效果可以分别使用，也可以组合使用。
+- 纯 COUI 页面可组合 `CouiTheme` 与可选的 [Scaffold](docs/components/scaffold.md)，统一栏位测量和安全区，无需 Material 3。
+- 设置式布局提供 `Group`、`Item`、`Divider` 和 `Footer`。`Item` 可自行处理可选整行点击，也可只布局内容，让宿主拥有选择、开关等状态。
+- 可以只取用单个 COUI 组件，与 Material、Miuix 或自有设计混搭；不要求替换宿主的 Scaffold、主题和导航，见[宿主页面接入](docs/guide/secondary-pages.md)。
 - 支持接入 App 的配色、文字样式和形状，并提供常用外观预设。
 - 提供原生主题、组件默认值与可选 `coui-material3` 适配模块。核心独立于 Material 3；M3 宿主可在启动时初始化适配，见[外观与预设](docs/guide/appearance.md)。
 - 基于 Android、Compose 和 AndroidX 的公开 API，不依赖厂商 SDK 或私有 SO。
 
 ## Demo
 
-可以运行仓库中的 `demo` 模块，体验组件和效果，并切换深浅色与外观预设。运行方法和 CI 构建下载方式见 [Demo 指南](docs/guide/demo.md)。
+运行 `demo` 模块，可以从目录进入组件与效果详情，并切换深浅色和外观预设。运行方法、操作说明和 CI 构建下载方式见 [Demo 指南](docs/guide/demo.md)。
 
 ## 开始使用
 
 ### 引入依赖
 
-COUI-Kit 已发布到 Maven Central。以下示例使用 Kotlin DSL。
-
-1. 在项目的 `settings.gradle.kts` 中确认已配置 Maven Central：
+在已启用 Compose 的模块中添加核心依赖：
 
 ```kotlin
-dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-```
-
-2. 在使用 COUI 的模块中启用 Compose，并添加依赖：
-
-```kotlin
-android {
-    buildFeatures { compose = true }
-}
-
 dependencies {
     implementation("io.github.itoseo:coui:0.0.1-alpha3")
 }
 ```
 
-`0.0.1-alpha3` 的最低运行版本为 Android 12（API 31），编译时需要 `compileSdk` 37 和 AGP 9.1.0 或更高版本。部分组件和效果需要更高的 Android 版本，使用前请查看[兼容要求](docs/guide/compatibility.md#效果门槛)。
+仓库配置和工具链要求见[快速开始](docs/guide/getting-started.md)。部分效果需要更高的 Android 版本，见[兼容要求](docs/guide/compatibility.md#效果门槛)。
 
-当前版本为早期预览版，后续版本可能调整 API。
+本分支的组件文档使用无前缀名称，如 `Text`、`Switch` 和 `Scaffold`。使用 `0.0.1-alpha3` 时，组件名称仍带 `Coui` 前缀；当前源码的迁移规则见 [CHANGELOG](CHANGELOG.md#组件命名迁移)。
 
 ### 接入 Material 3
 

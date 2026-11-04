@@ -25,32 +25,53 @@ CI 可通过 KEYSTORE_FILE、KEYSTORE_PASSWORD、KEYSTORE_ALIAS、KEYSTORE_ALIAS
 
 ## 展示与操作
 
-Demo 包含三个页面：
+首页有组件、效果、预设三页。组件与效果页显示分组目录，点击条目进入独立 Activity；顶部标题随滚动折叠，搜索栏停靠在顶端。
 
-| 页面 | 示例                                                                                                  |
-|----|-----------------------------------------------------------------------------------------------------|
-| 组件 | 连续滑条、可见分段、隐式步进与禁用态；复选框各状态；开关的点击/拖动、加载状态示例和禁用状态；带图标、选中项、独立勾选、分隔线、禁用项及子菜单的菜单；长菜单与滚动条；ChipTab 的单选、分类菜单、可选图标按钮与纯色背景、禁用态及横向滚动 |
-| 效果 | 胶囊阴影及便捷 / 底层入口；双主体融合、内容遮罩和跟随回弹；背景采样与模糊；材质混色                                                         |
-| 预设 | 全部 FAB 固定配色、轮廓光、左右附件独立收放及顶栏按钮禁用态                                                                    |
+| 页面 | 内容 |
+| --- | --- |
+| 组件 | 开关、滑条、复选、菜单、弹窗、顶栏、搜索、底栏、FAB、选择器、设置列表和 ChipTab |
+| 效果 | 平滑胶囊阴影、记录侧滑融合、背景模糊和材质 |
+| 预设 | Material 配色、轮廓光、底栏左右附件和右附件配色 |
 
-组件页还展示底部和居中弹窗、操作按钮、输入预设及背景材质，详见[弹窗示例](../components/dialog.md#demo-中的样式与示例)。
+底栏切换页面。左附件切换深浅色，右附件打开 FAB 示例；API 34 以下使用普通底部导航。主题和轮廓选项在 Activity 之间共享。
 
-顶栏演示渐进模糊、图标按钮、文字按钮和搜索，搜索时同时展示退场动作与常驻动作的布局。搜索仅匹配当前页的分组标题。底栏切换示例页；独立 FAB 与右侧附件打开外观预设页；顶栏“重置”恢复默认 FAB 配色。深浅色通过顶栏或左侧附件切换。全部数值滑条使用 CouiSlider，切页和筛选保留受控值。融合示例使用三条独立的示例记录，展示侧滑、跟随回弹、内容遮罩、删除确认和离场动画；删除只改变 Demo 内存状态，清空后可恢复。侧滑装配只在 Demo，库继续提供算法。滑条占满分组的可用宽度；长菜单限制高度并保留四组三项。
+### 搜索与返回
 
-Demo 页面使用系统动态色。Application 启动时选择 `CouiMaterial3Style`，组件在消费处读取宿主 M3。预设页的“使用 Material 主题配色”默认开启；关闭后通过局部 `CouiTheme` 使用原生预设并停止额外染色，页面本身仍由 Demo 的 M3 主题管理。切换移动同一内容树，不重置页面状态或 renderer。所选有色 FAB 预设保持不变，便于分别比较。顶栏保留完整自定义 Style 与省略 style 的两种调用，插槽直接使用普通 M3 Text/Icon。M3 导航在竖屏使用底栏、横屏使用侧栏；COUI 使用底栏。
+首页与搜索详情按目录名称、说明和页面标识筛选可导航条目。清空按钮只清除查询；取消或在搜索展开时按返回键会关闭搜索并清除查询。点击结果只打开目标页面，不改变来源页的查询和展开状态；返回后继续显示原搜索结果。
 
-不支持相应效果的平台会显示版本要求；浮动渲染器创建失败会显示失败信息。
+首页搜索展开及退场期间，原正文保留布局和保存状态，但禁用交互并退出无障碍遍历。结果层在展开目标为 true 时接受操作；收起目标生效后立即禁用输入和语义，保留退场绘制。搜索状态和路由由 Demo 持有，组件用法见[常驻搜索](../components/search-bar.md)。
+
+### 主要示例
+
+- 开关页展示整行点击、滑块拖动、加载和禁用；一次点击或拖动只提交一次业务值。
+- 菜单页展示顶栏三点入口、触点锚定、上下箭头行、勾选、子菜单和限高滚动。
+- 弹窗页展示底部、居中、长文、三操作、禁用确认、主题色确认及打开时切换主题。输入型示例用于观察草稿、过滤、计数、清除和取消。
+- 时间、倒计时、日期与月历各有详情页，组合页面控件和确认后提交的弹窗草稿。
+- 设置列表展示依赖开关、单选子页、字号预览、隐私说明和还原确认；这些操作只修改 Demo 状态。
+- 模糊页按图示、说明和参数调节组织。顶栏、底栏、搜索、FAB 与 ChipTab 在各自展示区域中操作。
+- 融合页使用本地记录样例：可侧滑展开删除区、二次点击确认，或继续长拉后松手删除。图标淡出后收缩整行；点击记录打开预览并更新最近查看标记，全部删除后可恢复。
+
+Sheet 和独立普通按钮不在当前展示范围。目录中的效果分类也不等于库的全部能力，完整入口见[效果目录](../effects/README.md)。
+
+## 主题与页面装配
+
+`DemoApplication` 初始化可选 `CouiMaterial3Style`。开启 Material 配色时，组件在消费处读取宿主主题；关闭时，局部 `CouiTheme` 使用原生外观，Demo 的 M3 内容也映射到 COUI 表面与强调色。`DemoTheme` 为首页和详情提供页面内容色，偏好行直接读取 `CouiTheme` 和 `CouiPageDefaults`。显式 FAB 配色预设继续生效。主题接入见[外观与预设](appearance.md)。
+
+首页和详情页使用公开的 [Scaffold](../components/scaffold.md)。容器测量栏位并处理横向安全区，Demo 在容器外处理 IME；正文应用测量所得 Padding。正文 Backdrop 供顶栏和底栏采样，Activity 根部的窗口源供菜单与弹窗使用。源和消费者的分层见[宿主页面接入](secondary-pages.md)。
+
+页面通过标准 Intent 启动、`finish()` 退出，使用当前 ROM 向普通应用提供的 Activity 转场。Demo 不实现系统设置的特权窗口或双栏协议。
 
 ## 源码导航
 
-- [DemoApp](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt)：页面、采样源、顶栏、搜索、底栏和 FAB。
-- [DemoSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)：滑条、复选框与菜单。
-- [DemoDialogSamples](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)：弹窗、材质开关与宿主受控回调。
-- [DemoDialogInputSample](../../demo/src/main/java/com/itos/coui/demo/DemoDialogInputSample.kt)：输入型预设、重命名草稿与宿主校验策略。
-- [DemoChipSamples](../../demo/src/main/java/com/itos/coui/demo/DemoChipSamples.kt)：ChipTab 与分类菜单。
-- [DemoSwitchSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSwitchSamples.kt)：普通开关、加载状态示例和禁用状态，位置及装配见[开关说明](../components/switch.md#demo-示例)。
-- [DemoVisualEffects](../../demo/src/main/java/com/itos/coui/demo/DemoVisualEffects.kt)：采样模糊与材质混色。
-- [DemoShadowSamples](../../demo/src/main/java/com/itos/coui/demo/DemoShadowSamples.kt)：便捷和底层阴影。
-- [DemoRecordSamples](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt)：侧滑驱动融合、确认和示例删除。
+| 职责 | 文件 |
+| --- | --- |
+| 首页、搜索与底栏 | [DemoApp](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt) |
+| 目录与查询 | [DemoCatalog](../../demo/src/main/java/com/itos/coui/demo/DemoCatalog.kt) |
+| Activity 导航 | [DemoSecondaryActivity](../../demo/src/main/java/com/itos/coui/demo/DemoSecondaryActivity.kt) |
+| 详情分发与页面容器 | [DemoSecondaryPage](../../demo/src/main/java/com/itos/coui/demo/DemoSecondaryPage.kt)、[DemoSettingsPage](../../demo/src/main/java/com/itos/coui/demo/DemoSettingsPage.kt) |
+| 组件与预设样例 | [DemoSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt) |
+| 阴影、模糊与材质 | [DemoShadowSamples](../../demo/src/main/java/com/itos/coui/demo/DemoShadowSamples.kt)、[DemoBlurTutorial](../../demo/src/main/java/com/itos/coui/demo/DemoBlurTutorial.kt)、[DemoVisualEffects](../../demo/src/main/java/com/itos/coui/demo/DemoVisualEffects.kt) |
+| 弹窗与选择器 | [DemoDialogSamples](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)、[DemoPickerSamples](../../demo/src/main/java/com/itos/coui/demo/DemoPickerSamples.kt) |
+| 记录侧滑 | [DemoRecordSamples](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt) |
 
-重命名示例用 TextFieldState 和 InputTransformation 保存真实编辑范围：整段粘贴包含禁用字符时，将本次插入部分置空；长度超限只保留配额内的插入内容。过滤和计数仍归 Demo，清除与取消不提交名称。
+Demo 展示宿主装配，内部行包装和路由不是库 API。接入从[组件目录](../components/README.md)或[效果目录](../effects/README.md)开始。

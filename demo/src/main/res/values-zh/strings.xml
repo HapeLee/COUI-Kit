@@ -39,7 +39,6 @@
     <string name="preset_remote">红外遥控</string>
     <string name="preset_recorder">录音</string>
     <string name="contour_toggle">轮廓光</string>
-    <string name="renderer_unavailable">渲染器未能初始化，请查看页面上方的错误信息。</string>
     <string name="implicit_step_value">隐藏点位的步进值：%1$d</string>
     <string name="checkbox_disabled_unchecked">未选中且禁用</string>
     <string name="continuous_slider">连续滑动选择条</string>
@@ -50,6 +49,7 @@
     <string name="left_accessory_toggle">显示左侧附件</string>
     <string name="right_accessory_toggle">显示右侧附件</string>
     <string name="toolbar_enabled">启用顶栏操作按钮</string>
+    <string name="search_enabled">启用搜索</string>
     <string name="backdrop_title">背景采样与模糊</string>
     <string name="material_title">材质混色</string>
     <string name="blur_radius">模糊半径</string>
@@ -63,8 +63,13 @@
     <string name="chip_show_icon_button">显示图标标签</string>
     <string name="chip_solid_background">纯色背景</string>
     <string name="chip_categories">选择分类</string>
-    <string name="record_title">示例记录 %1$d</string>
-    <string name="record_detail">COUI Demo · %1$d 分 %2$d 秒</string>
+    <string name="record_preview">示例记录</string>
+    <string name="record_view_details">查看记录</string>
+    <string name="record_fps">%1$s FPS</string>
+    <string name="record_separator">" / "</string>
+    <string name="record_remark">排位对局</string>
+    <string name="record_filtered">已筛选片段</string>
+    <string name="record_last_viewed">上次查看的记录</string>
     <string name="record_delete">删除示例</string>
     <string name="record_confirm_delete">确认删除</string>
     <string name="record_open_actions">展开记录操作</string>

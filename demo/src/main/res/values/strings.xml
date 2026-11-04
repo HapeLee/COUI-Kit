@@ -39,7 +39,6 @@
     <string name="preset_remote">Infrared remote</string>
     <string name="preset_recorder">Recorder</string>
     <string name="contour_toggle">Contour glow</string>
-    <string name="renderer_unavailable">The renderer could not be initialized. See the error above.</string>
     <string name="implicit_step_value">Stepped, without ticks: %1$d</string>
     <string name="checkbox_disabled_unchecked">Disabled and unchecked</string>
     <string name="continuous_slider">Continuous slider</string>
@@ -50,6 +49,7 @@
     <string name="left_accessory_toggle">Show left accessory</string>
     <string name="right_accessory_toggle">Show right accessory</string>
     <string name="toolbar_enabled">Enable top bar action buttons</string>
+    <string name="search_enabled">Enable search</string>
     <string name="backdrop_title">Background sampling and blur</string>
     <string name="material_title">Material blending</string>
     <string name="blur_radius">Blur radius</string>
@@ -63,8 +63,13 @@
     <string name="chip_show_icon_button">Show icon tab</string>
     <string name="chip_solid_background">Solid background</string>
     <string name="chip_categories">Select category</string>
-    <string name="record_title">Sample record %1$d</string>
-    <string name="record_detail">COUI Demo · %1$d min %2$d s</string>
+    <string name="record_preview">Sample record</string>
+    <string name="record_view_details">View record</string>
+    <string name="record_fps">%1$s FPS</string>
+    <string name="record_separator">" / "</string>
+    <string name="record_remark">Ranked match</string>
+    <string name="record_filtered">Segments filtered</string>
+    <string name="record_last_viewed">Last viewed record</string>
     <string name="record_delete">Delete sample</string>
     <string name="record_confirm_delete">Confirm deletion</string>
     <string name="record_open_actions">Show record actions</string>
