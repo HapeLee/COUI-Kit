@@ -74,7 +74,7 @@ fun NativePage(
 | 有底栏 | 正文底部 Padding 等于底栏实测高度；底栏负责底部安全区 |
 | 栏位为空或高度为零 | 对应正文 Padding 使用剩余系统 Insets |
 
-`CollapsingTopAppBar` 已处理状态栏；通用 `TopAppBar` 的内容需要使用 `statusBarsPadding()`。`BottomBar` 自带底部可点击区域的避让和浮动间距。自定义底栏应按其布局使用 `navigationBarsPadding()` 等 Foundation Modifier。不要把同一纵向 Insets 再加到返回的正文 Padding 上。
+`CollapsingTopAppBar` 已处理状态栏；通用 `TopAppBar` 的内容需要使用 `statusBarsPadding()`。`NavigationBar` 自带底部可点击区域的避让和浮动间距。自定义底栏应按其布局使用 `navigationBarsPadding()` 等 Foundation Modifier。不要把同一纵向 Insets 再加到返回的正文 Padding 上。
 
 普通正文使用 `Modifier.padding(padding).consumeWindowInsets(padding)`。`LazyColumn` 使用 `contentPadding = padding` 并消费它；`Column` 加滚动时，将 Padding 放在滚动 Modifier 后，保留栏位下方的采样区域。折叠标题需使用状态的顶部补偿，见[折叠顶栏](collapsing-app-bar.md)。
 

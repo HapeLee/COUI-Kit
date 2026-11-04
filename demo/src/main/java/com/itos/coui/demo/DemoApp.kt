@@ -37,7 +37,7 @@ import com.itos.coui.effect.LocalCouiContourGlowEnabled
 import com.itos.coui.effect.couiNavigationFeedback
 import com.itos.coui.floatingactionbutton.CouiFabColor
 import com.itos.coui.floatingactionbutton.CouiFabDefaults
-import com.itos.coui.navigation.BottomBar
+import com.itos.coui.navigation.NavigationBar
 import com.itos.coui.navigation.CouiNavigationItem
 import com.itos.coui.search.SearchBar
 import com.itos.coui.search.rememberCouiSearchBarState
@@ -101,7 +101,7 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
                 }, bottomBar = {
                     if (Build.VERSION.SDK_INT >= 34 && renderers != null) {
                         Box(Modifier.fillMaxWidth()) {
-                            BottomBar(
+                            NavigationBar(
                                 modifier = Modifier.align(Alignment.BottomCenter),
                                 backdrop = backdrop, renderer = renderers.bottom,
                                 items = titles.mapIndexed { index, title -> CouiNavigationItem(title, navigation[index], selectedNavigation[index]) },

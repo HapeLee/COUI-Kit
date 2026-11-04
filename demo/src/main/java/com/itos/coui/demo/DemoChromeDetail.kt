@@ -40,7 +40,7 @@ import com.itos.coui.floatingactionbutton.CouiFabDefaults
 import com.itos.coui.layout.CouiPageDefaults
 import com.itos.coui.layout.Footer
 import com.itos.coui.layout.Group
-import com.itos.coui.navigation.BottomBar
+import com.itos.coui.navigation.NavigationBar
 import com.itos.coui.navigation.CouiNavigationItem
 import com.itos.coui.search.SearchBar
 import com.itos.coui.search.rememberCouiSearchBarState
@@ -98,7 +98,7 @@ internal fun ChromeDetail(page: String, dark: Boolean, open: (String) -> Unit) {
                     if (Build.VERSION.SDK_INT >= 34 && renderer != null) {
                         if (page == "navigation") {
                             var selected by rememberSaveable { mutableIntStateOf(0) }
-                            BottomBar(Modifier.align(Alignment.BottomCenter), backdrop, renderer,
+                            NavigationBar(Modifier.align(Alignment.BottomCenter), backdrop, renderer,
                                 items = listOf(CouiNavigationItem(stringResource(R.string.controls), CouiIcons.Components, CouiIcons.ComponentsSelected),
                                     CouiNavigationItem(stringResource(R.string.effects), DemoIcons.Effects, DemoIcons.EffectsSelected),
                                     CouiNavigationItem(stringResource(R.string.presets), DemoIcons.Presets, DemoIcons.PresetsSelected)),

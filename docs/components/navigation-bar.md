@@ -1,6 +1,6 @@
 # 🧭底栏
 
-`BottomBar` 用于在页面底部切换导航项，两侧还可以放独立的操作按钮。
+`NavigationBar` 用于在页面底部切换导航项，两侧还可以放独立的操作按钮。
 
 ## 最小调用
 
@@ -13,12 +13,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.itos.coui.backdrop.CouiBackdrop
 import com.itos.coui.effect.CouiFloatingRenderer
-import com.itos.coui.navigation.BottomBar
+import com.itos.coui.navigation.NavigationBar
 import com.itos.coui.navigation.CouiNavigationItem
 
 @RequiresApi(34)
 @Composable
-fun NavigationBar(
+fun NavigationBarExample(
     modifier: Modifier = Modifier,
     backdrop: CouiBackdrop,
     items: List<CouiNavigationItem>,
@@ -26,7 +26,7 @@ fun NavigationBar(
     onSelection: (Int) -> Unit,
 ) {
     val renderer = remember { CouiFloatingRenderer() }
-    BottomBar(
+    NavigationBar(
         modifier = modifier,
         backdrop = backdrop,
         renderer = renderer,
@@ -64,13 +64,13 @@ import com.itos.coui.backdrop.CouiBackdrop
 import com.itos.coui.effect.CouiFloatingRenderer
 import com.itos.coui.floatingactionbutton.CouiFabColor
 import com.itos.coui.floatingactionbutton.CouiFabDefaults
-import com.itos.coui.navigation.BottomBar
+import com.itos.coui.navigation.NavigationBar
 import com.itos.coui.navigation.CouiNavigationItem
 import com.itos.coui.shape.CouiCapsuleShape
 
 @RequiresApi(34)
 @Composable
-fun PageBottomBar(
+fun PageNavigationBar(
     modifier: Modifier = Modifier,
     backdrop: CouiBackdrop,
     dark: Boolean,
@@ -86,7 +86,7 @@ fun PageBottomBar(
         CouiNavigationItem("组件", Icons.Filled.List, Icons.Filled.List),
         CouiNavigationItem("设置", Icons.Filled.Settings, Icons.Filled.Settings),
     )
-    BottomBar(
+    NavigationBar(
         modifier = modifier,
         backdrop = backdrop,
         renderer = renderer,
@@ -114,7 +114,7 @@ fun PageBottomBar(
 }
 ~~~
 
-示例保存选中的索引，并通过 `onSelection` 通知页面切换。项目已有导航状态时，可以将索引作为参数传入 `PageBottomBar`，再传给 `BottomBar`。`items` 不能为空，选中索引必须属于列表。每项可以分别设置普通图标和选中图标；示例使用相同图标。示例中的 Material 图标需要由应用声明图标依赖。
+示例保存选中的索引，并通过 `onSelection` 通知页面切换。项目已有导航状态时，可以将索引作为参数传入 `PageNavigationBar`，再传给 `NavigationBar`。`items` 不能为空，选中索引必须属于列表。每项可以分别设置普通图标和选中图标；示例使用相同图标。示例中的 Material 图标需要由应用声明图标依赖。
 
 将底栏放在背景源节点之外，例如放在页面 `Box` 的底部。
 
@@ -140,4 +140,4 @@ M3 适配下，自有文字继承宿主 ambient 字体属性，同时保留底�
 
 低于 API 34 时，可以显示项目自己的导航栏。
 
-完整页面示例见 [DemoApp](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt)，公开参数见 [BottomBar / CouiNavigationItem](../../coui/src/main/java/com/itos/coui/navigation/BottomBar.kt)。
+完整页面示例见 [DemoApp](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt)，公开参数见 [NavigationBar / CouiNavigationItem](../../coui/src/main/java/com/itos/coui/navigation/NavigationBar.kt)。

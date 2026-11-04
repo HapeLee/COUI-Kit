@@ -103,7 +103,7 @@ data class CouiNavigationItem(val title: String, val icon: ImageVector, val sele
 /** 只负责底栏装配; 页面状态和导航提交仍由宿主持有。 */
 @RequiresApi(34)
 @Composable
-fun BottomBar(
+fun NavigationBar(
     modifier: Modifier = Modifier,
     backdrop: CouiBackdrop,
     renderer: CouiFloatingRenderer,
@@ -136,8 +136,9 @@ fun BottomBar(
     val layoutDirection = LocalLayoutDirection.current
     val leftExpansion = remember(density, layoutDirection) { CouiFabExpansion(leftVisible) }
     val rightExpansion = remember(density, layoutDirection) { CouiFabExpansion(rightVisible) }
-    val leftInteractive = leftExpansion.interactive && leftIcon != null && onLeftClick != null
-    val rightInteractive = rightExpansion.interactive && rightIcon != null && onRightClick != null
+    // 融合完成会先隐藏附件, 点击不能继续等待缩放弹簧结束。
+    val leftInteractive = leftExpansion.present && leftExpansion.interactive && leftIcon != null && onLeftClick != null
+    val rightInteractive = rightExpansion.present && rightExpansion.interactive && rightIcon != null && onRightClick != null
     DisposableEffect(leftExpansion, rightExpansion) {
         onDispose {
             leftExpansion.dispose()

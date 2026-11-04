@@ -23,7 +23,7 @@
 | AlertDialog / InputDialog | 返回/外点关闭；焦点与 IME 策略；中文 IME 组合区、选区替换；输入过滤；窗口创建/移除；材质缺失时明确失败 | P0 |
 | Menu | 选中/禁用项，关闭回调；长菜单滚动；子菜单交接；快速取消、再次展开；键盘导航 | P1 |
 | Checkbox | 外部整行 toggleable 的单一点击 owner、正确 Checkbox 语义；动画中切换与禁用 | P1 |
-| BottomBar / ChipTab | 选中项合法性、RTL、长项目列表、惯性/回弹中中断、隐藏附件；资源随节点移除而释放 | P1 |
+| NavigationBar / ChipTab | 选中项合法性、RTL、长项目列表、惯性/回弹中中断、隐藏附件；资源随节点移除而释放 | P1 |
 | Backdrop / Effects | 不采样自身、释放后不再使用；不同 API 下显式失败/降级策略；独立 effect 入口 | P1 |
 
 设备集成测试需要覆盖实际前置条件：`ChipTabRow` 的 display 刷新率、`CouiDialogWindow` 的 Window 和背景源，以及 `CouiFloatingRenderer` 的 Shader 创建和失败处理。

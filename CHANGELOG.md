@@ -9,10 +9,12 @@ COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和�
 公开 UI 组件统一去掉 `Coui` 前缀，包名和参数保持不变。升级当前源码时，同步修改 import、调用和函数引用；不保留旧名称转发。此项属于源码及二进制不兼容变更，已发布版本的名称不变。
 
 - `CouiText`、`CouiSwitch`、`CouiSlider`、`CouiCheckbox` → `Text`、`Switch`、`Slider`、`Checkbox`。
-- `CouiMenu`、`CouiFab`、`CouiBottomBar`、`CouiScaffold` → `Menu`、`Fab`、`BottomBar`、`Scaffold`。
+- `CouiMenu`、`CouiFab`、`CouiBottomBar`、`CouiScaffold` → `Menu`、`Fab`、`NavigationBar`、`Scaffold`。
 - `CouiSearchBar`、`CouiCollapsingTopAppBar`、`CouiTopAppBar` → `SearchBar`、`CollapsingTopAppBar`、`TopAppBar`；顶栏的 Button、ButtonGroup、ActionVisibility、Search、SearchButton、SearchAction 入口同样去掉前缀。
 - `CouiChipTab`、`CouiChipTabButton`、`CouiChipTabRow` → `ChipTab`、`ChipTabButton`、`ChipTabRow`。
 - `CouiAlertDialog`、`CouiInputDialog`、`CouiWheelPicker`、`CouiCalendarPicker` → `AlertDialog`、`InputDialog`、`WheelPicker`、`CalendarPicker`。
+
+开发快照中已使用 `BottomBar` 的调用方，将 import 和调用改为 `com.itos.coui.navigation.NavigationBar`，参数保持不变。
 
 `CouiTextKind`、Defaults、Style、状态等类型，以及 `CouiTheme`、`rememberCoui…` 工厂和 `coui…` 效果入口保持原名。与 M3 等同名组件混用时，通过 import 别名区分来源。
 

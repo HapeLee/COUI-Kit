@@ -127,7 +127,7 @@ COUIPopupListWindow / COUIPopupWindow
 
 [CouiFloatingShader](../../coui/src/main/java/com/itos/coui/effect/CouiFloatingShader.kt) 的轮廓使用融合距离场。轮廓分离时，先检查这条链路。
 
-[CouiFloatingSurfaces](../../coui/src/main/java/com/itos/coui/effect/CouiFloatingSurfaces.kt) 承接采样、普通投影、caustic、材质和内容的分层。独立 FAB 走单主体入口，不填充假附件，也不共享底栏的收放状态。当前保留附件式底栏和独立 FAB，没有实现普通底栏绑定外部 FAB 的协议，当前装配见[独立 FAB](../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)与[底栏](../../coui/src/main/java/com/itos/coui/navigation/BottomBar.kt)。
+[CouiFloatingSurfaces](../../coui/src/main/java/com/itos/coui/effect/CouiFloatingSurfaces.kt) 承接采样、普通投影、caustic、材质和内容的分层。独立 FAB 走单主体入口，不填充假附件，也不共享底栏的收放状态。当前保留附件式底栏和独立 FAB，没有实现普通底栏绑定外部 FAB 的协议，当前装配见[独立 FAB](../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)与[底栏](../../coui/src/main/java/com/itos/coui/navigation/NavigationBar.kt)。
 
 **普通投影与有色外光晕分开研究：**
 
@@ -291,7 +291,7 @@ COUIPopupListWindow / COUIPopupWindow
 |---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 模块归属与预设       | [架构](architecture.md)、[分层决策](../../.agents/notes/implemented/architecture/2026-10-21-coui-module-boundary.md)                                                                                                                                           |
 | 菜单采样、材质与输入    | [菜单记录](../../.agents/notes/implemented/bug-fix/2026-10-15-coui-submenu-input-dispatch.md)、[模糊实现](../../coui/src/main/java/com/itos/coui/menu/CouiMenuBlur.kt)、[主子面板](../../coui/src/main/java/com/itos/coui/menu/CouiMenuSubMenu.kt)                    |
-| 底栏、独立 FAB 与配色 | [底栏](../../coui/src/main/java/com/itos/coui/navigation/BottomBar.kt)、[独立 FAB](../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)、[配色预设](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabDefaults.kt)        |
+| 底栏、独立 FAB 与配色 | [底栏](../../coui/src/main/java/com/itos/coui/navigation/NavigationBar.kt)、[独立 FAB](../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)、[配色预设](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabDefaults.kt)        |
 | 轮廓门控与材质分层     | [浮动表面](../effects/floating-surfaces.md)、[光效开关](../../coui/src/main/java/com/itos/coui/effect/CouiEffectLocals.kt)、[浮动表面](../../coui/src/main/java/com/itos/coui/effect/CouiFloatingSurfaces.kt)                                                         |
 | 普通投影          | [网格、覆盖率与缓存决定](../../.agents/notes/implemented/bug-fix/2026-10-18-coui-native-shadow.md)、[菜单投影装配](../../coui/src/main/java/com/itos/coui/menu/CouiMenuShadow.kt)                                                                                         |
 | 顶栏与搜索         | [渐进模糊](../../.agents/notes/implemented/bug-fix/2026-10-18-coui-topbar-gradient-blur.md)、[overlay 与搜索边界](../../.agents/notes/implemented/bug-fix/2026-10-20-topappbar-search-transition-boundaries.md)                                                   |

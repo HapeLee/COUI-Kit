@@ -12,7 +12,7 @@ Status: implemented
 
 原生主题保留灰白表面、黑白文字和 Theme.COUI 的蓝色强调色。菜单与底栏的额外页面色相染色仅在宿主适配明确提供 tint 时启用；有色 FAB 预设是另一条原厂能力，保留显式颜色和材质/投影的一致性。FAB 默认材质使用主题强调色，默认投影使用 material.firstColor，不自动叠加菜单式染色。Material 映射由 Demo 与使用示例承载，核心不引用 M3 类型。
 
-当前入口为 [CouiTheme](../../../../coui/src/main/java/com/itos/coui/theme/CouiTheme.kt)、[菜单 Defaults](../../../../coui/src/main/java/com/itos/coui/menu/CouiMenuStyle.kt)、[顶栏 Defaults](../../../../coui/src/main/java/com/itos/coui/topappbar/CouiTopAppBarButtonDefaults.kt)、[默认 FAB](../../../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)与[底栏](../../../../coui/src/main/java/com/itos/coui/navigation/BottomBar.kt)。[外观指南](../../../../docs/guide/appearance.md)持有颜色优先级、插槽迁移、宿主桥接和染色契约。
+当前入口为 [CouiTheme](../../../../coui/src/main/java/com/itos/coui/theme/CouiTheme.kt)、[菜单 Defaults](../../../../coui/src/main/java/com/itos/coui/menu/CouiMenuStyle.kt)、[顶栏 Defaults](../../../../coui/src/main/java/com/itos/coui/topappbar/CouiTopAppBarButtonDefaults.kt)、[默认 FAB](../../../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)与[底栏](../../../../coui/src/main/java/com/itos/coui/navigation/NavigationBar.kt)。[外观指南](../../../../docs/guide/appearance.md)持有颜色优先级、插槽迁移、宿主桥接和染色契约。
 
 ## Evidence
 
@@ -45,7 +45,7 @@ Status: implemented
 
 菜单标题的原生字体由 CouiTypography.label 提供，绘制直接使用最终 headerTextStyle，避免覆盖宿主字体。保留菜单自己的标题颜色、对齐、行数和溢出规则；Material 映射及显式样式可改变标题尺寸，因此实际布局仍需设备验收。
 
-调用方可省略样式，仍可显式覆盖配置并独立使用 Effect。Slider 只对需要后置 dark/enabled 的 colors 使用 null；BottomBar 保留非空 Color.Unspecified，避免 nullable Color 改变 JVM 装箱描述符。可选附件缺少必需配置时显式失败，旧的完整附件参数仍参与原退场流程。
+调用方可省略样式，仍可显式覆盖配置并独立使用 Effect。Slider 只对需要后置 dark/enabled 的 colors 使用 null；NavigationBar 保留非空 Color.Unspecified，避免 nullable Color 改变 JVM 装箱描述符。可选附件缺少必需配置时显式失败，旧的完整附件参数仍参与原退场流程。
 
 代价是 M3 插槽不再自动继承其颜色和文字样式，使用页与 Demo 显式接入 COUI 内容 Local。默认 Theme 与组件签名尚未发行，alpha2 不能直接使用新示例；消费者须重新编译核验，不声明二进制稳定。
 
