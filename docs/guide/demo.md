@@ -4,22 +4,17 @@
 
 在 Android Studio 中打开仓库根目录，完成 Gradle Sync，再选择 `demo` 运行。SDK、Java 和依赖要求以 [版本目录](../../gradle/libs.versions.toml)、[库配置](../../coui/build.gradle.kts)、[Demo 配置](../../demo/build.gradle.kts) 和 [Gradle JVM 配置](../../gradle/gradle-daemon-jvm.properties) 为准。工程使用 AGP 内置 Kotlin。
 
-需要下载 CI 构建时，见 [Demo CI 与 PR 检查](../development/ci.md)。本地与 CI 可以共用独立的 Demo 测试密钥；同一 applicationId 的覆盖安装要求证书一致。
+需要下载 CI 构建时，见 [Demo CI 与 PR 检查](../development/ci.md)。维护者本地构建和 CI 分发的 Demo 统一使用 `itos` 签名；同一 applicationId 的覆盖安装要求证书一致。
 
 Demo 的 release 启用 R8 代码压缩、优化、混淆及资源裁剪，使用 AGP 默认优化规则和依赖自带的 consumer rules；debug 保留默认调试配置。COUI 库由最终 App 统一优化，不单独预混淆。定位 release 崩溃时保留对应构建的 mapping 文件。
 
 ## 本地签名
 
-首次配置时，将根目录 [signing.properties.example](../../signing.properties.example) 复制为 signing.properties，填写已有 Demo 密钥。KEYSTORE_FILE 相对于仓库根目录，也可填写绝对路径。四个字段必须完整，debug 与 release 使用同一配置；未配置文件和环境字段时，AGP 自动使用或创建本机默认 debug keystore。
+维护者将根目录 [signing.properties.example](../../signing.properties.example) 复制为 signing.properties，填写已有 `itos` 密钥的路径及密码，别名为 `itos`。密钥保存在仓库外，KEYSTORE_FILE 使用实际绝对路径。四个字段必须完整，debug 与 release 使用同一配置。
 
-没有现成密钥时，可以使用 JDK 的 keytool 创建独立测试密钥，再将实际密码填入配置：
+signing.properties 与 keystore 被 Git 忽略，不加入提交。旧 Demo 若使用其他证书，需要先卸载再安装；同为 `itos` 签名的版本可按 Android 的版本要求覆盖安装。
 
-~~~sh
-keytool -genkeypair -keystore demo-test.jks -storetype PKCS12 \
-  -alias coui-demo -keyalg RSA -keysize 3072 -validity 10000
-~~~
-
-请备份固定测试密钥。signing.properties 与 keystore 被 Git 忽略，不加入提交；模板中的测试密码只用于示例，不用于生产 App。首次从默认测试证书切换到固定证书时，旧 Demo 需要先卸载一次。
+没有维护者密钥的贡献者无需配置此文件，AGP 使用本机默认 debug keystore；这类构建用于开发验证，不作为官方 Demo 分发。
 
 CI 可通过 KEYSTORE_FILE、KEYSTORE_PASSWORD、KEYSTORE_ALIAS、KEYSTORE_ALIAS_PASSWORD 环境字段覆盖本地文件。环境字段按完整一组优先；只提供部分字段、空值或不存在的密钥路径时明确失败，不混用本地配置或静默退回其他证书。库编译与 PR 不要求提供固定签名。
 

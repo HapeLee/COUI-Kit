@@ -12,7 +12,7 @@
 | 公开入口、单位、资源与 API 变更          | [API 设计](api-design.md)                |
 | 新增或修改 component / effect 文档 | [文档维护](documentation.md)               |
 | 对照、检查、设备验收与诊断               | [验证与评审](validation.md)                 |
-| Demo 打包、固定测试签名、PR 检查与失败诊断 | [CI 与 PR 检查](ci.md)                     |
+| Demo 打包、固定签名、PR 检查与失败诊断 | [CI 与 PR 检查](ci.md)                     |
 | Maven Central、GitHub Packages 与版本映射 | [发布渠道](publishing.md) |
 | 自动化测试建设顺序与场景 | [自动化测试建议](testing-plan.md) |
 

@@ -1,5 +1,5 @@
-# 此处为 Demo 测试签名示例，若有需要请自行更改
-KEYSTORE_FILE=demo-test.jks
-KEYSTORE_PASSWORD=android
-KEYSTORE_ALIAS=coui-demo
-KEYSTORE_ALIAS_PASSWORD=android
+# 维护者 Demo 使用已有 itos 签名；填写本地密钥路径和密码，不提交真实配置
+KEYSTORE_FILE=/path/to/itos.jks
+KEYSTORE_PASSWORD=填写密钥库密码
+KEYSTORE_ALIAS=itos
+KEYSTORE_ALIAS_PASSWORD=填写私钥密码

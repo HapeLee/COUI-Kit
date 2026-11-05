@@ -7,7 +7,7 @@
 | 操作 | 结果 |
 |---|---|
 | main 普通 push | Demo job 跳过，不占用 Android 构建 Runner |
-| main 最新提交标题以 `[ci]` 开头 | 构建固定测试签名的 release，上传 APK 与对应 mapping |
+| main 最新提交标题以 `[ci]` 开头 | 构建 itos 签名的 release，上传 APK 与对应 mapping |
 | Actions 手动运行 Demo 打包 | 构建所选受信任分支，日常使用 main |
 | 指向 main 的 PR | 自动执行 Note、库与 Demo Lint、Demo debug/release 与库发行构建 |
 | Actions 手动运行发布库预览版 | 构建并检查库产物，上传 GitHub Packages；见[发布指南](publishing.md) |
@@ -15,23 +15,23 @@
 
 前缀判断使用本次 push 最后一个提交的标题，不扫描之前的提交。GitHub 的 startsWith 比较不区分大小写。条件在 job 层执行，因此普通 push 仍可能显示 skipped 工作流记录。PR 检查不受此前缀限制，也不按文档路径整体跳过，避免必需检查一直 Pending。
 
-Demo 下载位于对应 Actions run 的 Artifacts。CI 版本名只追加 ci 与短 SHA，不包含提交计数；本地默认版本名由 Demo 构建配置持有。本地与 CI 的 versionCode 均由 Gradle 直接读取当前 HEAD 的完整 Git 历史计数，不另传版本码参数；克隆时保留完整历史。APK 与 mapping 必须来自同一次构建。附件保留期以工作流配置为准，固定测试密钥不进入附件。
+Demo 下载位于对应 Actions run 的 Artifacts。CI 版本名只追加 ci 与短 SHA，不包含提交计数；本地默认版本名由 Demo 构建配置持有。本地与 CI 的 versionCode 均由 Gradle 直接读取当前 HEAD 的完整 Git 历史计数，不另传版本码参数；克隆时保留完整历史。APK 与 mapping 必须来自同一次构建。附件保留期以工作流配置为准，签名密钥不进入附件。
 
 ## 签名凭据
 
-本地配置见 [Demo 签名](../guide/demo.md#本地签名)。CI 使用同一把独立 Demo 测试密钥，在仓库 Actions Secrets 配置：
+本地配置见 [Demo 签名](../guide/demo.md#本地签名)。CI 与维护者本地构建使用同一把 `itos` 密钥，在仓库 Actions Secrets 配置：
 
 | Secret | 内容 |
 |---|---|
-| KEYSTORE | keystore 的 Base64 内容 |
+| KEYSTORE | itos keystore 的 Base64 内容 |
 | KEYSTORE_PASSWORD | keystore 密码 |
-| KEYSTORE_ALIAS | key alias |
+| KEYSTORE_ALIAS | `itos` |
 | KEYSTORE_ALIAS_PASSWORD | key 密码 |
 
-例如在仓库根目录上传已经备份的本地密钥，不将 Base64 写入终端输出或 Git：
+例如由维护者上传仓库外的已有密钥，命令中的路径替换为实际路径，不将 Base64 写入终端输出或 Git：
 
 ~~~sh
-base64 < demo-test.jks | gh secret set KEYSTORE
+base64 < /path/to/itos.jks | gh secret set KEYSTORE --repo ItosEO/COUI-Kit
 ~~~
 
 其他三个字段通过 GitHub Settings → Secrets and variables → Actions 填写。PR 不注入这些凭据，使用 Runner 默认测试签名；包括 fork PR 在内，都不需要维护者密钥。构建代码通过 pull_request 执行，不使用 pull_request_target 执行贡献者代码。
