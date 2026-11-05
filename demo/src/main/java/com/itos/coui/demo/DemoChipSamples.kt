@@ -49,7 +49,12 @@ private fun ChipTabMaterialSample(dark: Boolean) {
     var showIconButton by rememberSaveable { mutableStateOf(false) }
     var solidBackground by rememberSaveable { mutableStateOf(true) }
     var categoriesOpen by rememberSaveable { mutableStateOf(false) }
-    val labels = (1..7).map { stringResource(R.string.chip_category_number, it) }
+    val labels = listOf(
+        R.string.chip_category_recent, R.string.chip_category_favorites,
+        R.string.chip_category_media, R.string.chip_category_notes,
+        R.string.chip_category_archive, R.string.chip_category_shared,
+        R.string.chip_category_all,
+    ).map { stringResource(it) }
     val rendering = remember(labels.size) { runCatching { List(labels.size) { CouiFloatingRenderer.standalone() } } }
     val buttonRendering = remember { lazy(LazyThreadSafetyMode.NONE) { runCatching { CouiFloatingRenderer.standalone() } } }
     val buttonResult = if (showIconButton || buttonRendering.isInitialized()) buttonRendering.value else null
@@ -59,7 +64,7 @@ private fun ChipTabMaterialSample(dark: Boolean) {
     val anchor = rememberCouiMenuAnchor()
     val backgroundColor = if (solidBackground) {
         if (dark) Color.Black else Color.White
-    } else MaterialTheme.colorScheme.surfaceBright
+    } else if (dark) MaterialTheme.colorScheme.surfaceBright else MaterialTheme.colorScheme.background
     Group {
         DemoSwitchPreference(title = stringResource(R.string.chip_enable), checked = enabled, onCheckedChange = { enabled = it })
         Divider()
@@ -74,12 +79,12 @@ private fun ChipTabMaterialSample(dark: Boolean) {
         return
     }
     // 卡片只在完整示意区域裁剪；不能用 48dp 行高把分类项的投影上下截断。
-    Group { Box(Modifier.fillMaxWidth().height(144.dp)) {
+    Group { Box(Modifier.fillMaxWidth().height(120.dp)) {
         Box(Modifier.matchParentSize().couiBackdrop(backdrop).background(backgroundColor))
         ChipTabRow(
             modifier = Modifier.fillMaxWidth().align(Alignment.Center),
             items = labels.mapIndexed { index, label ->
-                CouiChipTabItem(index, label, icon = { Icon(DemoIcons.Tune, null, tint = LocalCouiContentColor.current) })
+                CouiChipTabItem(index, label)
             },
             selectedKey = selected, onSelectedKeyChange = { selected = it as Int }, backdrop = backdrop, dark = dark,
             enabled = enabled, itemSpacing = 8.dp, renderers = renderers,

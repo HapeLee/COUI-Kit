@@ -4,17 +4,9 @@
 
 ## 最小调用
 
-FAB 需要 API 34、页面背景源和单独的 standalone renderer；页面提供点击回调与内容：
+FAB 需要 API 34、页面背景源和单独的 standalone renderer。放入 COUI Scaffold 的 `floatingActionButton` 时可省略 `backdrop`，容器自动提供正文源；显式参数优先。下面示例显式接收背景源，适用于第三方容器。页面提供内容，需要业务操作时再传入点击回调：
 
 ~~~kotlin
-import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import com.itos.coui.backdrop.CouiBackdrop
-import com.itos.coui.effect.CouiFloatingRenderer
-import com.itos.coui.floatingactionbutton.Fab
-
 @RequiresApi(34)
 @Composable
 fun PageFab(
@@ -35,20 +27,6 @@ fun PageFab(
 FAB 需要 API 34 和页面背景源。下面使用内置配色创建一个按钮：
 
 ~~~kotlin
-import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
-import com.itos.coui.backdrop.CouiBackdrop
-import com.itos.coui.effect.CouiFloatingRenderer
-import com.itos.coui.effect.LocalCouiContourGlowEnabled
-import com.itos.coui.floatingactionbutton.Fab
-import com.itos.coui.floatingactionbutton.CouiFabColor
-import com.itos.coui.floatingactionbutton.CouiFabDefaults
-import com.itos.coui.shape.CouiShape
-
 @RequiresApi(34)
 @Composable
 fun PresetFab(
@@ -77,17 +55,17 @@ fun PresetFab(
 }
 ~~~
 
-`preset` 可以选择 `Notes`、`Phone`、`InfraredRemote` 或 `Recorder`。按钮内容通过 `content` 传入，点击时调用 `onClick`。
+`preset` 可以选择 `Notes`、`Phone`、`InfraredRemote` 或 `Recorder`。按钮内容通过 `content` 传入，点击时调用 `onClick`。省略回调时保留展示和拖拽反馈，不添加点击或 Button 语义。
 
-位置和安全区由页面控制。例如，可以将 FAB 放在 `Box` 右下角并添加边距。父容器需要为投影留出空间。
+拖拽超过系统触摸阈值后，FAB 接管移动事件，避免带动父级滚动；轻触仍交给已提供的点击回调。
+
+COUI Scaffold 的 `floatingActionButton` 已应用正文占位 Padding 并消费 Insets。槽位不添加默认外边距，调用方使用 `Modifier.align(Alignment.BottomEnd).padding(24.dp)` 定位；也可组合多个 FAB，每个按钮使用独立 renderer，见[页面容器](scaffold.md#放置-fab)。第三方容器的位置和安全区由页面控制。父容器需要为投影留出空间。
 
 ## 使用自定义底色
 
 需要使用自己的颜色时，将同一个颜色传给材质和阴影：
 
 ~~~kotlin
-import androidx.compose.ui.graphics.Color
-
 val color = Color(0xFF0080FF)
 val renderer = remember { CouiFloatingRenderer.standalone() }
 val density = LocalDensity.current.density
@@ -105,13 +83,11 @@ Fab(
 )
 ~~~
 
-这段代码使用上一节的导入；`backdrop`、`onClick` 和 `content` 由页面提供。
+这段代码位于宿主 Composable 中；`backdrop`、`onClick` 和 `content` 由页面提供。
 
 ## 图标和轮廓光
 
 启用 M3 适配后，省略材质的 FAB 会向 M3 图标提供主题 `onAccent`。显式材质保持 ambient 内容色；预设或自定义底色可显式设置 `tint`。示例使用 `CouiShape` 创建圆形，也可以传入自己的 Shape。
-
-有色预设见 `CouiFabColor` 和 `CouiFabDefaults`。
 
 轮廓光由 `LocalCouiContourGlowEnabled` 控制；关闭后，`CouiFabDefaults.shadow` 使用普通有色投影。
 
@@ -119,6 +95,6 @@ Fab(
 
 每个 FAB 使用独立的 `CouiFloatingRenderer.standalone()`，不要与其他绘制节点共用。
 
-`backdrop` 应覆盖不透明的页面内容，FAB 放在源节点之外。背景源的创建方式见[背景采样](../effects/backdrop.md)。
+COUI Scaffold 自动将 FAB 放在正文源之外。第三方容器的 `backdrop` 应覆盖不透明的页面内容，FAB 放在源节点之外。背景源的创建方式见[背景采样](../effects/backdrop.md)。
 
-源码见 [Fab](../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)、[配色](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabColor.kt)、[Defaults](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabDefaults.kt)，完整页面见 [DemoApp](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt)。
+源码见 [Fab](../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)、[配色](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabColor.kt)、[Defaults](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabDefaults.kt)。Demo 的固定位置装配见 [DemoSettingsPage](../../demo/src/main/java/com/itos/coui/demo/DemoSettingsPage.kt) 和 [DemoSecondaryPage](../../demo/src/main/java/com/itos/coui/demo/DemoSecondaryPage.kt)。

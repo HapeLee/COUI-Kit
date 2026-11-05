@@ -7,11 +7,6 @@
 下面片段位于 Compose 内容中。revealPx 是宿主可观察的位移状态，使用像素；读取 translation 时再把结果用于当前几何或绘制变换。
 
 ~~~kotlin
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalDensity
-import com.itos.coui.motion.rememberCouiMetaballFollowingTranslation
-import com.itos.coui.swipereveal.CouiSwipeRevealDefaults
-
 val density = LocalDensity.current
 val subjectSizePx = with(density) { CouiSwipeRevealDefaults.fusedActionSize.toPx() }
 val followingDistancePx = with(density) { CouiSwipeRevealDefaults.menuFollowingDistance.roundToPx().toFloat() }
@@ -42,14 +37,6 @@ Touch 的四轴和 Press.scale 都是只读 State<Float>。在绘制阶段读取
 下面片段位于 Compose 内容中；Box 内放宿主的按钮内容。点击仍由宿主自己的 clickable 处理：
 
 ~~~kotlin
-import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
-import com.itos.coui.motion.couiPressMotion
-import com.itos.coui.motion.couiTouchMotion
-import com.itos.coui.motion.rememberCouiPressMotion
-import com.itos.coui.motion.rememberCouiTouchMotion
-
 val motion = rememberCouiTouchMotion(expanded = true)
 val press = rememberCouiPressMotion()
 Box(
@@ -70,7 +57,7 @@ Box(
 
 按压输入的 cancelOnConsumedMove 用于父容器消费移动后立即释放，并在本次触摸结束前保持取消。选择、光效、按压与滚动各自有状态 owner，不能用某一路已取消推断其他路径都已收尾。
 
-预设集中在 CouiSwipeRevealDefaults；菜单公开展开弹簧仍可引用。使用参数含义和单位，不在宿主复制固定数值。
+跟随预设使用 `CouiSwipeRevealDefaults`，宿主无需复制固定参数。
 
 ## 入口与示例
 

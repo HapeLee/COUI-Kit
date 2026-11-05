@@ -7,11 +7,6 @@
 下面片段位于 API 34 及以上的 Compose 内容中。backdrop 来自不透明 SDR 页面；material、shadow、shape 为宿主外观；contentLayer 是节点持有并录制实际前景内容的 GraphicsLayer；surface 返回该节点当前几何。
 
 ~~~kotlin
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import com.itos.coui.effect.CouiFloatingRenderer
-import com.itos.coui.effect.couiFloatingSurface
-
 val renderer = remember { CouiFloatingRenderer.standalone() }
 val surfaceModifier = Modifier.couiFloatingSurface(
     backdrop = backdrop,
@@ -53,7 +48,7 @@ val surfaceModifier = Modifier.couiFloatingSurface(
 
 ## 资源与错误
 
-每个独立绘制节点持有自己的 renderer、内容层和采样坐标，不跨节点共享可变资源。material、shadow 等不可变配置可以复用。主题、轮廓、几何和位置变化应更新当前节点，录制层随节点释放。
+主题、轮廓、几何或位置变化时，更新当前节点的参数；录制层随节点释放。
 
 平台门槛及创建失败的处理见[背景采样](backdrop.md#资源与失败处理)。
 

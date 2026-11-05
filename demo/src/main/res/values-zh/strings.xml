@@ -16,12 +16,15 @@
     <string name="enable_controls">启用滑动选择条</string>
     <string name="continuous_value">连续值：%1$d%%</string>
     <string name="section_value">分段值：%1$d</string>
-    <string name="checkbox_title">复选框</string>
+    <string name="checkbox_title">单/复选框</string>
+    <string name="radio_group_title">单选框</string>
+    <string name="radio_first">选项一</string>
+    <string name="radio_second">选项二</string>
     <string name="checkbox_toggle">切换此复选框</string>
     <string name="checkbox_disabled">已选中且禁用</string>
     <string name="menu_title">菜单</string>
-    <string name="menu_first">第一项</string>
-    <string name="menu_second">第二项</string>
+    <string name="menu_first">标准模式</string>
+    <string name="menu_second">节能模式</string>
     <string name="menu_pinned">固定</string>
     <string name="menu_more">子菜单</string>
     <string name="menu_disabled">禁用项</string>
@@ -29,7 +32,6 @@
     <string name="open_menu">打开菜单</string>
     <string name="menu_header">选择与子菜单</string>
     <string name="shadow_title">阴影</string>
-    <string name="shadow_description">便捷 Modifier 入口使用 COUI 阴影预设。底层 Canvas 渲染接口仍可使用。</string>
     <string name="elevation_value">投影高度：%1$d dp</string>
     <string name="shadow_subject">阴影主体</string>
     <string name="fusion_title">融合算法</string>
@@ -76,4 +78,7 @@
     <string name="record_close_actions">收起记录操作</string>
     <string name="record_restore">恢复示例记录</string>
     <string name="material_theme_toggle">使用 Material 主题配色</string>
+    <string name="demo_settings">设置</string>
+    <string name="demo_theme_settings">主题设置</string>
+    <string name="demo_navigation_settings">底栏设置</string>
 </resources>

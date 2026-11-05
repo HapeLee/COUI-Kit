@@ -7,8 +7,6 @@
 在 Compose 中直接使用原生默认值，`checked` 和回调由宿主持有：
 
 ~~~kotlin
-import com.itos.coui.switch.Switch
-
 Switch(checked = checked, onCheckedChange = onCheckedChange)
 ~~~
 
@@ -23,10 +21,6 @@ Switch(checked = checked, onCheckedChange = onCheckedChange)
 `CouiTheme` 建立局部原生或自定义外观，退出后恢复外层策略。它同时提供自身模式。在全局使用 M3 适配时，局部主题仍桥接 M3 内容插槽。
 
 ~~~kotlin
-import androidx.compose.ui.graphics.Color
-import com.itos.coui.theme.CouiPresets
-import com.itos.coui.theme.CouiTheme
-
 val colors = (if (dark) CouiPresets.Dark else CouiPresets.Light)
     .copy(accent = Color(0xFF0080FF))
 CouiTheme(darkTheme = dark, colorScheme = colors) {
@@ -38,7 +32,7 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 
 `CouiTypography` 管普通内容、标签、菜单项及可选字体族。Shape 仍由各组件 Defaults 提供，适配器不把 COUI 几何改成 M3。
 
-`CouiColorScheme.background` 是页面底色，`surface` 是组件表面，`container` 是分组卡片。原生预设区分页面与卡片；自定义色板省略 `background` 时沿用 `surface`。`CouiPageDefaults.themeColors()` 分别读取 `background` 和 `container`，宿主将页面底色传给自己的页面容器。`CouiPageDefaults.colors(accent, dark)` 从对应的原生浅色或深色预设生成 `CouiPageColors`，再应用显式强调色；它不会读取或创建主题作用域。
+`CouiColorScheme.background` 是页面底色，`surface` 是组件表面，`container` 是通用容器底色，`card` 是列表分组卡片色。原生深色卡片使用 `couiColorCardBackground` 的半透明白色，叠加页面背景；菜单等顶层容器使用独立颜色。自定义色板省略 `background` 时沿用 `surface`，省略 `card` 时沿用 `container`。`CouiPageDefaults.themeColors()` 分别读取 `background` 和 `card`，宿主将页面底色传给自己的页面容器。`CouiPageDefaults.colors(accent, dark)` 从对应的原生浅色或深色预设生成 `CouiPageColors`，再应用显式强调色；它不会读取或创建主题作用域。
 
 ## Material 颜色与字体角色
 
@@ -54,7 +48,7 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 
 Chip 从 `labelLarge` 取字体族。Dialog 从 `titleLarge`、`bodyMedium`、`labelLarge`、`bodyLarge`、`labelSmall` 分别取得标题、正文、按钮、输入与计数字体族。两者的字号、字重和排版由组件控制；未启用 M3 适配时使用系统字体策略。
 
-`com.itos.coui.text.Text` 提供固定 COUI 排版角色，`kind` 必填。文字颜色依次取显式 `color`、已提供的 `LocalCouiContentColor`、当前 `CouiTheme.colorScheme.onSurface`。省略颜色即可在独立布局中跟随主题，详见[分组与行布局](../components/settings.md#配色与文字)。菜单项则读取 `CouiTheme.typography.menuItem` 的字号、字重与字体族。
+`com.itos.coui.text.Text` 提供固定 COUI 排版角色，`kind` 必填。文字颜色依次取显式 `color`、已提供的 `LocalCouiContentColor`、当前 `CouiTheme.colorScheme.onSurface`。省略颜色即可在独立布局中跟随主题，详见[Item](../components/item.md#配色与文字)。菜单项则读取 `CouiTheme.typography.menuItem` 的字号、字重与字体族。
 
 `LocalCouiContentColor` 的缺省值为 `Color.Unspecified`，表示未提供内容色。直接读取该 Local 的宿主应在未指定时取当前主题颜色；COUI 的文字和图标已经在消费处解析。显式颜色优先，包括透明色；图标显式传入 `tint = Color.Unspecified` 时保留不染色语义。
 
@@ -74,6 +68,8 @@ Chip 从 `labelLarge` 取字体族。Dialog 从 `titleLarge`、`bodyMedium`、`l
 
 顶栏按钮的 M3 路径使用 `minimumInteractiveComponentSize()`，遵守宿主尺寸 Local 与 alignment lines；原生策略使用组件的最小布局尺寸。搜索按钮使用固定容器，不受该 Local 控制。
 
+独立复选框的外层点击容器应隐藏涟漪，并保留点击和无障碍语义，装配方式见[只放一个复选框](../components/checkbox.md#只放一个复选框)。
+
 未启用适配器而在纯 native 核心插槽中使用 M3 内容时，仍需自行桥接其内容 Local；更常见的做法是接入可选模块。
 
 ## Shape 与效果开关
@@ -85,9 +81,6 @@ Chip 从 `labelLarge` 取字体族。Dialog 从 `titleLarge`、`bodyMedium`、`l
 轮廓与内晕通过 `LocalCouiContourGlowEnabled` 控制。显式构造 Style 时，应与对应阴影工厂使用同一值：
 
 ~~~kotlin
-import androidx.compose.runtime.CompositionLocalProvider
-import com.itos.coui.effect.LocalCouiContourGlowEnabled
-
 CompositionLocalProvider(LocalCouiContourGlowEnabled provides contourEnabled) {
     content()
 }

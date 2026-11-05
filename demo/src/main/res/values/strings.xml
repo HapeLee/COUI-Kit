@@ -16,12 +16,15 @@
     <string name="enable_controls">Enable sliders</string>
     <string name="continuous_value">Continuous: %1$d%%</string>
     <string name="section_value">Section: %1$d</string>
-    <string name="checkbox_title">Checkbox</string>
+    <string name="checkbox_title">Radio / Checkbox</string>
+    <string name="radio_group_title">Radio buttons</string>
+    <string name="radio_first">First option</string>
+    <string name="radio_second">Second option</string>
     <string name="checkbox_toggle">Toggle this checkbox</string>
     <string name="checkbox_disabled">Disabled and checked</string>
     <string name="menu_title">Menu</string>
-    <string name="menu_first">First item</string>
-    <string name="menu_second">Second item</string>
+    <string name="menu_first">Standard mode</string>
+    <string name="menu_second">Power-saving mode</string>
     <string name="menu_pinned">Pinned</string>
     <string name="menu_more">Submenu</string>
     <string name="menu_disabled">Disabled item</string>
@@ -29,7 +32,6 @@
     <string name="open_menu">Open menu</string>
     <string name="menu_header">Selection and submenu</string>
     <string name="shadow_title">Shadow</string>
-    <string name="shadow_description">The easy Modifier entry uses COUI shadow presets. The low-level Canvas renderer remains available.</string>
     <string name="elevation_value">Elevation: %1$d dp</string>
     <string name="shadow_subject">Shadow subject</string>
     <string name="fusion_title">Metaball algorithm</string>
@@ -76,4 +78,7 @@
     <string name="record_close_actions">Close record actions</string>
     <string name="record_restore">Restore sample records</string>
     <string name="material_theme_toggle">Material theme colors</string>
+    <string name="demo_settings">Settings</string>
+    <string name="demo_theme_settings">Theme settings</string>
+    <string name="demo_navigation_settings">Navigation bar settings</string>
 </resources>

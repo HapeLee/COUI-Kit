@@ -7,22 +7,6 @@
 下面函数在 API 33 及以上使用。宿主传入不透明底色、Shape、深浅色、点击回调和内容；先画底色，再画光，最后画内容。
 
 ~~~kotlin
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.semantics.Role
-import com.itos.coui.effect.SpotlightPreset
-import com.itos.coui.effect.rememberCouiSpotlight
-
 @RequiresApi(33)
 @Composable
 fun LitSurface(
@@ -82,6 +66,4 @@ shader 的 size、radiusPx、lineWidthPx 使用节点本地像素，density 为�
 
 每个独立节点持有自己的 CouiContour；尺寸、几何或强度变化时更新 shader 参数。外部裁剪 Shape 应与距离场匹配。独立轮廓使用白光 SrcOver；需要后景颜色参与时使用 CouiEdge。
 
-[弹窗](../components/dialog.md)在内部面板与操作按钮中完成该组合，调用方无需自行复制 Shader。
-
-弹窗内部操作按钮将同一个 InteractionSource 交给状态蒙层与唯一的 clickable；内部反馈 Modifier 不创建点击。
+[弹窗](../components/dialog.md)包含面板与操作按钮的轮廓效果，无需单独配置。

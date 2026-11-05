@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.itos.coui.backdrop.CouiBackdrop
+import com.itos.coui.backdrop.LocalCouiBackdrop
 import com.itos.coui.effect.CouiFloatingMaterial
 import com.itos.coui.effect.CouiFloatingRenderer
 import com.itos.coui.effect.CouiFloatingShadow
@@ -49,9 +50,11 @@ import com.itos.coui.motion.rememberCouiTouchMotion
 @Composable
 fun Fab(
     modifier: Modifier = Modifier,
-    backdrop: CouiBackdrop,
+    backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) {
+        "FAB 需要显式 backdrop 或 COUI Scaffold 的独立栏位"
+    },
     renderer: CouiFloatingRenderer,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     dark: Boolean = CouiTheme.isDark,
     shape: Shape = CouiTopAppBarButtonDefaults.circleShape,
     material: CouiFloatingMaterial? = null,
@@ -90,11 +93,14 @@ fun Fab(
                 translationY = motion.translationY.value
                 scaleX = motion.scaleX.value + press.scale.value - 1f
                 scaleY = motion.scaleY.value + press.scale.value - 1f
-            }.couiTouchMotion(motion, true).couiPressMotion(press).then(lightInput)
+            }.couiTouchMotion(motion, true, cancelOnConsumedMove = false, consumeDrag = true)
+                .couiPressMotion(press).then(lightInput)
                 .drawWithContent { contentLayer.record { this@drawWithContent.drawContent() } }
                 .clip(shape).drawBehind { drawLight?.invoke(this) }
                 .couiFabFeedback(dark, interactionSource)
-                .clickable(interactionSource = interactionSource, indication = null, role = Role.Button, onClick = onClick),
+                .then(if (onClick != null) Modifier.clickable(
+                    interactionSource = interactionSource, indication = null, role = Role.Button, onClick = onClick,
+                ) else Modifier),
             contentAlignment = Alignment.Center,
         ) {
             ProvideCouiContent(color = if (material == null) colors.onAccent else androidx.compose.ui.graphics.Color.Unspecified,

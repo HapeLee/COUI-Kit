@@ -7,36 +7,6 @@
 下面的搜索框支持输入、提交、关闭和返回键。搜索按钮与输入框需要放在同一个顶栏中，并使用同一份状态。此组件要求 API 34。
 
 ~~~kotlin
-import androidx.activity.compose.BackHandler
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.unit.dp
-import com.itos.coui.backdrop.CouiBackdrop
-import com.itos.coui.topappbar.CouiToolbarStyle
-import com.itos.coui.topappbar.TopAppBar
-import com.itos.coui.topappbar.TopAppBarButtonGroup
-import com.itos.coui.topappbar.TopAppBarSearch
-import com.itos.coui.topappbar.TopAppBarSearchButton
-import com.itos.coui.topappbar.rememberCouiTopAppBarSearchState
-
 @RequiresApi(34)
 @Composable
 fun SearchToolbar(
@@ -63,7 +33,7 @@ fun SearchToolbar(
         Unit
     }
     BackHandler(enabled = expanded, onBack = close)
-    TopAppBar(modifier = modifier, backdrop = backdrop) {
+    TopAppBarSurface(modifier = modifier, backdrop = backdrop) {
         Row(
             modifier = Modifier.fillMaxWidth().statusBarsPadding()
                 .heightIn(min = 64.dp).padding(horizontal = 16.dp),
@@ -112,13 +82,6 @@ fun SearchToolbar(
 将前面示例中的 `TopAppBarButtonGroup` 替换为下面的内容，可以控制右侧动作在搜索展开时的显示方式。动作回调和描述文案由页面提供：
 
 ~~~kotlin
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import com.itos.coui.topappbar.TopAppBarButton
-import com.itos.coui.topappbar.TopAppBarSearchAction
-
 TopAppBarButtonGroup {
     TopAppBarSearchAction(state = state) {
         TopAppBarButton(onClick = onReset, style = style) {
@@ -143,6 +106,38 @@ TopAppBarButtonGroup {
 ~~~
 
 默认动作会在搜索展开时淡出。设置 `visibleWhileSearching = true` 后，动作会移到新位置并保持可用。
+
+### 从搜索胶囊分离自定义按钮
+
+将 `action` 和 `onActionClick` 传给 `TopAppBarSearch`。展开时，右侧动作从搜索胶囊中融合分离；关闭时，动作沿同一路径融合收回，绘制保留到搜索弹簧结束。
+
+动作显露后即可在展开过程中点击。按钮自身的移动不会取消已经按下的点击；手指拖动超出阈值或系统取消时不提交。宿主请求关闭后，弹簧从当前位置和速度反向收起。
+
+下面的代码替换基本示例中的 `TopAppBarSearch`，沿用其状态、样式和 `close` 回调：
+
+~~~kotlin
+TopAppBarSearch(
+    modifier = Modifier.weight(1f),
+    state = state,
+    style = searchStyle,
+    query = query,
+    onQueryChange = onQueryChange,
+    onSearch = onSearch,
+    placeholder = placeholder,
+    focusPending = focusPending,
+    onFocused = { focusPending = false },
+    action = { Text(closeDescription) },
+    onActionClick = close,
+) {
+    Text(title)
+}
+~~~
+
+`action` 放置文字、图标或自定义排版。组件负责胶囊材质、点击、反馈与 Button 语义，内容中不要再套 `TopAppBarButton` 或添加独立点击。`onActionClick = null` 显示禁用动作；`enabled = false` 同时禁用搜索和动作。关闭目标生效时，动作立即停止输入并退出无障碍遍历。
+
+按钮按内容测量，宽度最多为可用搜索宽度的 40%，并受组件最大宽度限制；输入使用剩余宽度。RTL 下动作位于逻辑末端。`trailingIcon` 仍是输入框内部插槽，与外侧融合动作独立。
+
+完整示例见[顶栏示例](../../demo/src/main/java/com/itos/coui/demo/DemoToolbarSamples.kt)。
 
 M3 插槽的主题继承见[外观与预设](../guide/appearance.md)。收起时的 title 使用宿主样式。`TopAppBarSearchButton` 使用固定布局容器，不受 M3 最小交互尺寸 Local 控制。
 

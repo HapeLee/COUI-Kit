@@ -23,6 +23,13 @@ internal data class DemoCatalogEntry(val page: String, val title: Int, val icon:
 
 private val CatalogRowMinHeight = 52.dp
 
+internal val DemoWheelPickerEntries = listOf(
+    DemoCatalogEntry("wheel", R.string.picker_number_title, DemoIcons.Tune),
+    DemoCatalogEntry("timepicker", R.string.picker_time_title, CouiIcons.Time),
+    DemoCatalogEntry("countdownpicker", R.string.picker_countdown_title, CouiIcons.Countdown),
+    DemoCatalogEntry("datepicker", R.string.picker_date_title, DemoIcons.Date),
+)
+
 internal val DemoComponentGroups = listOf(
     listOf(DemoCatalogEntry("switch", R.string.switch_title, DemoIcons.Switch),
         DemoCatalogEntry("sliders", R.string.slider_title, DemoIcons.Tune),
@@ -32,13 +39,10 @@ internal val DemoComponentGroups = listOf(
     listOf(DemoCatalogEntry("appbar", R.string.catalog_appbar, DemoIcons.Title),
         DemoCatalogEntry("search", R.string.catalog_search, CouiIcons.Search),
         DemoCatalogEntry("navigation", R.string.catalog_navigation, CouiIcons.Featured),
+        DemoCatalogEntry("chip", R.string.chip_tab_title, CouiIcons.Components),
         DemoCatalogEntry("fab", R.string.catalog_fab, CouiIcons.Add)),
-    listOf(DemoCatalogEntry("timepicker", R.string.picker_time_title, CouiIcons.Time),
-        DemoCatalogEntry("countdownpicker", R.string.picker_countdown_title, CouiIcons.Countdown),
-        DemoCatalogEntry("datepicker", R.string.picker_date_title, DemoIcons.Date),
+    listOf(DemoCatalogEntry("wheel", R.string.catalog_wheel, DemoIcons.Tune),
         DemoCatalogEntry("calendar", R.string.picker_calendar_title, CouiIcons.Calendar)),
-    listOf(DemoCatalogEntry("settings", R.string.settings_title, DemoIcons.Tune),
-        DemoCatalogEntry("chip", R.string.chip_tab_title, CouiIcons.Components)),
 )
 
 internal val DemoEffectGroups = listOf(
@@ -49,33 +53,45 @@ internal val DemoEffectGroups = listOf(
 )
 
 @Composable
-internal fun DemoCatalog(groups: List<List<DemoCatalogEntry>>, open: (String) -> Unit, enabled: Boolean = true) {
-    groups.forEach { entries -> key(entries.first().page) {
-        Group {
-            entries.forEachIndexed { index, entry -> key(entry.page) {
-                DemoPreference(Modifier.heightIn(min = CatalogRowMinHeight),
-                    title = stringResource(entry.title), enabled = enabled, onClick = { open(entry.page) }, icon = {
-                        Icon(entry.icon, null, Modifier.size(CouiPageDefaults.iconSize), tint = catalogIconColor(entry.page))
-                    })
-                if (index != entries.lastIndex) Divider(startIndent =
-                    CouiPageDefaults.rowPadding + CouiPageDefaults.iconSize + CouiPageDefaults.iconSpacing)
-            } }
+internal fun DemoCatalog(groups: List<List<DemoCatalogEntry>>, open: (String) -> Unit, enabled: Boolean = true,
+    query: String = "") {
+    val needle = query.trim()
+    var hasMatches = false
+    groups.forEach { entries ->
+        val matches = entries.mapNotNull { entry ->
+            if (catalogSearchMatches(entry, needle)) entry to entry.page
+            else if (entry.page == "wheel") {
+                DemoWheelPickerEntries.firstOrNull { catalogSearchMatches(it, needle) }?.let { entry to it.page }
+            } else null
         }
-    } }
+        if (matches.isNotEmpty()) {
+            hasMatches = true
+            key(entries.first().page) {
+                Group {
+                    matches.forEachIndexed { index, (entry, route) -> key(entry.page) {
+                        DemoPreference(Modifier.heightIn(min = CatalogRowMinHeight),
+                            title = stringResource(entry.title), enabled = enabled, onClick = { open(route) }, icon = {
+                                Icon(entry.icon, null, Modifier.size(CouiPageDefaults.iconSize), tint = catalogIconColor(entry.page))
+                            })
+                        if (index != matches.lastIndex) Divider(startIndent =
+                            CouiPageDefaults.rowPadding + CouiPageDefaults.iconSize + CouiPageDefaults.iconSpacing)
+                    } }
+                }
+            }
+        }
+    }
+    if (!hasMatches) Text(stringResource(R.string.no_matches), Modifier.padding(32.dp),
+        color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
 @Composable
-internal fun DemoCatalogSearch(query: String, enabled: Boolean = true, open: (String) -> Unit) {
-    val filtered = (DemoComponentGroups + DemoEffectGroups).flatten().filter {
-        val needle = query.trim()
-        stringResource(it.title).contains(needle, ignoreCase = true) ||
-            it.page.contains(needle, ignoreCase = true) ||
-            stringResource(catalogDescription(it.page)).contains(needle, ignoreCase = true)
-    }
-    if (filtered.isEmpty()) Text(stringResource(R.string.no_matches), Modifier.padding(32.dp),
-        color = MaterialTheme.colorScheme.onSurfaceVariant)
-    else DemoCatalog(listOf(filtered), open, enabled = enabled)
-}
+private fun catalogSearchMatches(entry: DemoCatalogEntry, needle: String): Boolean =
+    stringResource(entry.title).contains(needle, ignoreCase = true) ||
+        entry.page.contains(needle, ignoreCase = true) ||
+        (entry.page == "checkbox" && "radio".contains(needle, ignoreCase = true)) ||
+        stringResource(if (entry.page == "wheel") R.string.intro_numberpicker else catalogDescription(entry.page))
+            .contains(needle, ignoreCase = true) ||
+        (entry.page == "wheel" && stringResource(R.string.picker_number_title).contains(needle, ignoreCase = true))
 
 /** 目录图标由 Demo 配色，几何使用随 Demo 打包的 ColorOS 原始矢量。 */
 private fun catalogIconColor(page: String): Color = Color(when (page) {
@@ -99,7 +115,7 @@ internal fun catalogDescription(page: String): Int = when (page) {
     "search" -> R.string.intro_search
     "navigation" -> R.string.intro_navigation
     "fab" -> R.string.intro_fab
-    "settings" -> R.string.intro_settings
+    "wheel" -> R.string.intro_wheel
     "timepicker" -> R.string.intro_timepicker
     "countdownpicker" -> R.string.intro_countdownpicker
     "datepicker" -> R.string.intro_datepicker

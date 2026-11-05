@@ -43,20 +43,11 @@ dependencies {
 
 ## 显示第一个组件
 
-以下无前缀 API 示例对应当前源码，使用[源码模块接入](#源码模块)或包含该变更的开发版本。上方 `0.0.1-alpha3` 依赖使用带 `Coui` 前缀的组件名，迁移规则见 [CHANGELOG](../../CHANGELOG.md#组件命名迁移)。
+以下示例使用源码或开发快照中的无前缀组件名；源码接入见[源码模块](#源码模块)。`0.0.1-alpha3` 使用带 `Coui` 前缀的名称，版本差异和迁移规则见 [CHANGELOG](../../CHANGELOG.md#组件命名迁移)。
 
 在 Compose 页面中加入下面的滑条，拖动时更新 `value`：
 
 ~~~kotlin
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import com.itos.coui.slider.Slider
-
 @Composable
 fun SliderExample(
     modifier: Modifier = Modifier,
@@ -74,23 +65,9 @@ fun SliderExample(
 
 ## 浮动组件的背景源
 
-顶栏、底栏、FAB 和材质弹窗需要采样页面背景。下面创建一个背景源，并将顶栏放在被采样的页面内容之外：
+COUI `Scaffold` 自动录制正文背景，供顶栏、底栏和 FAB 槽位使用，无需创建、挂载或传递 Backdrop。下面使用 COUI Scaffold 与顶栏；采样本身不需要全局初始化：
 
 ~~~kotlin
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import com.itos.coui.backdrop.couiBackdrop
-import com.itos.coui.backdrop.rememberCouiBackdrop
-import com.itos.coui.topappbar.TopAppBar
-
 @Composable
 fun PageContent(
     modifier: Modifier = Modifier,
@@ -98,22 +75,27 @@ fun PageContent(
     title: String,
     content: @Composable () -> Unit,
 ) {
-    val backdrop = rememberCouiBackdrop()
-    Box(modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().couiBackdrop(backdrop).background(background)) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = background,
+        topBar = {
+            TopAppBar(
+                title = { BasicText(title, style = LocalCouiTextStyle.current) },
+            )
+        },
+    ) { padding ->
+        Column(Modifier.fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(padding).consumeWindowInsets(padding)) {
             content()
-        }
-        TopAppBar(
-            modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth(),
-            backdrop = backdrop,
-        ) {
-            BasicText(title)
         }
     }
 }
 ~~~
 
-背景源只挂一个节点，节点应覆盖不透明的页面内容。顶栏不会自动为内容留出空间，实际页面需要按顶栏高度设置顶部间距。示例文字使用 Foundation；深色页面按页面配色传入文字 Style。
+容器录制完整正文视口与 `containerColor`，不包含顶栏、底栏和 FAB。正文需应用并消费 Padding。正文内部的模糊效果需使用独立源，不能采样自身。Material 等第三方容器需手动创建源、挂载源并显式传参，见[宿主页面接入](secondary-pages.md)。
+
+`TopAppBar` 提供标题字体和主题内容色，并处理顶部及横向安全区。示例文字使用 Foundation，通过 `LocalCouiTextStyle` 读取槽位样式。
 
 菜单的背景源使用 `ProvideCouiMenuBackdrop`；材质弹窗的用法见[弹窗](../components/dialog.md#使用背景材质)。背景源、renderer 和失败处理的细节见[背景采样](../effects/backdrop.md)。
 

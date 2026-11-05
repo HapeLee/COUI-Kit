@@ -4,18 +4,9 @@
 
 ## 最小调用
 
-底栏需要 API 34、背景源、导航项、选中索引和选择回调。`items`、`selectedIndex` 与 `onSelection` 由宿主提供：
+底栏需要 API 34、背景源、导航项、选中索引和选择回调。放入 COUI Scaffold 的 `bottomBar` 时可省略 `backdrop`，容器自动提供正文源；显式参数优先。下面示例显式接收背景源，适用于第三方容器。`items`、`selectedIndex` 与 `onSelection` 由宿主提供：
 
 ~~~kotlin
-import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import com.itos.coui.backdrop.CouiBackdrop
-import com.itos.coui.effect.CouiFloatingRenderer
-import com.itos.coui.navigation.NavigationBar
-import com.itos.coui.navigation.CouiNavigationItem
-
 @RequiresApi(34)
 @Composable
 fun NavigationBarExample(
@@ -44,30 +35,6 @@ fun NavigationBarExample(
 底栏需要 API 34，以及一个覆盖页面内容的背景源。下面显示三个导航项和两个操作按钮；背景源的创建方式见[快速开始](../guide/getting-started.md#浮动组件的背景源)。
 
 ~~~kotlin
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import com.itos.coui.backdrop.CouiBackdrop
-import com.itos.coui.effect.CouiFloatingRenderer
-import com.itos.coui.floatingactionbutton.CouiFabColor
-import com.itos.coui.floatingactionbutton.CouiFabDefaults
-import com.itos.coui.navigation.NavigationBar
-import com.itos.coui.navigation.CouiNavigationItem
-import com.itos.coui.shape.CouiCapsuleShape
-
 @RequiresApi(34)
 @Composable
 fun PageNavigationBar(
@@ -116,13 +83,15 @@ fun PageNavigationBar(
 
 示例保存选中的索引，并通过 `onSelection` 通知页面切换。项目已有导航状态时，可以将索引作为参数传入 `PageNavigationBar`，再传给 `NavigationBar`。`items` 不能为空，选中索引必须属于列表。每项可以分别设置普通图标和选中图标；示例使用相同图标。示例中的 Material 图标需要由应用声明图标依赖。
 
-将底栏放在背景源节点之外，例如放在页面 `Box` 的底部。
+使用 COUI Scaffold 时，将底栏放在 `bottomBar`。第三方容器将底栏放在背景源节点之外，例如放在页面 `Box` 的底部。
 
-底栏会处理底部系统安全区，但不会给页面内容留白。请按底栏的实际高度为内容设置底部间距，不要重复叠加系统底部 inset。
+底栏会处理底部系统安全区，但不会自行给正文留白。COUI Scaffold 测量底栏并通过正文 Padding 提供占位，正文应用并消费它。第三方容器按其契约处理底栏的实际高度，不要重复叠加系统底部 inset。
 
 ## 左右附件
 
-左右附件默认隐藏。将 `leftVisible` 或 `rightVisible` 设为 `true` 时，必须提供该侧的图标、无障碍描述和点击回调。需要保留附件退场动画内容时，隐藏期间仍传入对应附件参数，只切换可见状态。
+左右附件默认隐藏。将 `leftVisible` 或 `rightVisible` 设为 `true` 时，必须提供该侧的图标和无障碍描述。点击回调可以省略；没有回调时，附件保留展示与拖拽反馈，但不注册点击或 Button 语义。需要保留附件退场动画内容时，隐藏期间仍传入对应附件参数，只切换可见状态。
+
+底栏主体及附件的拖拽超过触摸阈值后会接管移动事件，避免带动父级滚动。轻触仍由导航项或附件已有的点击回调处理。
 
 `rightContainerColor` 是右侧按钮的底色；默认的 `Color.Unspecified` 会解析为 COUI 主题强调色。页面同时使用独立 FAB 时，可以显式传入相同颜色，让两个按钮保持一致。
 

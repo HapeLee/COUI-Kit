@@ -40,7 +40,7 @@ dependencies {
 
 仓库配置和工具链要求见[快速开始](docs/guide/getting-started.md)。部分效果需要更高的 Android 版本，见[兼容要求](docs/guide/compatibility.md#效果门槛)。
 
-本分支的组件文档使用无前缀名称，如 `Text`、`Switch` 和 `Scaffold`。使用 `0.0.1-alpha3` 时，组件名称仍带 `Coui` 前缀；当前源码的迁移规则见 [CHANGELOG](CHANGELOG.md#组件命名迁移)。
+源码文档使用 `Text`、`Switch` 和 `Scaffold` 等无前缀组件名。`0.0.1-alpha3` 使用带 `Coui` 前缀的名称，版本差异和迁移规则见 [CHANGELOG](CHANGELOG.md#组件命名迁移)。
 
 ### 接入 Material 3
 
@@ -63,10 +63,6 @@ dependencies {
 在已有 `Application.onCreate()` 中、创建 Compose UI 前初始化一次：
 
 ```kotlin
-import android.app.Application
-import com.itos.coui.material3.CouiMaterial3Style
-import com.itos.coui.theme.Coui
-
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -80,9 +76,6 @@ class App : Application() {
 默认深浅模式跟随系统。App 有独立主题开关时，在现有主题 Provider 中提供实际的 `darkTheme`：
 
 ```kotlin
-import androidx.compose.runtime.CompositionLocalProvider
-import com.itos.coui.theme.LocalCouiDarkTheme
-
 CompositionLocalProvider(LocalCouiDarkTheme provides darkTheme) {
     content()
 }
@@ -90,16 +83,13 @@ CompositionLocalProvider(LocalCouiDarkTheme provides darkTheme) {
 
 `darkTheme` 和 `content` 来自宿主主题。嵌套 `MaterialTheme` 若独立改变深浅模式，也在该边界提供此 Local；库不会从自定义色板猜测模式。显式组件参数继续优先，局部原生主题、字体与染色规则见[外观与预设](docs/guide/appearance.md)。
 
-### 在页面中使用
-
-添加依赖后，请参考[快速开始](docs/guide/getting-started.md)配置页面并运行示例。
-
 ## 文档
 
 - [组件目录](docs/components/README.md)
 - [效果目录](docs/effects/README.md)
 - [兼容要求](docs/guide/compatibility.md)
 - [外观与预设](docs/guide/appearance.md)
+- [与原厂的定制差异](docs/guide/customizations.md)
 - [GitHub Packages 开发快照](docs/guide/github-packages.md)
 - [更新记录与版本映射](CHANGELOG.md)
 
