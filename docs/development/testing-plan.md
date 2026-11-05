@@ -20,7 +20,7 @@
 | --- | --- | --- |
 | Switch | 点击后回调一次；拖动到另一锚点仅提交一次；CANCEL/父级接管不提交；loading/disabled 拒绝输入；宿主拒绝后回到受控值；RTL | P0 |
 | Slider | 0/1 和非零范围边界；step 吸附与可见 Tick 分离；快速反向；禁用与完成回调；键盘调值和语义 | P0 |
-| AlertDialog / InputDialog | 返回/外点关闭；焦点与 IME 策略；中文 IME 组合区、选区替换；输入过滤；窗口创建/移除；材质缺失时明确失败 | P0 |
+| Dialog / InputDialog | 返回/外点关闭；焦点与 IME 策略；中文 IME 组合区、选区替换；输入过滤；窗口创建/移除；材质缺失时明确失败 | P0 |
 | Menu | 选中/禁用项，关闭回调；长菜单滚动；子菜单交接；快速取消、再次展开；键盘导航 | P1 |
 | Checkbox | 外部整行 toggleable 的单一点击 owner、正确 Checkbox 语义；动画中切换与禁用 | P1 |
 | NavigationBar / ChipTab | 选中项合法性、RTL、长项目列表、惯性/回弹中中断、隐藏附件；资源随节点移除而释放 | P1 |

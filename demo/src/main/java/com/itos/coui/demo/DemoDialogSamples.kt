@@ -8,7 +8,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
-import com.itos.coui.dialog.AlertDialog
+import com.itos.coui.dialog.Dialog
 import com.itos.coui.dialog.CouiDialogAction
 import com.itos.coui.dialog.CouiDialogDefaults
 import com.itos.coui.dialog.CouiDialogPlacement
@@ -19,6 +19,8 @@ import com.itos.coui.layout.*
 @Composable
 internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
     var opened by rememberSaveable { mutableStateOf<String?>(null) }
+    var visible by rememberSaveable { mutableStateOf(false) }
+    var session by rememberSaveable { mutableStateOf(0) }
     var material by rememberSaveable { mutableStateOf(Build.VERSION.SDK_INT >= 33) }
     val initialDeviceName = stringResource(R.string.dialog_device_name_initial)
     var deviceName by rememberSaveable { mutableStateOf(initialDeviceName) }
@@ -33,19 +35,20 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
     }
     Group {
         variants.forEachIndexed { index, (key, label) ->
-            DemoPreference(title = stringResource(label), onClick = { opened = key })
+            DemoPreference(title = stringResource(label), onClick = { opened = key; session++; visible = true })
             if (index < variants.lastIndex) Divider()
         }
     }
     if (opened != null) {
         val variant = opened
-        val dismiss = { opened = null }
+        val dismiss = { visible = false }
         val regularMessage = stringResource(R.string.dialog_sample_message)
         val title = stringResource(R.string.dialog_sample_title)
-        if (variant == "input") RenameDeviceDialogSample(dark = dark, initialName = deviceName,
+        if (variant == "input") androidx.compose.runtime.key(session) {
+            RenameDeviceDialogSample(dark = dark, initialName = deviceName, visible = visible,
             material = material && supported, backdrop = windowBackdrop, onDismissRequest = dismiss,
-            onSave = { deviceName = it; opened = null })
-        else AlertDialog(onDismissRequest = dismiss, dark = dark,
+            onSave = { deviceName = it; visible = false })
+        } else Dialog(onDismissRequest = dismiss, dark = dark, visible = visible,
             title = title,
             message = if (variant == "long") List(12) { regularMessage }.joinToString("\n\n") else regularMessage,
             confirmAction = CouiDialogAction(stringResource(R.string.dialog_confirm), dismiss, variant != "disabled",

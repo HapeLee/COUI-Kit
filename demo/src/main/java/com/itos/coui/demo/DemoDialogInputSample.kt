@@ -35,6 +35,7 @@ internal fun RenameDeviceDialogSample(
     onDismissRequest: () -> Unit,
     onSave: (String) -> Unit,
     backdrop: CouiBackdrop? = null,
+    visible: Boolean = true,
 ) {
     val draft = rememberTextFieldState(initialText = initialName, initialSelection = TextRange(initialName.length))
     var edited by rememberSaveable { mutableStateOf(false) }
@@ -59,7 +60,7 @@ internal fun RenameDeviceDialogSample(
             }
         }
     }
-    InputDialog(state = draft, inputTransformation = transformation,
+    InputDialog(state = draft, inputTransformation = transformation, visible = visible,
         onDismissRequest = onDismissRequest, dark = dark, accent = com.itos.coui.theme.CouiTheme.colorScheme.accent,
         title = stringResource(R.string.dialog_device_name_title),
         message = stringResource(R.string.dialog_device_name_message),

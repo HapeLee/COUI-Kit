@@ -31,6 +31,7 @@ internal fun PickerSamples(page: String, dark: Boolean) {
     var restricted by rememberSaveable { mutableStateOf(false) }
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
     var dialogMode by rememberSaveable { mutableStateOf<String?>(null) }
+    var dialogVisible by rememberSaveable { mutableStateOf(false) }
     var draft by rememberSaveable { mutableLongStateOf(0) }
     val activeMode = mode
     val calendar = page == "calendar"
@@ -105,12 +106,13 @@ internal fun PickerSamples(page: String, dark: Boolean) {
         DemoPreference(title = title, value = value, enabled = activeMode != "wheel" || enabled, onClick = {
             draft = currentValue(activeMode)
             dialogMode = activeMode
+            dialogVisible = true
         })
     }
     val editingMode = dialogMode
-    if (editingMode != null) DemoPickerDialog(onDismissRequest = { dialogMode = null }, onConfirm = {
+    if (editingMode != null) DemoPickerDialog(visible = dialogVisible, onDismissRequest = { dialogVisible = false }, onConfirm = {
         updateValue(editingMode, draft)
-        dialogMode = null
+        dialogVisible = false
     }, title = stringResource(pickerTitle(editingMode)),
         confirmText = stringResource(R.string.picker_confirm), cancelText = stringResource(R.string.picker_cancel),
         backdrop = backdrop) {

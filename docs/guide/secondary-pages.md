@@ -67,6 +67,8 @@ fun MixedPage(
 
 含输入框的页面在滚动容器外使用 `imePadding()`，使键盘打开时实际视口缩小，Foundation 才能处理焦点避让。只增加滚动内容尾部空白不会缩小视口。父级已处理 IME 时沿用其分工，详见 [Insets 消费规则](https://developer.android.com/develop/ui/compose/system/insets-ui)。
 
+页面还会打开输入弹窗时，按[宿主窗口焦点启用键盘避让](../components/dialog.md#宿主页的键盘避让)，避免背景页面提前空出键盘区域。
+
 大标题页面使用 `LargeTopAppBar` 与 `CouiTopAppBarDefaults.exitUntilCollapsedScrollBehavior`，正文通过 `scrollBehavior.state.contentPadding` 补偿顶部，并用宿主原始 Padding 消费 Insets。常驻搜索页面使用 `CollapsingTopAppBar` 的 `state.contentPadding`。完整装配见[折叠顶栏](../components/collapsing-app-bar.md)。该状态接收普通 PaddingValues，不依赖特定 Scaffold。
 
 ## 正文源与窗口源

@@ -1,6 +1,6 @@
 # 📅选择器
 
-`WheelPicker` 用于选择整数，`CalendarPicker` 用于选择单个公历日期。两者都由页面提供当前值和更新回调，可直接嵌入页面，也可以放进现有的 `AlertDialog`。
+`WheelPicker` 用于选择整数，`CalendarPicker` 用于选择单个公历日期。两者都由页面提供当前值和更新回调，可直接嵌入页面，也可以放进现有的 `Dialog`。
 
 库公开的是这两个受控组件。时间、倒计时、年月日滚轮组合和选择弹窗属于 Demo 示例，不是额外的公开 Picker API。
 
@@ -109,7 +109,7 @@ CalendarPicker(
 
 ## 在弹窗内选择日期
 
-直接使用已有的 `AlertDialog` 和 `content` 槽位。弹窗持有草稿，用户确认后才保存：
+直接使用已有的 `Dialog` 和 `content` 槽位。弹窗持有草稿，用户确认后才保存：
 
 ~~~kotlin
 @Composable
@@ -124,7 +124,7 @@ fun DatePickerDialog(
     var draftDay by rememberSaveable(value) {
         mutableLongStateOf(value.toEpochDay())
     }
-    AlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
         title = "选择日期",
         confirmAction = CouiDialogAction("确定", {

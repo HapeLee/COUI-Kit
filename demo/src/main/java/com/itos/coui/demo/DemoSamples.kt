@@ -4,7 +4,7 @@ import android.os.Build
 import com.itos.coui.dialog.CouiDialogDefaults
 import com.itos.coui.dialog.CouiDialogActionStyle
 import com.itos.coui.dialog.CouiDialogAction
-import com.itos.coui.dialog.AlertDialog
+import com.itos.coui.dialog.Dialog
 import com.itos.coui.theme.CouiTheme
 import com.itos.coui.menu.rememberCouiWindowBackdrop
 import com.itos.coui.icons.CouiIcons
@@ -178,7 +178,7 @@ internal fun SettingsDemo(dark: Boolean, preferences: DemoPreferences,
     }
     val backdrop = rememberCouiWindowBackdrop()
     val accent = CouiTheme.colorScheme.accent
-    if (reset) AlertDialog(onDismissRequest = { reset = false }, dark = dark,
+    Dialog(visible = reset, onDismissRequest = { reset = false }, dark = dark,
         title = stringResource(R.string.settings_reset), message = stringResource(R.string.settings_reset_message),
         confirmAction = CouiDialogAction(stringResource(R.string.dialog_confirm),
             { onReset(); reset = false }, style = CouiDialogActionStyle.Primary,

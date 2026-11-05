@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -82,7 +83,9 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
         val header = behavior.state
         val search = key(page) { rememberCouiSearchBarState(page == 0 && searching) }
         val density = LocalDensity.current
-        Scaffold(modifier = Modifier.fillMaxSize().imePadding()
+        // 弹窗持有输入时，后面的页面不为其键盘提前腾空背景。
+        val imePadding = if (LocalWindowInfo.current.isWindowFocused) Modifier.imePadding() else Modifier
+        Scaffold(modifier = Modifier.fillMaxSize().then(imePadding)
             .nestedScroll(behavior.nestedScrollConnection), containerColor = background,
             topBar = {
                 if (page == 0) {

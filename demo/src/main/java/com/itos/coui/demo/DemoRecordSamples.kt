@@ -56,7 +56,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
-import com.itos.coui.dialog.AlertDialog
+import com.itos.coui.dialog.Dialog
 import com.itos.coui.dialog.CouiDialogAction
 import com.itos.coui.effect.CouiMetaballRenderer
 import kotlinx.coroutines.launch
@@ -83,6 +83,7 @@ internal fun RecordSwipeSamples(dark: Boolean) {
     var openId by remember { mutableIntStateOf(0) }
     var lastViewedId by rememberSaveable { mutableIntStateOf(0) }
     var viewedId by rememberSaveable { mutableIntStateOf(0) }
+    var previewVisible by rememberSaveable { mutableStateOf(false) }
     if (Build.VERSION.SDK_INT < 33) {
         Text(stringResource(R.string.requires_api_33), Modifier.padding(horizontal = 16.dp))
         return
@@ -104,7 +105,7 @@ internal fun RecordSwipeSamples(dark: Boolean) {
                     onOpenChange = { open ->
                         if (open) openId = id else if (openId == id) openId = 0
                     },
-                    onClick = { lastViewedId = id; viewedId = id },
+                    onClick = { lastViewedId = id; viewedId = id; previewVisible = true },
                     onDelete = { records = records.filterTo(arrayListOf()) { it != id } },
                 )
             }
@@ -116,9 +117,9 @@ internal fun RecordSwipeSamples(dark: Boolean) {
         }
     }
     SampleRecords.firstOrNull { it.id == viewedId }?.let { record ->
-        AlertDialog(onDismissRequest = { viewedId = 0 }, dark = dark,
+        Dialog(visible = previewVisible, onDismissRequest = { previewVisible = false }, dark = dark,
             title = stringResource(R.string.record_preview),
-            confirmAction = CouiDialogAction(stringResource(R.string.dialog_confirm), { viewedId = 0 })) {
+            confirmAction = CouiDialogAction(stringResource(R.string.dialog_confirm), { previewVisible = false })) {
             RecordHistoryContent(record = record)
         }
     }

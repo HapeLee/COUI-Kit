@@ -40,6 +40,7 @@ import com.itos.coui.topappbar.CouiTopAppBarButtonDefaults
 import com.itos.coui.topappbar.CouiTopAppBarDefaults
 import com.itos.coui.effect.LocalCouiContourGlowEnabled
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import android.os.Build
 
 import com.itos.coui.layout.*
@@ -68,7 +69,9 @@ internal fun DemoSettingsPage(
     val behavior = CouiTopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         canScroll = { scrollState.maxValue > 0 })
     val localDensity = LocalDensity.current
-    Scaffold(modifier = modifier.fillMaxSize().imePadding()
+    // 弹窗持有输入时，后面的页面不为其键盘提前腾空背景。
+    val imePadding = if (LocalWindowInfo.current.isWindowFocused) Modifier.imePadding() else Modifier
+    Scaffold(modifier = modifier.fillMaxSize().then(imePadding)
         .nestedScroll(behavior.nestedScrollConnection),
         containerColor = colors.background,
         floatingActionButton = floatingAction,

@@ -1,19 +1,22 @@
 # 💬弹窗
 
-`AlertDialog` 用于显示确认、提示等弹窗，可以放在屏幕底部或居中显示。需要单行输入时，可以使用 `InputDialog`。
+`Dialog` 用于显示确认、提示等弹窗，可以放在屏幕底部或居中显示。需要单行输入时，可以使用 `InputDialog`。
 
 ## 最小调用
 
 页面提供显隐状态、操作文案和回调；`confirmAction` 是宿主用文案和业务回调构造的 `CouiDialogAction`：
 
 ~~~kotlin
-if (visible) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmAction = confirmAction,
-    )
-}
+Dialog(
+    visible = visible,
+    onDismissRequest = onDismiss,
+    confirmAction = confirmAction,
+)
 ~~~
+
+需要移动过程中实时采样背景时，传入 `visible`，并将调用持续保留在组合中。`true` 开始入场，`false` 开始退场；库在退场结束后释放窗口。移动和背景采样使用同一帧的位移、缩放，动画中途可以反向。
+
+`Dialog` 和两个 `InputDialog` 重载均支持此参数。不要再用 `if (visible)` 包裹这类调用，否则退场内容会立即移除。省略参数（默认 `null`）时，由外层条件控制窗口，使用系统窗口动画；此方式不提供移动过程中的实时采样。下文外层条件示例展示该调用方式。
 
 `dark` 和 `colors` 默认读取局部 `CouiTheme` 或初始化策略；未初始化时使用原生预设，模式来自 Local 或系统。M3 模式使用对应文字角色的字体族，字号、字重、行距和 fontScale 由组件控制。自定义正文使用宿主样式。通用规则见[外观与预设](../guide/appearance.md)。
 
@@ -35,7 +38,7 @@ fun ConfirmDialog(
     onDismiss: () -> Unit,
 ) {
     if (visible) {
-        AlertDialog(
+        Dialog(
             modifier = modifier,
             onDismissRequest = onDismiss,
             dark = dark,
@@ -57,7 +60,7 @@ fun ConfirmDialog(
 通过 `neutralAction` 添加第三个操作。例如，在确认和取消之外增加重置按钮：
 
 ~~~kotlin
-AlertDialog(
+Dialog(
     onDismissRequest = onDismiss,
     dark = dark,
     title = title,
@@ -81,7 +84,7 @@ AlertDialog(
 需要在正文中放列表或选择器时，可以使用 `content` 槽位：
 
 ~~~kotlin
-AlertDialog(
+Dialog(
     onDismissRequest = onDismiss,
     dark = dark,
     title = title,
@@ -138,7 +141,24 @@ fun RenameDialog(
 
 页面负责设置长度、内容校验和确认条件。`InputDialog` 支持 `TextFieldState` 和 `TextFieldValue`。需要按替换范围过滤粘贴或输入法组合输入时，使用 `state` 版本的 `inputTransformation`；程序性的 `state.edit` 和清除不会经过该转换。
 
-默认会在窗口获焦后请求输入焦点和键盘。需要手动点击输入区时，设置 `autoFocus = false`。输入弹窗使用 `ADJUST_RESIZE`，内容不需要再添加 `imePadding`。自定义 `properties` 时，请保留 `decorFitsSystemWindows = true` 和 `usePlatformDefaultWidth = false`。
+默认会在窗口获焦后请求输入焦点和键盘。需要手动点击输入区时，设置 `autoFocus = false`。
+
+传入 `visible` 时，卡片随键盘展开、收起而移动，背景模糊采样同步跟随卡片位置。关闭弹窗会立即释放输入焦点并收起键盘，卡片从当前位置退场。省略 `visible` 时，使用系统窗口的 `ADJUST_RESIZE` 避让键盘。两种方式均不需要额外添加 `imePadding`；自定义 `properties` 时，保留 `decorFitsSystemWindows = true` 和 `usePlatformDefaultWidth = false`。
+
+### 宿主页的键盘避让
+
+宿主页如果使用 `imePadding()`，只在自己的窗口拥有焦点时启用。输入弹窗打开后，宿主页仍可能收到键盘尺寸；继续应用间距会提前空出整块区域，在键盘升起前露出窗口底色。
+
+在宿主 Activity 的 Composable 中创建以下 Modifier，替换页面原来的无条件 `imePadding()`，并传给现有的 Scaffold 或页面容器。焦点判断放在宿主页，不放在 `InputDialog` 内部：
+
+~~~kotlin
+val imePadding = if (LocalWindowInfo.current.isWindowFocused) {
+    Modifier.imePadding()
+} else {
+    Modifier
+}
+val pageModifier = Modifier.fillMaxSize().then(imePadding)
+~~~
 
 ## 使用背景材质
 
@@ -146,7 +166,7 @@ fun RenameDialog(
 
 ~~~kotlin
 if (visible) {
-    AlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
         dark = dark,
         title = title,
@@ -165,14 +185,14 @@ if (visible) {
 
 `visible`、文案和回调沿用前面的确认弹窗示例。`material` 非空时要求 API 33 及以上，并须通过 `backdrop` 或 `ProvideCouiMenuBackdrop` 提供有效背景源；缺少系统支持或背景源时会报错。不支持材质时传入 `material = null`，使用不透明表面。
 
-背景模糊采样自页面，窗口遮罩由系统绘制。
+背景模糊采样自页面，窗口遮罩由系统独立渐变。传入 `visible` 时，入场等待窗口完成布局后开始；底部弹窗按卡片外框高度进入，按显示区域高度退出，位移与背景采样共用当前帧的位置。
 
 ## 位置和外观
 
 默认从底部显示。需要居中时，设置 `placement = CouiDialogPlacement.Center`：
 
 ~~~kotlin
-AlertDialog(
+Dialog(
     onDismissRequest = onDismiss,
     confirmAction = CouiDialogAction(confirmLabel, onConfirm),
     dark = dark,
@@ -198,4 +218,4 @@ Demo 的“组件 → 弹窗”分组包含底部、居中、长内容、多个�
 
 支持的设备可以通过“弹窗背景材质”开关比较模糊材质和不透明表面。
 
-Demo 源码见 [DemoDialogSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt) 与[输入型示例](../../demo/src/main/java/com/itos/coui/demo/DemoDialogInputSample.kt)。公开参数见 [AlertDialog / CouiDialogAction](../../coui/src/main/java/com/itos/coui/dialog/AlertDialog.kt)、[CouiDialogActionStyle / CouiDialogActionColors](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogButton.kt)、[InputDialog](../../coui/src/main/java/com/itos/coui/dialog/InputDialog.kt) 与 [CouiDialogDefaults](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogDefaults.kt)。
+Demo 源码见 [DemoDialogSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt) 与[输入型示例](../../demo/src/main/java/com/itos/coui/demo/DemoDialogInputSample.kt)。公开参数见 [Dialog / CouiDialogAction](../../coui/src/main/java/com/itos/coui/dialog/Dialog.kt)、[CouiDialogActionStyle / CouiDialogActionColors](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogButton.kt)、[InputDialog](../../coui/src/main/java/com/itos/coui/dialog/InputDialog.kt) 与 [CouiDialogDefaults](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogDefaults.kt)。

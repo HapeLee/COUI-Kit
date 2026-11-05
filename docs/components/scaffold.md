@@ -59,6 +59,8 @@ fun NativePage(
 
 含输入框的页面在容器外侧使用 `Modifier.imePadding()`，使键盘打开时缩小实际视口；默认 `windowInsets` 不包含 IME。只增加正文尾部空白不能代替焦点避让。父级已处理 IME 时沿用父级分工。消费规则见 [Android 官方 Insets 文档](https://developer.android.com/develop/ui/compose/system/insets-ui)。
 
+页面还会打开输入弹窗时，按[宿主窗口焦点启用键盘避让](dialog.md#宿主页的键盘避让)，避免背景页面提前空出键盘区域。
+
 容器占满父级提供的有界宽高，不放入纵向无界滚动内容。关闭系统安全区处理可传入 `windowInsets = WindowInsets(0, 0, 0, 0)`，随后由宿主负责避让。
 
 ## 放置 FAB
