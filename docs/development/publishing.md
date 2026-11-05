@@ -40,16 +40,18 @@ Packages 按分支、Central 按 Tag 串行执行，不取消正在上传的任�
 
 先将发布工作流与待发行改动合入 main，确认该提交的 CI 和所需验收通过，再创建尚未发布的版本 Tag。Tag 必须指向 main 历史中的提交；不要在未合入的开发分支发布。
 
-例如准备发布 `0.0.1-alpha4`：
+发行只使用 Alpha 和正式 Release；Release 内容手写。先创建 GitHub 预发布草稿，Tag 推送会独立触发 Maven 发布；两个模块通过远端下载检查后再公开草稿。正式版不带预览后缀，并取消 GitHub 的 Pre-release 标记。
+
+例如准备发布 `0.0.1-alpha5`：
 
 ```sh
 git switch main
 git pull --ff-only
-git tag -a v0.0.1-alpha4 -m "发布 0.0.1-alpha4"
-git push origin v0.0.1-alpha4
+git tag -a v0.0.1-alpha5 -m "发布 0.0.1-alpha5"
+git push origin v0.0.1-alpha5
 ```
 
-支持 `v主版本.次版本.补丁版本`，以及 `-alphaN`、`-betaN`、`-rcN` 后缀，例如 `v0.1.0`、`v0.1.0-rc1`。版本数字不带多余前导零。不接受 SNAPSHOT、构建元数据或 Commit 标题作为 Central 版本；具体校验由 [Tag 脚本](../../.github/scripts/central-release-version.cjs)持有。
+支持 `v主版本.次版本.补丁版本` 和 `-alphaN` 后缀，例如 `v0.1.0`、`v0.1.0-alpha1`。版本数字不带多余前导零。不接受 Beta、RC、SNAPSHOT、构建元数据或 Commit 标题作为 Central 版本；具体校验由 [Tag 脚本](../../.github/scripts/central-release-version.cjs)持有。
 
 在 Actions 查看“发布 Maven Central”。工作流先执行两个库的 Release Lint 和本地发行检查，再通过已有 Vanniktech 插件签名、上传并自动发布。Central 配置只在发布命令中启用，普通 PR、Demo 与 Packages 构建不需要 Central 凭据或 GPG 私钥。
 

@@ -2,17 +2,19 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
-## 未发布
+## [0.0.1-alpha5] - 2026-11-05
+
+`coui` 与 `coui-material3` 同版本发行，源码见 [v0.0.1-alpha5](https://github.com/ItosEO/COUI-Kit/tree/v0.0.1-alpha5)。发行记录、验证结果及 Maven 坐标见 [Release](https://github.com/ItosEO/COUI-Kit/releases/tag/v0.0.1-alpha5)。以下为相对 alpha4 的主要变更。
 
 ### 组件命名迁移
 
-公开 UI 组件统一去掉 `Coui` 前缀，包名和参数保持不变。升级当前源码时，同步修改 import、调用和函数引用；不保留旧名称转发。此项属于源码及二进制不兼容变更，已发布版本的名称不变。
+公开 UI 组件统一简化名称。升级时同步修改 import、调用和函数引用；不保留旧名称转发。名称及下述参数变化属于源码及二进制不兼容变更，已发布版本的名称不变。
 
 - `CouiText`、`CouiSwitch`、`CouiSlider`、`CouiCheckbox` → `Text`、`Switch`、`Slider`、`Checkbox`。
 - `CouiMenu`、`CouiFab`、`CouiBottomBar`、`CouiScaffold` → `Menu`、`Fab`、`NavigationBar`、`Scaffold`。
-- `CouiSearchBar`、`CouiCollapsingTopAppBar`、`CouiTopAppBar` → `SearchBar`、`CollapsingTopAppBar`、`TopAppBar`；顶栏的 Button、ButtonGroup、ActionVisibility、Search、SearchButton、SearchAction 入口同样去掉前缀。
+- `CouiSearchBar`、`CouiCollapsingTopAppBar`、`CouiTopAppBar` → `SearchBar`、`CollapsingTopAppBar`、`TopAppBarSurface`；顶栏的 Button、ButtonGroup、ActionVisibility、Search、SearchButton、SearchAction 入口同样去掉前缀。
 - `CouiChipTab`、`CouiChipTabButton`、`CouiChipTabRow` → `ChipTab`、`ChipTabButton`、`ChipTabRow`。
-- `CouiAlertDialog`、`CouiInputDialog`、`CouiWheelPicker`、`CouiCalendarPicker` → `AlertDialog`、`InputDialog`、`WheelPicker`、`CalendarPicker`。
+- `CouiAlertDialog`、`CouiInputDialog`、`CouiWheelPicker`、`CouiCalendarPicker` → `Dialog`、`InputDialog`、`WheelPicker`、`CalendarPicker`；开发快照中的 `AlertDialog` 也需改为 `Dialog`。
 
 开发快照中已使用 `BottomBar` 的调用方，将 import 和调用改为 `com.itos.coui.navigation.NavigationBar`，参数保持不变。
 
@@ -20,6 +22,10 @@ COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和�
 
 ### 新增
 
+- 新增受控 `WheelPicker`、`CalendarPicker` 和 `RadioButton`，分别提供滚轮、月历和单选交互。
+- `TopAppBar` 提供完整的标题、导航与操作槽位；`LargeTopAppBar` 支持大标题折叠。仅需背景效果、继续使用宿主顶栏布局时，调用 `TopAppBarSurface`。
+- `TopAppBarSearch` 支持可选右侧融合动作，内容由 `action` 提供，点击由 `onActionClick` 提交。
+- `Dialog` 和 `InputDialog` 增加 `visible`，支持受控进退场与移动过程中的实时背景采样。传入时须保持调用在组合中，不用 `if (visible)` 提前移除；输入弹窗同步处理焦点、键盘关闭与位移避让。
 - `Text` 增加可选 `maxLines`、`overflow`；Body 与 Description 默认按逻辑起始边对齐，显式 `textAlign` 优先。
 - `SearchBar` 增加可选 `enabled`，统一控制点击、编辑、清除、取消、IME 提交和交互反馈，禁用时释放自身输入但保留宿主状态。取消文字宽度按文本、样式、密度、布局方向和测量器缓存。
 - `Item` 移除无条件语义合并；整行点击沿用 clickable 的语义，纯布局保留子控件语义。`Group.headerActions` 仅随非空标题渲染。
@@ -37,11 +43,11 @@ COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和�
 
 - `LocalCouiContentColor` 的缺省值为 `Color.Unspecified`。COUI 文字和图标在消费处解析当前主题前景色；直接读取该 Local 的宿主需处理未指定值。显式文字颜色及图标的不染色语义保留。
 - `CouiColorScheme` 增加独立 `background`，默认沿用 `surface`；原生页面与组件表面分别配色。M3 适配的菜单项和头部标签分别读取 `labelLarge` 与 `bodySmall`。
-- `TopAppBar` 支持背景透明度和全高渐隐曲线，保留显式渐变颜色的 alpha；`dark` 默认跟随 `CouiTheme`。
+- `TopAppBarSurface` 支持背景透明度和全高渐隐曲线，保留显式渐变颜色的 alpha；`dark` 默认跟随 `CouiTheme`。
 - 浮动表面增加双主体入口，复用既有材质、融合和光效。列表按压复用现有反馈入口。
 - ChipTab 与纵向滚动共享物理内核，各实例的动画等级独立决定摩擦参数。
 
-开发分支中临时布局名称及搜索配色参数的迁移说明见 [PR #16](https://github.com/ItosEO/COUI-Kit/pull/16)。以上内容尚未进入发行版本。
+开发分支中临时布局名称及搜索配色参数的迁移说明见 [PR #16](https://github.com/ItosEO/COUI-Kit/pull/16)。Dialog 的显隐与宿主页键盘避让接线见 [弹窗文档](docs/components/dialog.md)。
 
 ## [0.0.1-alpha3] - 2026-11-01
 
