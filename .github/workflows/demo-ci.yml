@@ -62,11 +62,9 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
-          DEMO_COMMIT: ${{ steps.version.outputs.commit }}
         run: |
           set -euo pipefail
           ./gradlew :demo:assembleRelease --no-configuration-cache --stacktrace \
-            "-PdemoVersionNameSuffix=-ci.$DEMO_COMMIT" \
             2>&1 | tee "$RUNNER_TEMP/coui-demo-build.log"
       - name: 验证 APK 签名与 mapping
         run: |

@@ -59,7 +59,7 @@ fun PageToolbar(
 
 把顶栏放入 Scaffold 的 `topBar`，并将正文应用 Scaffold 返回的 Padding。直接叠放时，由页面预留顶栏的实际高度。此例显式使用按钮 `style`；也可以省略它以使用默认样式。示例假定宿主已接入可选 M3 适配，Material3 `Text` 自动继承组件内容色与文字样式，项目仍需声明 Material3 依赖。
 
-`navigationIcon` 放置返回等导航操作，`actions` 是 RowScope 槽位。`CouiTopAppBarDefaults.colors()` 分别配置背景、标题、导航和操作颜色；默认读取当前主题。标题字体由顶栏提供。纯 Compose 标题使用 `BasicText(title, style = LocalCouiTextStyle.current)`，其中 `BasicText` 来自 `androidx.compose.foundation.text`，`LocalCouiTextStyle` 来自 `com.itos.coui.theme`。
+`navigationIcon` 放置返回等导航操作，`actions` 是 RowScope 槽位。`CouiTopAppBarDefaults.colors()` 分别配置背景遮罩、标题、导航和操作颜色。背景遮罩默认在浅色模式使用白色、深色模式使用黑色，并向下渐隐；其余颜色读取当前主题。传入 `backgroundColor = Color.Transparent` 可关闭遮罩。标题字体由顶栏提供。纯 Compose 标题使用 `BasicText(title, style = LocalCouiTextStyle.current)`，其中 `BasicText` 来自 `androidx.compose.foundation.text`，`LocalCouiTextStyle` 来自 `com.itos.coui.theme`。
 
 普通大标题页面的滚动装配见[折叠顶栏](collapsing-app-bar.md#普通大标题)。
 
@@ -149,7 +149,7 @@ COUI Scaffold 的 `topBar` 自动提供正文背景源，`TopAppBar`、`LargeTop
 
 ## 背景参数
 
-以下参数属于 `TopAppBarSurface`。`backgroundAlpha` 只控制背景透明度。`gradientColor` 的 alpha 与渐变曲线及背景图层透明度相乘；`dark` 决定背景渐变的深浅色分支，默认读取 `CouiTheme.isDark`。
+以下参数属于 `TopAppBarSurface`。`backgroundAlpha` 同时控制模糊背景与遮罩的透明度，不影响标题和按钮。`gradientColor` 省略或传入 `Color.Unspecified` 时，浅色模式使用白色渐变、深色模式使用黑色渐变，从顶部向下淡出。显式颜色覆盖默认遮罩，其 alpha 与渐变曲线及背景图层透明度相乘；`Color.Transparent` 关闭遮罩并保留模糊。`dark` 决定背景渐变的深浅色分支，默认读取 `CouiTheme.isDark`。
 
 `topExtension` 返回背景向上延伸的 dp 距离，在测量阶段读取；它增加背景高度并将背景向上平移，不改变内容占位或命中区域。折叠顶栏用它保持完整背景随顶栏移动，使渐进曲线与采样尺寸稳定。`bottomExtension` 只增加向下延伸的范围。
 

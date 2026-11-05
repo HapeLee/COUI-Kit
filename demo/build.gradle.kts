@@ -37,7 +37,7 @@ android {
         minSdk = 31
         targetSdk = 37
         versionCode = gitCommitCount.get()
-        versionName = "1.0" + providers.gradleProperty("demoVersionNameSuffix").orElse("").get()
+        versionName = "0.0.1-alpha6"
     }
     buildFeatures { compose = true }
     val demoSigning = if (signingValues.isNotEmpty()) {

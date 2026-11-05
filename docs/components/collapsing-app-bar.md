@@ -19,7 +19,6 @@ Scaffold(
         LargeTopAppBar(
             title = { BasicText(title, style = LocalCouiTextStyle.current) },
             scrollBehavior = behavior,
-            colors = CouiTopAppBarDefaults.colors(backgroundColor = background),
         )
     },
 ) { padding ->
@@ -50,11 +49,10 @@ CollapsingTopAppBar(
     state = header,
     title = title,
     backdrop = backdrop,
-    backgroundColor = colors.background,
 )
 ```
 
-`header`、`backdrop` 和 `colors` 由页面按下节方式创建；正文使用同一个 `header.nestedScrollConnection` 和 `contentPadding`。标题保持可见，字号和位置随折叠变化，最终保留固定栏位。预设见 `CouiCollapsingAppBarDefaults`；无搜索模式的字号使用 dp，不额外按系统字体倍率放大。普通大标题页面优先使用上面的 `LargeTopAppBar` 槽位接口。
+`header` 和 `backdrop` 由页面按下节方式创建；正文使用同一个 `header.nestedScrollConnection` 和 `contentPadding`。标题保持可见，字号和位置随折叠变化，最终保留固定栏位。预设见 `CouiCollapsingAppBarDefaults`；无搜索模式的字号使用 dp，不额外按系统字体倍率放大。普通大标题页面优先使用上面的 `LargeTopAppBar` 槽位接口。
 
 省略 `searchBar` 或传入 `null` 时使用纯标题布局；传入空 lambda 也会使用搜索式布局。
 
@@ -79,7 +77,7 @@ androidx.compose.material3.Scaffold(
                 WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
             state = header, searchState = search, title = title,
             color = colors.title, backdrop = backdrop,
-            backgroundColor = colors.background, dark = dark,
+            dark = dark,
         ) {
             SearchBar(state = search, query = query, onQueryChange = updateQuery,
                 onExpandedChange = updateExpanded, placeholder = searchLabel,
@@ -142,7 +140,7 @@ LazyColumn 使用补偿后的 `contentPadding`，但 `consumeWindowInsets` 仍�
 
 `color` 默认按实际 `dark` 解析，显式颜色优先，其 alpha 与标题动画相乘。`dark` 只控制顶栏自身；需要搜索采用同一模式时，显式传入相同 `dark`，或将二者放入同一个局部 `CouiTheme`。
 
-`backgroundColor` 提供背景渐变色。模糊背景使用固定的下沿延伸，并随折叠向上平移；完整背景高度不随当前栏高缩放。普通大标题保持不透明；带常驻搜索时，背景淡入跟随正文实际位置，搜索活动期间保持显示。这些绘制范围不改变布局或命中高度。
+`backgroundColor` 省略或传入 `Color.Unspecified` 时，背景遮罩在浅色模式使用白色、深色模式使用黑色，并向下渐隐。显式颜色覆盖默认遮罩；`Color.Transparent` 关闭遮罩并保留模糊。模糊背景使用固定的下沿延伸，并随折叠向上平移；完整背景高度不随当前栏高缩放。普通大标题保持不透明；带常驻搜索时，背景淡入跟随正文实际位置，搜索活动期间保持显示。这些绘制范围不改变布局或命中高度。
 
 COUI Scaffold 自动录制正文与结果，不包含顶栏或其浮动消费者；`LargeTopAppBar` 和 `CollapsingTopAppBar` 放在 `topBar` 时可省略 `backdrop`，显式参数优先。上面的 Material 3 示例仍需创建源，在现有正文容器添加 `.couiBackdrop(backdrop)`，并将源显式传给顶栏。图层由库管理，无需全局初始化，见[背景采样](../effects/backdrop.md#顶栏接入)。自定义背景容器 `TopAppBarSurface` 的参数见[顶栏与按钮](top-app-bar.md#背景参数)。
 

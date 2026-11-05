@@ -2,6 +2,20 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
+## [0.0.1-alpha6] - 2026-11-05
+
+`coui` 与 `coui-material3` 同版本发行，源码见 [v0.0.1-alpha6](https://github.com/ItosEO/COUI-Kit/tree/v0.0.1-alpha6)。发行附件及更新日志见 [Release](https://github.com/ItosEO/COUI-Kit/releases/tag/v0.0.1-alpha6)。以下为相对 alpha5 的主要变更。
+
+- 新增 顶栏默认背景遮罩，浅色使用白色、深色使用黑色，并向下渐隐。
+- 优化 顶栏背景渐隐曲线，平滑中间节点与底部过渡，减轻渐变接痕。
+- 优化 渐进模糊的颜色计算精度，减轻横向色带。
+- 调整 顶栏模糊强度，同步普通顶栏、大标题顶栏与旧平台预设。
+- 调整 Demo 顶栏示例使用默认背景遮罩，同步背景颜色与透明遮罩的接入说明。
+- 调整 Demo 本地与 CI 统一使用 `itos` 签名。
+- 调整 Demo 版本名为 `0.0.1-alpha6`，与发行 Tag 对齐；版本码继续使用 Git commit count。
+
+顶栏背景参数省略或为 `Color.Unspecified` 时使用默认遮罩。显式颜色覆盖默认值；`Color.Transparent` 关闭遮罩并保留模糊。升级时检查已有背景颜色覆盖，详见[顶栏背景参数](docs/components/top-app-bar.md#背景参数)。
+
 ## [0.0.1-alpha5] - 2026-11-05
 
 `coui` 与 `coui-material3` 同版本发行，源码见 [v0.0.1-alpha5](https://github.com/ItosEO/COUI-Kit/tree/v0.0.1-alpha5)。发行记录、验证结果及 Maven 坐标见 [Release](https://github.com/ItosEO/COUI-Kit/releases/tag/v0.0.1-alpha5)。以下为相对 alpha4 的主要变更。

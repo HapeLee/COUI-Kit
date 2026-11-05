@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -92,8 +91,7 @@ internal fun DemoSettingsPage(
                         DemoSettingsArrow(Modifier.size(24.dp), back = true, color = colors.title)
                     }
             }
-            val barColors = CouiTopAppBarDefaults.colors(backgroundColor = Color.Transparent,
-                titleColor = colors.title, dark = dark)
+            val barColors = CouiTopAppBarDefaults.colors(titleColor = colors.title, dark = dark)
             LargeTopAppBar(title = {
                 androidx.compose.material3.Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }, navigationIcon = navigation, actions = { actions() },
