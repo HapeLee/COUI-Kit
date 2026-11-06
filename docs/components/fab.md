@@ -113,6 +113,8 @@ Fab(
 
 每个 FAB 使用独立的 `CouiFloatingRenderer.standalone()`，不要与其他绘制节点共用。
 
+组合相邻 FAB 时，传入 `foregroundComposition = true`。材质和外光晕将以透明前景叠加，拖拽形变时不会用矩形背景回填覆盖相邻按钮。此模式要求背景源覆盖不透明 SDR 页面，并排除所有 FAB；各按钮仍保留自己的 renderer、输入和动画。重叠区域的光效不包含兄弟前景采样，合成边界见[浮动表面](../effects/floating-surfaces.md#几何与绘制)。
+
 COUI Scaffold 自动将 FAB 放在正文源之外。第三方容器的 `backdrop` 应覆盖不透明的页面内容，FAB 放在源节点之外。背景源的创建方式见[背景采样](../effects/backdrop.md)。
 
 源码见 [Fab](../../coui/src/main/java/com/itos/coui/floatingactionbutton/Fab.kt)、[配色](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabColor.kt)、[Defaults](../../coui/src/main/java/com/itos/coui/floatingactionbutton/CouiFabDefaults.kt)。Demo 的固定位置装配见 [DemoSettingsPage](../../demo/src/main/java/com/itos/coui/demo/DemoSettingsPage.kt) 和 [DemoSecondaryPage](../../demo/src/main/java/com/itos/coui/demo/DemoSecondaryPage.kt)。

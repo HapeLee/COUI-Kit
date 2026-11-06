@@ -101,8 +101,8 @@ Scaffold(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.End,
         ) {
-            Fab(renderer = editRenderer, onClick = onEdit, content = editContent)
-            Fab(renderer = addRenderer, onClick = onAdd, content = addContent)
+            Fab(renderer = editRenderer, onClick = onEdit, foregroundComposition = true, content = editContent)
+            Fab(renderer = addRenderer, onClick = onAdd, foregroundComposition = true, content = addContent)
         }
     },
 ) { padding ->

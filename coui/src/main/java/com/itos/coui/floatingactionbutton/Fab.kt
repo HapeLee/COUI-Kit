@@ -46,7 +46,10 @@ import com.itos.coui.motion.rememberCouiPressMotion
 import com.itos.coui.motion.rememberCouiTouchMotion
 import com.itos.coui.shape.CouiShape
 
-/** 使用 CouiShape 时, 裁剪与材质共用半径和权重, 普通投影使用相同半径的 caster。 */
+/**
+ * 使用 CouiShape 时, 裁剪与材质共用半径和权重, 普通投影使用相同半径的 caster。
+ * 相邻 FAB 可启用 foregroundComposition, 在不透明 SDR 背景上只叠加自身前景, 避免背景回填擦除兄弟节点。
+ */
 @RequiresApi(34)
 @Composable
 fun Fab(
@@ -60,6 +63,7 @@ fun Fab(
     shape: Shape = CouiFabDefaults.circleShape,
     material: CouiFloatingMaterial? = null,
     shadow: CouiFloatingShadow? = null,
+    foregroundComposition: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val contour = LocalCouiContourGlowEnabled.current
@@ -81,7 +85,7 @@ fun Fab(
     Box(
         modifier.size(56.dp).onSizeChanged { boundsSize = it }
             .couiFloatingSurface(backdrop, renderer, resolvedMaterial, resolvedShadow, shape,
-                contentLayer, contour) {
+                contentLayer, contour, foregroundComposition = foregroundComposition) {
                 CouiFloatingSurface(
                     Rect(Offset(motion.translationX.value, motion.translationY.value),
                         Size(boundsSize.width.toFloat(), boundsSize.height.toFloat())),
