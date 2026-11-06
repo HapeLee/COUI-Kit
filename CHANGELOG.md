@@ -2,6 +2,13 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
+## [0.0.1-alpha7] - 2026-11-06
+
+`coui` 与 `coui-material3` 同版本发行，源码见 [v0.0.1-alpha7](https://github.com/ItosEO/COUI-Kit/tree/v0.0.1-alpha7)。发行附件及更新日志见 [Release](https://github.com/ItosEO/COUI-Kit/releases/tag/v0.0.1-alpha7)。以下为相对 alpha6 的主要变更。
+
+- 修复 临时禁用纵向滚动会中断子内容横向拖动的问题，恢复图表连续选点和 tooltip 跟随；保留边界回弹，以及选点期间禁止上下滚动的行为。
+- 调整 Demo 启动图标，更新前景矢量与白色背景。
+
 ## [0.0.1-alpha6] - 2026-11-05
 
 `coui` 与 `coui-material3` 同版本发行，源码见 [v0.0.1-alpha6](https://github.com/ItosEO/COUI-Kit/tree/v0.0.1-alpha6)。发行附件及更新日志见 [Release](https://github.com/ItosEO/COUI-Kit/releases/tag/v0.0.1-alpha6)。以下为相对 alpha5 的主要变更。

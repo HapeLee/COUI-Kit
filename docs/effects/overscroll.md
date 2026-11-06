@@ -19,6 +19,8 @@ Column(Modifier.fillMaxSize().couiVerticalScroll(scroll)) {
 
 宿主的 `ScrollState` 持有真实位置、范围和滚动互斥。`value`、`maxValue`、`isScrollInProgress`、`scrollTo`、`animateScrollTo` 和 `stopScroll` 均操作同一个状态。
 
+子内容需要横向拖动时，可暂时设置 `enabled = false`，暂停用户纵向滚动。回弹节点保持挂载，子内容的当前手势可继续；恢复为 `true` 后可再次上下滚动。
+
 此入口的手指拖动事件通过可选 `interactionSource` 发出，不发送到只读的 `ScrollState.interactionSource`。下面片段同样位于 Composable 中；`dragged` 可供宿主 UI 读取。
 
 ```kotlin
@@ -31,7 +33,7 @@ val scrolling = Modifier.couiVerticalScroll(scroll, interactionSource = interact
 
 ## 生命周期与触觉
 
-一个 effect 只能挂到一个布局节点。边界位移属于该实例，不写入业务滚动位置，也不保存为页面状态。再次按下会停止旧运动；松手和取消按各自分支恢复边界。禁用或移除效果节点时停止任务并清理位移。
+一个 effect 只能挂到一个布局节点。边界位移属于该实例，不写入业务滚动位置，也不保存为页面状态。再次按下会停止旧运动；松手和取消按各自分支恢复边界。移除效果节点时停止任务并清理位移。
 
 触觉使用当前 View 的 COUI 边缘反馈码，并遵守系统触觉设置；不支持该码的 ROM 不替换为其他波形。关闭方式如下：
 

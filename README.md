@@ -34,13 +34,13 @@ COUI-Kit 参考 ColorOS 17 的「凝光视效」，提供背景模糊、材质�
 
 ```kotlin
 dependencies {
-    implementation("io.github.itoseo:coui:0.0.1-alpha6")
+    implementation("io.github.itoseo:coui:0.0.1-alpha7")
 }
 ```
 
 仓库配置和工具链要求见[快速开始](docs/guide/getting-started.md)。部分效果需要更高的 Android 版本，见[兼容要求](docs/guide/compatibility.md#效果门槛)。
 
-文档与 `0.0.1-alpha6` 使用 `Text`、`Switch` 和 `Scaffold` 等无前缀组件名。旧版升级的名称和参数迁移规则见 [CHANGELOG](CHANGELOG.md#组件命名迁移)。
+文档与 `0.0.1-alpha7` 使用 `Text`、`Switch` 和 `Scaffold` 等无前缀组件名。旧版升级的名称和参数迁移规则见 [CHANGELOG](CHANGELOG.md#组件命名迁移)。
 
 ### 接入 Material 3
 
@@ -49,7 +49,7 @@ dependencies {
 `coui` 与 `coui-material3` 采用相同版本并同步发布。通过 Maven Central 接入 M3 时，只需添加适配模块：
 
 ```kotlin
-val couiVersion = "0.0.1-alpha6"
+val couiVersion = "0.0.1-alpha7"
 
 dependencies {
     implementation("io.github.itoseo:coui-material3:$couiVersion")
