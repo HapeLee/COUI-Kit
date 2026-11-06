@@ -84,7 +84,17 @@ private fun NavigationSample(dark: Boolean) {
 }
 
 @Composable
-internal fun FabSample(preset: CouiFabColor, onPresetChange: (CouiFabColor) -> Unit) {
+internal fun FabSample(preset: CouiFabColor, onPresetChange: (CouiFabColor) -> Unit,
+    rounded: Boolean, onRoundedChange: (Boolean) -> Unit) {
+    Group(title = stringResource(R.string.fab_shape)) {
+        Column(Modifier.selectableGroup()) {
+            DemoSelectPreference(title = stringResource(R.string.fab_circle), selected = !rounded,
+                onSelect = { onRoundedChange(false) })
+            Divider()
+            DemoSelectPreference(title = stringResource(R.string.fab_rounded_square), selected = rounded,
+                onSelect = { onRoundedChange(true) })
+        }
+    }
     Group(title = stringResource(R.string.presets_title)) {
         Column(Modifier.selectableGroup()) {
             CouiFabColor.entries.forEachIndexed { index, option ->
@@ -105,13 +115,14 @@ internal fun FabSample(preset: CouiFabColor, onPresetChange: (CouiFabColor) -> U
 }
 
 @Composable
-internal fun FabSampleButton(modifier: Modifier = Modifier, dark: Boolean, preset: CouiFabColor) {
+internal fun FabSampleButton(modifier: Modifier = Modifier, dark: Boolean, preset: CouiFabColor, rounded: Boolean) {
     if (Build.VERSION.SDK_INT >= 34) {
         val rendering = remember { runCatching { CouiFloatingRenderer.standalone() } }
         val renderer = rendering.getOrNull()
         if (renderer != null) {
             val color = CouiFabDefaults.containerColor(preset, dark)
-            Fab(modifier, renderer = renderer, dark = dark, shape = DemoShapes.couiCircle,
+            Fab(modifier, renderer = renderer, dark = dark,
+                shape = if (rounded) CouiFabDefaults.roundedSquareShape else CouiFabDefaults.circleShape,
                 material = CouiFabDefaults.material(color, dark),
                 shadow = CouiFabDefaults.shadow(color, LocalDensity.current.density,
                     LocalCouiContourGlowEnabled.current)) {

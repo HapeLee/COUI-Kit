@@ -36,6 +36,9 @@
     <string name="shadow_subject">Shadow subject</string>
     <string name="fusion_title">Metaball algorithm</string>
     <string name="presets_title">Appearance presets</string>
+    <string name="fab_shape">Shape</string>
+    <string name="fab_circle">Circle</string>
+    <string name="fab_rounded_square">Rounded square</string>
     <string name="preset_notes">Notes</string>
     <string name="preset_phone">Phone</string>
     <string name="preset_remote">Infrared remote</string>

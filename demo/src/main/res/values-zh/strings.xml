@@ -36,6 +36,9 @@
     <string name="shadow_subject">阴影主体</string>
     <string name="fusion_title">融合算法</string>
     <string name="presets_title">外观预设</string>
+    <string name="fab_shape">形状</string>
+    <string name="fab_circle">圆形</string>
+    <string name="fab_rounded_square">圆角方形</string>
     <string name="preset_notes">便签</string>
     <string name="preset_phone">电话</string>
     <string name="preset_remote">红外遥控</string>

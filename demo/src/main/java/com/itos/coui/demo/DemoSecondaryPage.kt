@@ -23,13 +23,14 @@ internal fun DemoSecondaryPage(page: String, dark: Boolean, preferences: DemoPre
     back: () -> Unit) {
     val toggleTheme = { preferences.dark(!dark) }
     var fabPreset by rememberSaveable { mutableStateOf(CouiFabColor.Notes) }
+    var roundedFab by rememberSaveable { mutableStateOf(false) }
     val catalogPage = if (DemoWheelPickerEntries.any { it.page == page }) "wheel" else page
     val entry = (DemoComponentGroups + DemoEffectGroups).flatten().firstOrNull { it.page == catalogPage }
     val title = entry?.title ?: R.string.settings_about
     val floatingAction: (@Composable BoxScope.() -> Unit)? = if (page == "fab") {
         {
             FabSampleButton(Modifier.align(Alignment.BottomEnd).padding(24.dp),
-                dark = dark, preset = fabPreset)
+                dark = dark, preset = fabPreset, rounded = roundedFab)
         }
     } else null
     CompositionLocalProvider(LocalCouiContourGlowEnabled provides preferences.contour) {
@@ -50,7 +51,8 @@ internal fun DemoSecondaryPage(page: String, dark: Boolean, preferences: DemoPre
                 }
                 "wheel", "timepicker", "countdownpicker", "datepicker", "calendar" -> PickerSamples(page, dark)
                 "appbar", "search", "navigation" -> ChromeDetail(page, dark)
-                "fab" -> FabSample(preset = fabPreset, onPresetChange = { fabPreset = it })
+                "fab" -> FabSample(preset = fabPreset, onPresetChange = { fabPreset = it },
+                    rounded = roundedFab, onRoundedChange = { roundedFab = it })
                 "about" -> {
                     DemoAboutHero()
                     Group {

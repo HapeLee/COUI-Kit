@@ -87,9 +87,27 @@ Fab(
 
 ## 图标和轮廓光
 
-启用 M3 适配后，省略材质的 FAB 会向 M3 图标提供主题 `onAccent`。显式材质保持 ambient 内容色；预设或自定义底色可显式设置 `tint`。示例使用 `CouiShape` 创建圆形，也可以传入自己的 Shape。
+启用 M3 适配后，省略材质的 FAB 会向 M3 图标提供主题 `onAccent`。显式材质保持 ambient 内容色；预设或自定义底色可显式设置 `tint`。
 
 轮廓光由 `LocalCouiContourGlowEnabled` 控制；关闭后，`CouiFabDefaults.shadow` 使用普通有色投影。
+
+## 圆角方形
+
+`Fab` 默认使用 `CouiFabDefaults.circleShape`。需要圆角方形时，在原调用中传入形状预设：
+
+~~~kotlin
+Fab(
+    backdrop = backdrop,
+    renderer = renderer,
+    onClick = onClick,
+    shape = CouiFabDefaults.roundedSquareShape,
+    content = content,
+)
+~~~
+
+这段代码位于 API 34 及以上的宿主 Composable 中，各参数沿用最小调用的来源。用 `CouiShape(20.dp)` 可自定义圆角；用 `Modifier.size(width, height)` 可改为圆角矩形。
+
+`CouiShape` 的半径和权重同时用于内容裁剪、材质与轮廓光。半径按实际短边的一半限制，普通投影使用同半径的 RoundRect caster。该投影沿用不透明主体的绘制方式，不裁掉主体内部的阴影；自定义半透明材质会透出内部阴影。其他 Shape 只控制内容裁剪，材质仍使用圆形或胶囊几何。
 
 ## 版本和绘制空间
 
