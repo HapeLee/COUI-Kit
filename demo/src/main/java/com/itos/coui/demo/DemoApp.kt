@@ -90,7 +90,7 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
             topBar = {
                 if (page == 0) {
                     CollapsingTopAppBar(state = header, searchState = search, title = titles[page],
-                        color = colors.onSurface, dark = dark) {
+                        color = colors.onSurface, backgroundColor = LocalDemoTopBarGradient.current, dark = dark) {
                             SearchBar(state = search, query = query, onQueryChange = { query = it },
                                 onExpandedChange = { searching = it; if (!it) query = "" },
                                 placeholder = stringResource(R.string.catalog_search_hint),
@@ -100,7 +100,8 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
                     }
                 } else LargeTopAppBar(title = { Text(titles[page], maxLines = 1) },
                     scrollBehavior = behavior, dark = dark,
-                    colors = CouiTopAppBarDefaults.colors(titleColor = colors.onSurface, dark = dark))
+                    colors = CouiTopAppBarDefaults.colors(backgroundColor = LocalDemoTopBarGradient.current,
+                        titleColor = colors.onSurface, dark = dark))
             }, bottomBar = {
                 if (Build.VERSION.SDK_INT >= 34 && renderers != null) {
                     Box(Modifier.fillMaxWidth()) {

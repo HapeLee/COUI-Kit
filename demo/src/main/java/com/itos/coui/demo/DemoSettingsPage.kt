@@ -91,7 +91,8 @@ internal fun DemoSettingsPage(
                         DemoSettingsArrow(Modifier.size(24.dp), back = true, color = colors.title)
                     }
             }
-            val barColors = CouiTopAppBarDefaults.colors(titleColor = colors.title, dark = dark)
+            val barColors = CouiTopAppBarDefaults.colors(backgroundColor = LocalDemoTopBarGradient.current,
+                titleColor = colors.title, dark = dark)
             LargeTopAppBar(title = {
                 androidx.compose.material3.Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }, navigationIcon = navigation, actions = { actions() },

@@ -62,7 +62,7 @@ Demo 二级页统一使用 `LargeTopAppBar`。参考的原厂设置二级页使�
 
 | 组件 | 定制行为 | 作用范围与依据 |
 | --- | --- | --- |
-| 菜单与底栏 | 可叠加宿主页面色相，保留材质亮度。 | 仅在宿主提供 tint 或启用相应主题策略时生效；原生默认不加额外染色。见[外观与预设](appearance.md#菜单底栏与-fab-的染色)。 |
+| 菜单、底栏与搜索栏 | 可叠加宿主页面色相，保留材质亮度。 | 仅在宿主提供 tint 或启用相应主题策略时生效；原生默认不加额外染色。见[外观与预设](appearance.md#菜单底栏搜索栏与-fab-的染色)。 |
 | `ChipTab` | 投影复用库内顶栏胶囊按钮预设，并随选中进度变化，减轻浅色背景上的底部亮带。 | 这是投影预设的选择，不表示分类间距、滚动或边缘渐隐属于主动视觉定制。见 [CouiChipTabDefaults](../../coui/src/main/java/com/itos/coui/chip/CouiChipTabDefaults.kt)与[装配依据](../../.agents/notes/implemented/feature/2026-10-24-chip-tab.md)。 |
 | `Slider` | 默认轨道采用 G2 平滑胶囊轮廓，背景、进度与光效使用同一 Shape；拇指保持圆形。 | 宿主可覆盖 Shape；平滑轨道不称为原厂默认。见 [Slider](../../coui/src/main/java/com/itos/coui/slider/Slider.kt)与[滑条依据](../../.agents/notes/implemented/feature/2026-10-21-coui-slider.md)。 |
 | `Switch` | 轨道和滑块采用平滑胶囊轮廓，滑块拉伸时保持平滑几何。 | 参考实现的滑块使用普通 `drawRoundRect`。见[开关依据](../../.agents/notes/implemented/feature/2026-10-27-coui-switch.md)。 |
