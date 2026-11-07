@@ -16,7 +16,7 @@ COUI-Kit 以 ColorOS 17 组件为参考，并保留以下视觉与交互微调�
 
 Demo 二级页统一使用 `LargeTopAppBar`。参考的原厂设置二级页使用紧凑顶栏；这里的大标题装配与收起轨迹属于项目定制。
 
-`LargeTopAppBar` 的展开标题略向右收进，字号与带常驻搜索的 `CollapsingTopAppBar` 首页标题 `HomeTitle` 一致。展开标题跟随系统字体大小；收起标题仍使用固定 dp 字号。有返回按钮时，展开标题位于按钮下方，折叠时沿连续弧线向右上方移动到按钮旁，横移略领先于上移；展开沿原路径返回，RTL 布局镜像移动方向。返回按钮和操作区保持在标题上层，允许转场中轻微遮挡标题。标题宽度保留操作区。
+`LargeTopAppBar` 的展开标题略向右收进，默认字号与带常驻搜索的 `CollapsingTopAppBar` 首页标题 `HomeTitle` 一致。默认展开标题跟随系统字体大小，收起标题使用固定 dp 字号；调用方可分别覆盖两端字号，单位与示例见[普通大标题](../components/collapsing-app-bar.md#普通大标题)。有返回按钮时，展开标题位于按钮下方，折叠时沿连续弧线向右上方移动到按钮旁，横移略领先于上移；展开沿原路径返回，RTL 布局镜像移动方向。返回按钮和操作区保持在标题上层，允许转场中轻微遮挡标题。标题宽度保留操作区。
 
 这套排版是 `LargeTopAppBar` 的默认定制，不作为所有顶栏标题的统一样式。入口见[大标题顶栏](../components/collapsing-app-bar.md)与 [TopAppBar](../../coui/src/main/java/com/itos/coui/topappbar/TopAppBar.kt)。
 
