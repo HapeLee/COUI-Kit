@@ -235,7 +235,7 @@ fun SearchBar(
                     Row(Modifier.fillMaxSize().padding(start = CouiSearchBarDefaults.iconStart,
                         end = CouiSearchBarDefaults.textEnd), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(CouiSearchBarDefaults.innerIconSlot), contentAlignment = Alignment.Center) {
-                            Icon(modifier = Modifier.size(CouiSearchBarDefaults.iconSize), imageVector = CouiIcons.SearchField,
+                            Icon(modifier = Modifier.size(CouiSearchBarDefaults.iconSize), imageVector = CouiIcons.Search,
                                 contentDescription = null, tint = secondary)
                         }
                         Box(Modifier.weight(1f)) {

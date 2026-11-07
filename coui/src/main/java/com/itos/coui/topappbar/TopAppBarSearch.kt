@@ -251,7 +251,7 @@ fun TopAppBarSearchButton(
                         capsule = false, enabled = enabled, interactive = enabled, deform = enabled,
                         onClick = { center -> state.sourceCenter = center; open() },
                     ) {
-                        Icon(modifier = Modifier.size(CouiSearchBarDefaults.iconSize), imageVector = CouiIcons.SearchField, contentDescription = contentDescription)
+                        Icon(modifier = Modifier.size(CouiSearchBarDefaults.iconSize), imageVector = CouiIcons.Search, contentDescription = contentDescription)
                     }
                 }
 
@@ -352,7 +352,7 @@ private fun SearchInput(
             decorationBox = { input ->
                 Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.padding(start = 2.dp).size(36.dp), contentAlignment = Alignment.Center) {
-                        Icon(modifier = Modifier.size(CouiSearchBarDefaults.iconSize), imageVector = CouiIcons.SearchField, contentDescription = null)
+                        Icon(modifier = Modifier.size(CouiSearchBarDefaults.iconSize), imageVector = CouiIcons.Search, contentDescription = null)
                     }
                     Box(Modifier.weight(1f).graphicsLayer { alpha = progress.coerceIn(0f, 1f) },
                         contentAlignment = Alignment.CenterStart) {

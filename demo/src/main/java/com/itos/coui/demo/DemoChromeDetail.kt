@@ -65,11 +65,11 @@ private fun NavigationSample(dark: Boolean) {
             if (Build.VERSION.SDK_INT >= 34 && renderer != null) {
                 NavigationBar(Modifier.align(Alignment.BottomCenter), backdrop, renderer,
                     items = listOf(
-                        CouiNavigationItem(titles[0], CouiIcons.Components, CouiIcons.ComponentsSelected),
+                        CouiNavigationItem(titles[0], CouiIcons.Grid, CouiIcons.Grid),
                         CouiNavigationItem(titles[1], DemoIcons.Effects, DemoIcons.EffectsSelected),
                         CouiNavigationItem(titles[2], DemoIcons.Settings, DemoIcons.SettingsSelected)),
                     selectedIndex = selected, onSelection = { selected = it },
-                    leftIcon = CouiIcons.Settings, leftDescription = stringResource(R.string.nav_left_description),
+                    leftIcon = CouiIcons.Setting, leftDescription = stringResource(R.string.nav_left_description),
                     rightIcon = CouiIcons.Add, rightDescription = stringResource(R.string.nav_right_description),
                     leftVisible = left, rightVisible = right,
                     rightContainerColor = CouiFabDefaults.containerColor(CouiFabColor.Notes, dark),

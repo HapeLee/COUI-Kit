@@ -1,31 +1,49 @@
-# 功能图标
+# 图标
 
-`CouiIcons` 提供可用于顶栏、菜单和导航的 Compose ImageVector。颜色和交互状态由使用它的组件提供。
+`CouiIcons` 提供可在 Composable 中使用的 `ImageVector` 图标，部分属性会根据当前 `CouiTheme` 模式切换日间与夜间配色。以下示例中的 `contentDescription` 均由调用方根据界面语义提供。
 
-## 基本用法
+## 基本显示
 
-以下片段只使用 Foundation 与 COUI，位于宿主 Composable 中。`label` 和 `color` 由宿主提供；M3 应用也可把同一矢量传给 `Icon`：
+在 Composable 中使用 `Image` 可直接显示图标内置颜色；使用 Material 3 `Icon` 时，传 `tint = Color.Unspecified` 以保留图标默认配色：
 
 ```kotlin
 Image(
-    painter = rememberVectorPainter(CouiIcons.Search),
-    contentDescription = label,
-    colorFilter = ColorFilter.tint(color),
+    imageVector = CouiIcons.Wifi,
+    contentDescription = contentDescription,
+)
+
+Icon(
+    imageVector = CouiIcons.Wifi,
+    contentDescription = contentDescription,
+    tint = Color.Unspecified,
 )
 ```
 
-## 图标与状态
+通用功能图标 `Search`、`Back`、`Close`、`Add`、`DarkLight` 默认日间为黑色、夜间为白色，其中 `Back` 支持 RTL 自动镜像。
 
-搜索、更多、设置、主题、添加、关闭、确认和返回分别使用 `Search`、`More`、`Settings`、`Theme`、`Add`、`Close`、`Check`、`Back`。导航可按选中状态切换 `Components` / `ComponentsSelected` 或 `Featured` / `FeaturedSelected`。
+## 指定颜色与特殊图标
 
-## 尺寸与方向
+- **单色图标指定 `tint`**：可结合 `CouiTheme.isDark` 从 `CouiColor.Day` / `CouiColor.Night` 选择颜色并传给 `Icon`：
 
-`Back` / `Next` 自动跟随 RTL 镜像，其他图标维持原方向。通过 `Modifier.size` 调整显示大小；`Next` 和 `Popup` 为竖长图标，用于设置行时可分别设置为 12 × 24dp 和 14 × 24dp。
+```kotlin
+val iconTint = if (CouiTheme.isDark) CouiColor.Night.BLUE else CouiColor.Day.BLUE
+Icon(
+    imageVector = CouiIcons.Wifi,
+    contentDescription = contentDescription,
+    tint = iconTint,
+)
+```
 
-只表达选中状态的图标将 contentDescription 设为 null，让父级选择节点持有语义；独立按钮提供操作说明。点击、热区、禁用状态及反馈仍由组件承担。
+- **多色图标**：`AI`、`Google`、`Setting`、`Phone` 内置多色或渐变路径，应使用 `Image` 或 `Icon(..., tint = Color.Unspecified)`，避免整体 `tint` 覆盖原有配色。
+- **应用更新图标（`AppUpdate`）**：自定义圆形背景色时调用 `CouiIcons.AppUpdate(color = ...)`，并在 `Icon` 中传 `tint = Color.Unspecified` 以保留白色前景：
 
-## 资源来源
+```kotlin
+val badgeColor = if (CouiTheme.isDark) CouiColor.Night.GREEN else CouiColor.Day.GREEN
+Icon(
+    imageVector = CouiIcons.AppUpdate(color = badgeColor),
+    contentDescription = contentDescription,
+    tint = Color.Unspecified,
+)
+```
 
-资源未附带独立许可，本项目不授予额外第三方权利，详见[来源与权利说明](../../coui/ICON_SOURCES.md)。
-
-[矢量实现](../../coui/src/main/java/com/itos/coui/icons/CouiIcons.kt) · [Demo 用途分配](../../demo/ICON_SOURCES.md) · [首页消费](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt)
+[CouiIcons.kt](../../coui/src/main/java/com/itos/coui/icons/CouiIcons.kt) · [CouiColor.kt](../../coui/src/main/java/com/itos/coui/theme/CouiColor.kt)
