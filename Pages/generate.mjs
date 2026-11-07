@@ -7,8 +7,8 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 
 const COUI_COLOR_PATH = path.join(ROOT_DIR, 'coui/src/main/java/com/itos/coui/theme/CouiColor.kt');
-const COUI_ICONS_PATH = path.join(ROOT_DIR, 'coui/src/main/java/com/itos/coui/icons/CouiIcons.kt');
-const COUI_VECTORS_PATH = path.join(ROOT_DIR, 'coui/src/main/java/com/itos/coui/icons/CouiIconVectors.kt');
+const COUI_ICONS_PATH = path.join(ROOT_DIR, 'coui-icons/src/main/java/com/itos/coui/icons/CouiIcons.kt');
+const COUI_VECTORS_PATH = path.join(ROOT_DIR, 'coui-icons/src/main/java/com/itos/coui/icons/CouiIconVectors.kt');
 const OUTPUT_DATA_PATH = path.join(__dirname, 'data.js');
 
 function formatNum(n) {

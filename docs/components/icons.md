@@ -1,6 +1,14 @@
 # 图标
 
-`CouiIcons` 提供可在 Composable 中使用的 `ImageVector` 图标，部分属性会根据当前 `CouiTheme` 模式切换日间与夜间配色。以下示例中的 `contentDescription` 均由调用方根据界面语义提供。
+`CouiIcons` 提供可在 Composable 中使用的 `ImageVector` 图标，部分图标会根据 `CouiTheme` 切换日间与夜间配色。
+
+使用图标时，在调用模块中添加依赖，并与核心库使用相同版本：
+
+```kotlin
+implementation("io.github.itoseo:coui-icons:$couiVersion")
+```
+
+以下示例中的 `contentDescription` 由调用方根据界面语义提供。
 
 ## 基本显示
 
@@ -46,4 +54,4 @@ Icon(
 )
 ```
 
-[CouiIcons.kt](../../coui/src/main/java/com/itos/coui/icons/CouiIcons.kt) · [CouiColor.kt](../../coui/src/main/java/com/itos/coui/theme/CouiColor.kt)
+[CouiIcons.kt](../../coui-icons/src/main/java/com/itos/coui/icons/CouiIcons.kt) · [CouiColor.kt](../../coui/src/main/java/com/itos/coui/theme/CouiColor.kt)

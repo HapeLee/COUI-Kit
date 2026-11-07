@@ -19,8 +19,8 @@
 
 ## 接入图标库
 
-1. 参照 [CouiIconVectors.kt](../../coui/src/main/java/com/itos/coui/icons/CouiIconVectors.kt) 中最接近的图标，添加 `ImageVector` 及所需日夜变体；保留实际路径、viewport、填充、描边、裁剪、渐变与透明度。仅有颜色差异时可复用同一图形，几何或图层不同则分别保留。
-2. 在 [CouiIcons.kt](../../coui/src/main/java/com/itos/coui/icons/CouiIcons.kt) 中提供 `CouiIcons.名称` 入口。需要随主题变化时，在 Composable getter 中通过 `CouiTheme.isDark` 选择变体；供静态目录使用时，保存 `@Composable () -> ImageVector` 并在组合时读取。
+1. 参照 [CouiIconVectors.kt](../../coui-icons/src/main/java/com/itos/coui/icons/CouiIconVectors.kt) 中最接近的图标，添加 `ImageVector` 及所需日夜变体；保留实际路径、viewport、填充、描边、裁剪、渐变与透明度。仅有颜色差异时可复用同一图形，几何或图层不同则分别保留。
+2. 在 [CouiIcons.kt](../../coui-icons/src/main/java/com/itos/coui/icons/CouiIcons.kt) 中提供 `CouiIcons.名称` 入口。需要随主题变化时，在 Composable getter 中通过 `CouiTheme.isDark` 选择变体；供静态目录使用时，保存 `@Composable () -> ImageVector` 并在组合时读取。
 3. 按实际来源应用更新[图标来源](../../coui/ICON_SOURCES.md)中的图标分组。详细使用方法维护在[图标用法](../components/icons.md)，来源清单不记录路径细节或提取日志。
 
 `Image` 可显示矢量自带颜色；Material 3 `Icon` 要保留这些颜色，应传 `tint = Color.Unspecified`。显式 tint 可覆盖单色图标，但会覆盖整张多色图。需要可换色的局部时，在图标实现中单独处理该图层。

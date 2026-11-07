@@ -72,7 +72,6 @@ import com.itos.coui.effect.couiFloatingPair
 import com.itos.coui.effect.couiToolbarFeedback
 import com.itos.coui.input.CouiSearchRelocationBoundary
 import com.itos.coui.theme.CouiTheme
-import com.itos.coui.icons.CouiIcons
 import com.itos.coui.motion.rememberCouiPressMotion
 import com.itos.coui.motion.couiPressMotion
 import com.itos.coui.motion.couiTouchMotion
@@ -235,7 +234,7 @@ fun SearchBar(
                     Row(Modifier.fillMaxSize().padding(start = CouiSearchBarDefaults.iconStart,
                         end = CouiSearchBarDefaults.textEnd), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(CouiSearchBarDefaults.innerIconSlot), contentAlignment = Alignment.Center) {
-                            Icon(modifier = Modifier.size(CouiSearchBarDefaults.iconSize), imageVector = CouiIcons.Search,
+                            Icon(modifier = Modifier.size(CouiSearchBarDefaults.iconSize), imageVector = CouiSearchIcon.imageVector,
                                 contentDescription = null, tint = secondary)
                         }
                         Box(Modifier.weight(1f)) {

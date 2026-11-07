@@ -12,8 +12,8 @@ node Pages/generate.mjs
 
 `Pages/generate.mjs` 读取以下源码并自动从现有公开图标导出 `Pages/data.js`：
 
-- `coui/src/main/java/com/itos/coui/icons/CouiIcons.kt`
-- `coui/src/main/java/com/itos/coui/icons/CouiIconVectors.kt`
+- `coui-icons/src/main/java/com/itos/coui/icons/CouiIcons.kt`
+- `coui-icons/src/main/java/com/itos/coui/icons/CouiIconVectors.kt`
 - `coui/src/main/java/com/itos/coui/theme/CouiColor.kt`
 
 在仓库根目录启动本地静态服务预览：
