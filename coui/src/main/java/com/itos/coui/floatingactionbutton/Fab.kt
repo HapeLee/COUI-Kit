@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
@@ -64,6 +65,7 @@ fun Fab(
     material: CouiFloatingMaterial? = null,
     shadow: CouiFloatingShadow? = null,
     foregroundComposition: Boolean = false,
+    contentColor: Color = CouiFabDefaults.contentColor(dark),
     content: @Composable () -> Unit,
 ) {
     val contour = LocalCouiContourGlowEnabled.current
@@ -111,8 +113,7 @@ fun Fab(
                 ) else Modifier),
             contentAlignment = Alignment.Center,
         ) {
-            ProvideCouiContent(color = if (material == null) colors.onAccent else androidx.compose.ui.graphics.Color.Unspecified,
-                content = content)
+            ProvideCouiContent(color = contentColor, content = content)
         }
     }
 }

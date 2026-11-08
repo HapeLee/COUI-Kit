@@ -20,7 +20,7 @@ fun PageFab(
 }
 ~~~
 
-省略 material 时，底色取 COUI 强调色，内容色取 `onAccent`；省略 shadow 时，阴影颜色从最终 `material.firstColor` 取得。显式 material 使用宿主 ambient 内容色，子内容的显式颜色优先。FAB 不使用页面 `themeTint`。通用主题规则见[外观与预设](../guide/appearance.md)；强调色生成策略（包括 HCT）由宿主负责。
+省略 material 时，底色取 COUI 强调色；省略 shadow 时，阴影颜色从最终 `material.firstColor` 取得。内容色默认与底栏选中态一致：日间黑色、夜间白色，不透明度为 `230 / 255`，也适用于显式 material。可用 `contentColor` 覆盖，子内容的显式颜色优先。FAB 不使用页面 `themeTint`。通用主题规则见[外观与预设](../guide/appearance.md)；强调色生成策略（包括 HCT）由宿主负责。
 
 ## 使用显式配色预设
 
@@ -87,7 +87,7 @@ Fab(
 
 ## 图标和轮廓光
 
-启用 M3 适配后，省略材质的 FAB 会向 M3 图标提供主题 `onAccent`。显式材质保持 ambient 内容色；预设或自定义底色可显式设置 `tint`。
+启用 M3 适配后，FAB 会向 M3 `Icon` 提供内容色，图标可省略 `tint`。要覆盖整个内容槽，传入 `contentColor = Color.White` 等颜色；`contentColor = Color.Unspecified` 表示继承外部内容色。子图标显式指定 `tint` 时优先使用该值，`Image` 不会自动读取内容色。
 
 轮廓光由 `LocalCouiContourGlowEnabled` 控制；关闭后，`CouiFabDefaults.shadow` 使用普通有色投影。
 

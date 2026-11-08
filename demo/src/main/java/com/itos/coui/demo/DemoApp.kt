@@ -108,7 +108,9 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
                         NavigationBar(
                             modifier = Modifier.align(Alignment.BottomCenter),
                             renderer = renderers.bottom,
-                            items = titles.mapIndexed { index, title -> CouiNavigationItem(title, navigation[index], selectedNavigation[index]) },
+                            items = titles.mapIndexed { index, title ->
+                                CouiNavigationItem(title = title, icon = navigation[index], selectedIcon = selectedNavigation[index])
+                            },
                             selectedIndex = page, leftIcon = CouiIcons.Filled.DarkLight, leftDescription = stringResource(R.string.toggle_theme),
                             rightIcon = CouiIcons.Filled.Add, rightDescription = stringResource(R.string.catalog_fab),
                             leftVisible = leftAccessory, rightVisible = rightAccessory,

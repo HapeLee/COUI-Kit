@@ -15,6 +15,10 @@ object CouiFabDefaults {
     val circleShape = CouiShape(999.dp, cornerWeight = 2f)
     val roundedSquareShape = CouiShape(16.dp)
 
+    /** 默认内容色与底栏选中态一致。 */
+    fun contentColor(dark: Boolean): Color =
+        (if (dark) Color.White else Color.Black).copy(alpha = 230f / 255f)
+
     fun containerColor(preset: CouiFabColor, dark: Boolean): Color = when (preset) {
         CouiFabColor.Notes -> if (dark) CouiColor.Night.YELLOW else CouiColor.Day.YELLOW
         CouiFabColor.Phone -> if (dark) CouiColor.Night.GREEN else CouiColor.Day.GREEN
