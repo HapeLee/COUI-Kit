@@ -46,7 +46,8 @@ jobs:
           test -s Pages/data.js
 
       - name: 清理网页生成依赖
-        run: node -e 'require("node:fs").rmSync("Pages/node_modules", { recursive: true, force: true })'
+        run: |
+          node -e 'require("node:fs").rmSync("Pages/node_modules", { recursive: true, force: true })'
 
       - name: 配置 GitHub Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
