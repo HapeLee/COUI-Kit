@@ -57,12 +57,13 @@ SearchBar(
 
 `shadowProgress` 可接收折叠顶栏的 `collapsedFraction`。默认值不添加滚动投影；展开时使用搜索自身的投影动画。
 
-`CouiSearchBarDefaults.colors(dark)` 读取当前主题。`foreground`、`secondary`、`clear` 分别控制文字、图标等次要内容和清除操作；通过 `copy` 覆盖颜色。`fallbackBackground` 仅作用于 API 31–33 的普通背景。
+`CouiSearchBarDefaults.colors(dark)` 读取当前主题。`foreground`、`secondary`、`clear` 分别控制文字、图标等次要内容和清除操作；通过 `copy` 覆盖颜色。`fallbackBackground` 作用于 API 26–33 的普通背景；API 26–30 还会跳过取消文字的平台模糊。
 
 | 平台 | 绘制 |
 | --- | --- |
-| API 31–32 | 普通填色、输入和宽度/取消动画 |
-| API 33 | 普通填色及支持的跟手光 |
+| API 26–30 | 普通填色、输入和宽度/取消动画，无模糊 |
+| API 31–32 | 普通填色、输入和宽度/取消动画，取消文字使用平台模糊 |
+| API 33 | 普通填色、取消文字模糊及支持的跟手光 |
 | API 34+ | 背景模糊材质、双主体融合、轮廓和投影 |
 
 API 34+ 在组件内部创建模糊材质；创建失败时抛出异常。

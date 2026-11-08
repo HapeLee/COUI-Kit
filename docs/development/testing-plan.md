@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | JVM 单测 | `coui/src/test`，纯函数/状态模型测试 | 数值边界、插值、几何、滚动状态、回调去重等可隔离逻辑 | 不代表真实触摸、Choreographer 或 GPU |
 | Compose 设备测试 | `coui/src/androidTest`，`ui-test-junit4`、`createComposeRule` | Switch、Slider、Menu、Dialog、Checkbox、导航语义 | 不代表跨设备 GPU 结果相同 |
-| 设备与视觉回归 | 真实 API 31/34/35+ 设备，手动录像/选择性截图断言 | Shader 编译、背景采样、中断动画、窗体及性能 | 单台通过不代表所有 ROM 都支持 |
+| 设备与视觉回归 | 真实 API 26/31/33/34/35+ 设备，手动录像/选择性截图断言 | 旧系统降级、平台模糊、Shader、背景采样、中断动画、窗体及性能 | 单台通过不代表所有 ROM 都支持 |
 
 优先使用 Compose 的语义树查找控件、执行点击/拖动与断言；必要时检查未合并的 semantics tree。对没有自身语义的绘制型 Checkbox，应从正确的宿主 `toggleable` 容器测试，不应为了测试将错误的交互逻辑加到库内。
 
@@ -34,7 +34,7 @@
 
 - **阶段 1**：新增依赖、可运行的 JVM 测试，执行 `:coui:testDebugUnitTest`；在 PR Android 检查中启用，失败直接阻断合并。
 - **阶段 2**：新增 Android Compose UI 测试；在受控 API 34 模拟器工作流运行，先手动触发或定期运行，收集失败与耗时。
-- **阶段 3**：引入 API 31/34/35 设备矩阵、可选择的截图回归和真机 GPU 验收；确认稳定后再让部分 UI 测试成为 PR 必需检查。
+- **阶段 3**：引入 API 26/31/33/34/35 设备矩阵、可选择的截图回归和真机 GPU 验收；确认稳定后再让部分 UI 测试成为 PR 必需检查。
 
 给 UI 测试使用 `performTouchInput`、`performKeyInput`、`waitForIdle`、`mainClock` 和明确的 State 断言；避免硬编码 `Thread.sleep` 作为完成条件。对于弹簧、系统窗口动画和 HWUI 帧，由真实设备的时序决定断言范围。
 

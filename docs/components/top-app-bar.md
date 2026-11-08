@@ -68,6 +68,7 @@ fun PageToolbar(
 顶栏按钮使用 `CouiToolbarStyle` 设置材质、文字和光标。下面根据页面的颜色创建一份样式：
 
 ~~~kotlin
+@RequiresApi(34)
 @Composable
 fun rememberToolbarStyle(
     dark: Boolean,
@@ -135,7 +136,7 @@ TopAppBarButtonGroup {
 
 ## 版本和 inset
 
-顶栏容器支持库的最低系统版本，顶栏按钮和搜索需要 API 34。按钮组放在完整顶栏的导航或操作槽位中，或放在 `TopAppBarSurface` 的自定义内容中。组合搜索使用 `TopAppBarSurface`。
+顶栏容器支持库的最低系统版本；API 26–30 用遮罩色作无模糊实底，API 31–32 使用三层平台模糊，API 33+ 使用渐进模糊。顶栏按钮和搜索需要 API 34。按钮组放在完整顶栏的导航或操作槽位中，或放在 `TopAppBarSurface` 的自定义内容中。组合搜索使用 `TopAppBarSurface`。
 
 每个按钮默认创建独立的 renderer。需要处理创建失败时，可以先创建 `CouiFloatingRenderer.standalone()`，再通过 `renderer` 传入。
 
@@ -149,10 +150,10 @@ COUI Scaffold 的 `topBar` 自动提供正文背景源，`TopAppBar`、`LargeTop
 
 ## 背景参数
 
-以下参数属于 `TopAppBarSurface`。`backgroundAlpha` 同时控制模糊背景与遮罩的透明度，不影响标题和按钮。`gradientColor` 省略或传入 `Color.Unspecified` 时，浅色模式使用白色渐变、深色模式使用黑色渐变，从顶部向下淡出。显式颜色覆盖默认遮罩，其 alpha 与渐变曲线及背景图层透明度相乘；`Color.Transparent` 关闭遮罩并保留模糊。`dark` 决定背景渐变的深浅色分支，默认读取 `CouiTheme.isDark`。
+以下参数属于 `TopAppBarSurface`。`backgroundAlpha` 同时控制模糊背景与遮罩的透明度，不影响标题和按钮。`gradientColor` 省略或传入 `Color.Unspecified` 时，浅色模式使用白色渐变、深色模式使用黑色渐变，从顶部向下淡出。显式颜色覆盖默认遮罩，其 alpha 与渐变曲线及背景图层透明度相乘；`Color.Transparent` 关闭遮罩并保留模糊。`dark` 决定背景渐变的深浅色分支，默认读取 `CouiTheme.isDark`。API 26–30 不采样背景，同一遮罩色作为无模糊实底；`Color.Transparent` 时不铺底。
 
 `topExtension` 返回背景向上延伸的 dp 距离，在测量阶段读取；它增加背景高度并将背景向上平移，不改变内容占位或命中区域。折叠顶栏用它保持完整背景随顶栏移动，使渐进曲线与采样尺寸稳定。`bottomExtension` 只增加向下延伸的范围。
 
-API 33 起，`gradientSpeed = null` 使用固定长度渐隐，正值选择全高幂曲线。`referenceBlurRadius` 按 dp 解释；需要固定引擎像素半径时，在消费处按当前 density 换算。API 31–32 的平台分层路径仍使用自身固定模糊参数。
+API 33 起，`gradientSpeed = null` 使用固定长度渐隐，正值选择全高幂曲线。`referenceBlurRadius` 按 dp 解释；需要固定引擎像素半径时，在消费处按当前 density 换算。API 31–32 的平台分层路径仍使用自身固定模糊参数；API 26–30 用解析后的遮罩色作无模糊实底，渐变仍生效，`Color.Transparent` 时不铺底。
 
 需要大标题与常驻搜索联动时，使用[折叠顶栏](collapsing-app-bar.md)。

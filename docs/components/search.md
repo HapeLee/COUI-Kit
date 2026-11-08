@@ -150,7 +150,7 @@ material = { capsule -> CouiTopAppBarButtonDefaults.material(dark, capsule, sear
 shadow = { capsule -> CouiTopAppBarButtonDefaults.shadow(dark, capsule, density, contour, search = true) },
 ~~~
 
-`dark`、`density` 和 `contour` 来自顶栏样式示例。`TopAppBarSearch` 的 `visible` 控制搜索区域显隐，不会改变 `expanded`；隐藏时搜索框不接受输入。
+`dark`、`density` 和 `contour` 来自顶栏样式示例。材质工厂声明 `RequiresApi(29)`，所属 `TopAppBarSearch` 要求 API 34，示例应在版本守卫内使用。`TopAppBarSearch` 的 `visible` 控制搜索区域显隐，不会改变 `expanded`；隐藏时搜索框不接受输入。
 
 ## 版本和键盘
 

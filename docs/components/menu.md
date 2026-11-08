@@ -167,7 +167,7 @@ fun rememberMenuStyle(
 
 ## 兼容性和滚动
 
-API 33 以下的菜单模糊效果与较新系统不同，见[兼容要求](../guide/compatibility.md)。
+API 26–30 使用不透明的普通菜单；API 31–32 的 Gaussian 模糊与 API 33+ 的 Fast Kawase 不同，见[兼容要求](../guide/compatibility.md)。
 
 `headerText` 用于显示提示文案，不参与选择。`themeTint` 透明时关闭采样材质上的页面色相叠加；显式样式可以提供非透明色。
 

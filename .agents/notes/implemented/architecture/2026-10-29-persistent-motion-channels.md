@@ -8,7 +8,7 @@ Status: implemented
 
 ## Decision
 
-仅将普通标量弹簧抽为内部 [CouiSpring](../../../../coui/src/main/java/com/itos/coui/motion/CouiSpring.kt)，复用已锁定的 AndroidX DynamicAnimation。Touch、Press、Slider、Switch 的普通弹簧和状态反馈共用它，不复制厂商调度框架。
+仅将普通标量弹簧抽为内部 [CouiSpring](../../../../coui/src/main/java/com/itos/coui/motion/CouiSpring.kt)，复用版本目录声明的 AndroidX DynamicAnimation 1.1.0，见[对齐决定](2026-11-08-dynamicanimation-and-api-26.md)。Touch、Press、Slider、Switch 的普通弹簧和状态反馈共用它，不复制厂商调度框架。
 
 运行中重定向复用原 SpringAnimation，保留速度及 pending/半帧积分。普通 cancel 只停止；cancelComplete 清回调并在使用过的通道上重建实例，清除原厂 reset 对应的历史。无弹簧运行介入的连续 snap 不反复重建。Slider 停止位置动画、重新按下及硬定位使用完整重置，Section ValueAnimator、惯性与既有边界适配保持。
 
@@ -25,7 +25,7 @@ Status: implemented
 - 录音 com.coloros.soundrecorder 17.8.8 / 17008008，SHA-256 为 968c3c17c6cdcc09f9a64e6fd939bfa4382104d7afda6dffb7c2f14ccb587588。COUITouchMotionAnimator.TouchMotionCollector.put 对 scale 累加相对单位值的增量；COUIPressAnimatorUnit 按下显式设置输入速度，抬手保留运行速度。COUIDeformAnimatorUnit、COUIRubberAnimatorUnit 和 COUIITouchMotionUnit 分别持有普通取消与完整 reset。
 - StateEffectAnimator.animateToProgressUntil / setProgress 保留运行中的上行目标，跨阈值后重定向；直接达到终点时通过结束监听退场。animateToProgressFrom 清除短按阈值。此规则不推广到未启用最低进度的反馈消费者。
 - CellBroadcastReceiver 的 com.android.cellbroadcastreceiver.module 17.10.10 / 1700010010，SHA-256 为 e57ed508605794386949f90c0c288fbaacea327ba618d7bae91d4d03ac421d10。coui_btn_check 双向 transition 没有 reversible；转入 check 的缩放回落有独立插值，转出 fill 延迟退场。Android SDK 的 AnimatedStateListDrawable.selectTransition 在不可逆中断时以旧目标作为下一条转场来源，不连续倒放旧动画。
-- 锁定的 AndroidX SpringAnimation.animateToFinalPosition 在运行时设置 pending；DynamicAnimation.cancel 不清 pending 或速度。原厂菜单的独立双阈值弹簧不是此普通分支，本轮不改菜单展开后端。
+- 1.0.0 的 SpringAnimation.animateToFinalPosition 在运行时设置 pending，DynamicAnimation.cancel 不清 pending 或速度；[1.1.0 对齐决定](2026-11-08-dynamicanimation-and-api-26.md)后 cancel 会清 pending，速度仍不重置，CouiSpring.cancelComplete 继续用新实例表达原厂完整重置。本篇逐帧验证使用当时的 1.0.0 二进制，升级后的取消再进入序列需重新验证。原厂菜单的独立双阈值弹簧不是此普通分支，本轮不改菜单展开后端。
 - Switch 的目标 Settings 参数与既有适配见[开关组件](../feature/2026-10-27-coui-switch.md)。本次回读录音包的 COUISpringDragHelper.dragTo、getAttachPosition、cancelDrag 及双轴状态收尾，核对提取边界；没有重新提取 Settings APK，不将共享 helper 的核对扩大为目标包全链路复验。
 
 ## Existing-note audit

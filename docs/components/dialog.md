@@ -162,7 +162,7 @@ val pageModifier = Modifier.fillMaxSize().then(imePadding)
 
 ## 使用背景材质
 
-默认弹窗使用不透明表面。API 33 及以上可以传入 `material`，采样页面背景。先按[快速开始](../guide/getting-started.md#浮动组件的背景源)创建 `backdrop`，再将弹窗放在背景源节点之外：
+默认弹窗使用不透明表面；窗口背景模糊归零只在 API 31+ 设置，API 26–30 保持普通窗口遮罩。API 33 及以上可以传入 `material`，采样页面背景。先按[快速开始](../guide/getting-started.md#浮动组件的背景源)创建 `backdrop`，再将弹窗放在背景源节点之外：
 
 ~~~kotlin
 if (visible) {

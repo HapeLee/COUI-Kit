@@ -5,7 +5,7 @@
 面向 Android Jetpack Compose 的 COUI 组件与视觉效果库
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.itoseo/coui?label=Maven%20Central&color=blue)](https://central.sonatype.com/artifact/io.github.itoseo/coui)
-[![Android API 31+](https://img.shields.io/badge/minSdk-31-3DDC84?logo=android)](docs/guide/compatibility.md)
+[![Android API 26+](https://img.shields.io/badge/minSdk-26-3DDC84?logo=android)](docs/guide/compatibility.md)
 [![MPL 2.0](https://img.shields.io/badge/License-MPL--2.0-blue)](LICENSE)
 [![Telegram 讨论群组](https://img.shields.io/badge/Telegram-%E8%AE%A8%E8%AE%BA%E7%BE%A4%E7%BB%84-26A5E4?logo=telegram&logoColor=white)](https://t.me/metric_official/2949)
 
