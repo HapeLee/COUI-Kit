@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.unit.dp
 import com.itos.coui.theme.CouiTheme
 
-// 搜索组件不依赖可选图标包；图形与 CouiIcons.Search 保持一致。
+// 搜索组件不依赖可选图标包；图形与 CouiIcons.Filled.Search 保持一致。
 internal object CouiSearchIcon {
     private val variants: Pair<ImageVector, ImageVector> by lazy {
         createVector(Color.Black) to createVector(Color.White)

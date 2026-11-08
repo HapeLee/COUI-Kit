@@ -1,6 +1,6 @@
 # 新增图标
 
-新增图标时，先确认目标应用和页面实际使用的资源，再将图形接入 `CouiIcons`。现有的网页生成器负责从库代码生成预览，不负责从 APK 提取或将 Android XML 转成 `ImageVector`。
+新增图标时，先确认目标应用和页面实际使用的资源，再将图形接入 `CouiIcons`。图形保存在 VectorDrawable XML 中，Compose 从同一份资源读取 `ImageVector`；网页生成器从 XML 生成预览。
 
 ## 确认目标和资源
 
@@ -12,15 +12,15 @@
 
 ## 处理资源与颜色
 
-- 对矢量资源，同时保留可用的 Android XML 及必要依赖，并转换为 Compose `ImageVector`。独立使用的 VectorDrawable 需要完整的命名空间、宽高、viewport 和路径；资源表、主题依赖或未解析的引用不能直接当作完整图标。预览异常时先检查实际资源类型和依赖，不要只改文件名。XML 及依赖属于独立交付材料，应给出保存位置；当前库尚未为每个图标统一保存 XML，网页 SVG 不能代替它。
+- 对矢量资源，保留可用的 Android VectorDrawable XML 及必要的颜色资源。XML 需要完整的命名空间、宽高、viewport 和路径；资源表、未解析的主题或资源引用不能直接当作完整图标。预览异常时先检查实际资源类型和依赖，不要只改文件名。
 - 若 PNG 或 WebP 含无法忠实矢量化的细节，保留原图并列为待处理，不生成失真的矢量图。
 - 单色图标保留各路径的 alpha，再按已确认的日夜色值使用 [CouiColor](../../coui/src/main/java/com/itos/coui/theme/CouiColor.kt)。多条路径只是透明度不同，仍可使用同一颜色；不能把未证实的颜色近似归入现有色板。需要新色时，先确认日夜值，再补充对应角色。
 - 多色和渐变图标保留各路径颜色及渐变，不使用整体单色 tint。若只有部分图层可换色，应分别处理：`AppUpdate` 只更改背景，白色前景保持不变。
 
 ## 接入图标库
 
-1. 参照 [CouiIconVectors.kt](../../coui-icons/src/main/java/com/itos/coui/icons/CouiIconVectors.kt) 中最接近的图标，添加 `ImageVector` 及所需日夜变体；保留实际路径、viewport、填充、描边、裁剪、渐变与透明度。仅有颜色差异时可复用同一图形，几何或图层不同则分别保留。
-2. 在 [CouiIcons.kt](../../coui-icons/src/main/java/com/itos/coui/icons/CouiIcons.kt) 的对应样式中提供 `CouiIcons.Filled.名称` 或 `CouiIcons.Outlined.名称` 入口。需要随主题变化时，在 Composable getter 中通过 `CouiTheme.isDark` 选择变体；供静态目录使用时，保存 `@Composable () -> ImageVector` 并在组合时读取。
+1. 在 [drawable](../../coui-icons/src/main/res/drawable) 中添加 VectorDrawable XML；需要不同的夜间图形时，在 `drawable-night` 中添加同名资源。保留实际路径、viewport、填充、描边、裁剪、渐变与透明度；日夜颜色资源分别放入 `values` 和 `values-night`。
+2. 在 [CouiIcons.kt](../../coui-icons/src/main/java/com/itos/coui/icons/CouiIcons.kt) 的对应样式中提供 `CouiIcons.Filled.名称` 或 `CouiIcons.Outlined.名称` 入口，通过 `couiIconResource` 加载 XML。图标跟随 `CouiTheme.isDark` 选择日夜资源；供静态目录使用时，保存 `@Composable () -> ImageVector` 并在组合时读取。
 3. 按实际来源应用更新[图标来源](../../coui/ICON_SOURCES.md)中的图标分组。详细使用方法维护在[图标用法](../components/icons.md)，来源清单不记录路径细节或提取日志。
 
 `Image` 可显示矢量自带颜色；Material 3 `Icon` 要保留这些颜色，应传 `tint = Color.Unspecified`。显式 tint 可覆盖单色图标，但会覆盖整张多色图。需要可换色的局部时，在图标实现中单独处理该图层。
@@ -30,9 +30,10 @@
 在仓库根目录执行：
 
 ```sh
+npm ci --prefix Pages
 node Pages/generate.mjs
 ```
 
-脚本根据库中的公开图标、向量和色板生成网页数据。打开预览、处理新增色板或特殊图标，以及发布网页的步骤见[网页数据生成指南](../../Pages/GENERATION.md)。生成器仅支持当前实现的 Kotlin 写法；遇到不支持的写法应检查报错，并按实际需要扩展生成器。
+脚本根据库中的 XML 图标和色板生成网页数据。打开预览、处理新增色板或特殊图标，以及发布网页的步骤见[网页数据生成指南](../../Pages/GENERATION.md)。遇到不支持的资源写法应检查报错，并按实际需要扩展生成器。
 
 核对新增名称和调用、日夜默认颜色、单色透明度、多色路径，以及不同状态或方向；有可换色图层时检查改色后其他图层是否保持不变。将网页预览与目标资源对照，但不要把网页 SVG 正常显示当作 Android Compose 或真机显示已验证。Android 构建和设备验证按项目授权执行，记录实际完成的检查及未验证部分。

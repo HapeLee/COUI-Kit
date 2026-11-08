@@ -82,7 +82,7 @@ internal fun DemoSettingsPage(
                             textStyle = rememberCouiTextStyle(CouiTextKind.Toolbar), cursorColor = colors.accent,
                             material = { CouiTopAppBarButtonDefaults.systemMaterial(dark, it) },
                             shadow = { CouiTopAppBarButtonDefaults.shadow(dark, it, density, contour, alphaScale = 1f) })) {
-                            Icon(CouiIcons.Back, backDescription, Modifier.size(24.dp))
+                            Icon(CouiIcons.Filled.Back, backDescription, Modifier.size(24.dp))
                         }
                     } else Box(Modifier.size(48.dp).clip(CouiShape(24.dp, 2f))
                         .couiButtonFeedback(dark, source, true)

@@ -70,7 +70,7 @@ private fun NavigationSample(dark: Boolean) {
                         CouiNavigationItem(titles[2], DemoIcons.Settings, DemoIcons.SettingsSelected)),
                     selectedIndex = selected, onSelection = { selected = it },
                     leftIcon = CouiIcons.Filled.Setting, leftDescription = stringResource(R.string.nav_left_description),
-                    rightIcon = CouiIcons.Add, rightDescription = stringResource(R.string.nav_right_description),
+                    rightIcon = CouiIcons.Filled.Add, rightDescription = stringResource(R.string.nav_right_description),
                     leftVisible = left, rightVisible = right,
                     rightContainerColor = CouiFabDefaults.containerColor(CouiFabColor.Notes, dark),
                     dark = dark, lightColor = Color.White,
@@ -126,7 +126,7 @@ internal fun FabSampleButton(modifier: Modifier = Modifier, dark: Boolean, prese
                 material = CouiFabDefaults.material(color, dark),
                 shadow = CouiFabDefaults.shadow(color, LocalDensity.current.density,
                     LocalCouiContourGlowEnabled.current)) {
-                Icon(CouiIcons.Add, stringResource(R.string.catalog_fab), Modifier.size(24.dp), tint = Color.White)
+                Icon(CouiIcons.Filled.Add, stringResource(R.string.catalog_fab), Modifier.size(24.dp), tint = Color.White)
             }
         }
         rendering.exceptionOrNull()?.let { error ->

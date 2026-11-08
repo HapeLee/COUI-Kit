@@ -151,5 +151,5 @@ internal fun DemoPreferenceRow(modifier: Modifier, title: String, summary: Strin
 /** 原始 VectorDrawable 保留 RTL 镜像与原生 viewport。 */
 @Composable
 internal fun DemoSettingsArrow(modifier: Modifier, back: Boolean, color: Color) {
-    Icon(CouiIcons.Back, null, modifier.then(if (back) Modifier else Modifier.rotate(180f)), tint = color)
+    Icon(CouiIcons.Filled.Back, null, modifier.then(if (back) Modifier else Modifier.rotate(180f)), tint = color)
 }

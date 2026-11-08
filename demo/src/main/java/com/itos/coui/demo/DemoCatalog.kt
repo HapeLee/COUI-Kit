@@ -38,17 +38,17 @@ internal val DemoComponentGroups = listOf(
     listOf(DemoCatalogEntry("dialogs", R.string.dialog_title) { DemoIcons.Dialogs },
         DemoCatalogEntry("menu", R.string.menu_title) { CouiIcons.Filled.Grid }),
     listOf(DemoCatalogEntry("appbar", R.string.catalog_appbar) { DemoIcons.Title },
-        DemoCatalogEntry("search", R.string.catalog_search) { CouiIcons.Search },
+        DemoCatalogEntry("search", R.string.catalog_search) { CouiIcons.Filled.Search },
         DemoCatalogEntry("navigation", R.string.catalog_navigation) { CouiIcons.Filled.Lab },
         DemoCatalogEntry("chip", R.string.chip_tab_title) { CouiIcons.Filled.Grid },
-        DemoCatalogEntry("fab", R.string.catalog_fab) { CouiIcons.Add }),
+        DemoCatalogEntry("fab", R.string.catalog_fab) { CouiIcons.Filled.Add }),
     listOf(DemoCatalogEntry("wheel", R.string.catalog_wheel) { DemoIcons.Tune },
         DemoCatalogEntry("calendar", R.string.picker_calendar_title) { CouiIcons.Filled.Health }),
 )
 
 internal val DemoEffectGroups = listOf(
     listOf(DemoCatalogEntry("effect_shadow", R.string.shadow_title) { CouiIcons.Filled.Rings },
-        DemoCatalogEntry("effect_fusion", R.string.fusion_title) { CouiIcons.Add },
+        DemoCatalogEntry("effect_fusion", R.string.fusion_title) { CouiIcons.Filled.Add },
         DemoCatalogEntry("effect_backdrop", R.string.backdrop_title) { CouiIcons.Filled.Radar },
         DemoCatalogEntry("effect_material", R.string.material_title) { DemoIcons.Switch }),
 )

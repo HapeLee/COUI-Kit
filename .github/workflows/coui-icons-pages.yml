@@ -31,6 +31,9 @@ jobs:
         with:
           node-version: '24'
 
+      - name: 安装网页生成依赖
+        run: npm ci --prefix Pages
+
       - name: 生成图标数据文件
         run: |
           set -euo pipefail
@@ -39,6 +42,9 @@ jobs:
           test -s Pages/style.css
           test -s Pages/app.js
           test -s Pages/data.js
+
+      - name: 清理网页生成依赖
+        run: node -e 'require("node:fs").rmSync("Pages/node_modules", { recursive: true, force: true })'
 
       - name: 配置 GitHub Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5

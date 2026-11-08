@@ -27,7 +27,9 @@ Icon(
 )
 ```
 
-图标按 `CouiIcons.Filled` 和 `CouiIcons.Outlined` 提供。通用功能图标 `Search`、`Back`、`Close`、`Add`、`DarkLight` 在两种样式中使用相同图形，也可直接通过 `CouiIcons.Search` 等入口使用。它们默认日间为黑色、夜间为白色，其中 `Back` 支持 RTL 自动镜像。
+图标按 `CouiIcons.Filled` 和 `CouiIcons.Outlined` 提供。通用功能图标 `Search`、`Back`、`Close`、`Add`、`DarkLight` 在两种样式中使用相同图形。它们默认日间为黑色、夜间为白色，其中 `Back` 支持 RTL 自动镜像。
+
+图形保存在 VectorDrawable 资源中，传统 View 可直接引用，例如 `@drawable/coui_wifi_filled`。Compose 入口根据 `CouiTheme` 加载日夜资源；传统 View 的资源则根据 Android 配置选择。
 
 ## 指定颜色与特殊图标
 
