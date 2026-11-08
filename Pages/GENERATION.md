@@ -20,7 +20,7 @@ python3 -m http.server 8080 --directory Pages
 - `coui-icons/src/main/res/drawable-night/` 中存在同名文件时，提供夜间图形；没有时，网页使用日间图形，并按夜间颜色资源解析颜色引用。
 - `values/coui_icon_colors.xml` 与可选的 `values-night/coui_icon_colors.xml` 提供图标颜色资源。网页色板读取 `coui/src/main/java/com/itos/coui/theme/CouiColor.kt`，生成器会核对 XML 中蓝、绿、黄、红、橙的日夜值与 `CouiColor` 一致。
 - 生成器保留路径顺序、透明度、组变换、裁剪、笔画和渐变。
-- 每个 vector 的 `android:name` 必须是准确的 PascalCase 图标名。文件后缀决定 `Filled` 或 `Outlined` 样式。
+- 每个 vector 的 `android:name` 必须是准确的 PascalCase 图标名。文件后缀对应 `Filled` 或 `Outlined` 样式；共用图标的两个样式读取 `CouiIcons.kt` 内部 `Monochrome` 指定的同一资源。
 - 网页列表按 `CouiIcons.kt` 中 `Filled`、`Outlined` 属性的声明顺序排列；图形数据仍全部来自 XML。
 - `AI`、`Google`、`Setting` 和 `Phone` 保持原色。`coui_background` 路径用于 `AppUpdate` 的网页背景色调整。
 

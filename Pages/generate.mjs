@@ -77,7 +77,9 @@ function parseCouiColors(source) {
 function parseIconOrder(source) {
   const clean = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
   const order = {};
-  for (const style of ['Filled', 'Outlined']) {
+  const aliases = {};
+  const sharedResources = new Map();
+  for (const style of ['Filled', 'Outlined', 'Monochrome']) {
     const declaration = new RegExp(`\\bobject\\s+${style}\\s*\\{`).exec(clean);
     if (!declaration) throw new Error(`Could not find CouiIcons.${style}`);
     const openBrace = declaration.index + declaration[0].lastIndexOf('{');
@@ -95,11 +97,20 @@ function parseIconOrder(source) {
     }
     if (endBrace === -1) throw new Error(`Unclosed CouiIcons.${style} declaration`);
     const body = clean.slice(openBrace + 1, endBrace);
-    order[style] = [...body.matchAll(/^\s*val\s+([A-Z][A-Za-z0-9_]*)\s*:\s*ImageVector\b/gm)]
-      .map((match) => match[1]);
-    if (order[style].length === 0) throw new Error(`CouiIcons.${style} has no icon properties`);
+    const properties = [...body.matchAll(/^\s*val\s+([A-Z][A-Za-z0-9_]*)\s*:\s*ImageVector\s+@Composable\s+get\(\)\s*=\s*([^\n]+)/gm)];
+    if (properties.length === 0) throw new Error(`CouiIcons.${style} has no icon properties`);
+    if (style === 'Monochrome') {
+      for (const [, name, getter] of properties) {
+        const resource = getter.trim().match(/^couiIconResource\(R\.drawable\.(coui_[a-z0-9_]+)\)$/);
+        if (!resource || sharedResources.has(name)) throw new Error(`Invalid Monochrome icon ${name}`);
+        sharedResources.set(name, resource[1]);
+      }
+    } else {
+      order[style] = properties.map((match) => match[1]);
+      aliases[style] = new Set(properties.filter(([, name, getter]) => getter.trim() === `Monochrome.${name}`).map((match) => match[1]));
+    }
   }
-  return order;
+  return { order, aliases, sharedResources };
 }
 
 function parseXml(source, context) {
@@ -697,7 +708,7 @@ function validateGeneratedPayload({ icons, colors }) {
 
 function main() {
   const couiColors = parseCouiColors(fs.readFileSync(COUI_COLOR_PATH, 'utf8'));
-  const iconOrder = parseIconOrder(fs.readFileSync(COUI_ICONS_PATH, 'utf8'));
+  const { order: iconOrder, aliases, sharedResources } = parseIconOrder(fs.readFileSync(COUI_ICONS_PATH, 'utf8'));
   const rawDayColors = parseResourceColorFile(DAY_COLORS_PATH, true);
   const rawNightColors = new Map(rawDayColors);
   for (const [name, value] of parseResourceColorFile(NIGHT_COLORS_PATH, false)) {
@@ -722,6 +733,23 @@ function main() {
   }
   for (const key of nightFiles.keys()) {
     if (!dayFiles.has(key)) throw new Error(`Night icon resource has no day resource: ${key}`);
+  }
+
+  for (const [name, resource] of sharedResources) {
+    const match = resource.match(/^coui_(.+)_(filled|outlined)$/);
+    if (!match || match[1] !== snakeCase(name)) throw new Error(`Invalid Monochrome resource for ${name}: ${resource}`);
+    const sourceStyle = match[2] === 'filled' ? 'Filled' : 'Outlined';
+    const source = specs.get(`${match[1]}:${sourceStyle}`);
+    if (!source) throw new Error(`Missing Monochrome resource for ${name}: ${resource}`);
+    for (const style of ['Filled', 'Outlined']) {
+      if (!aliases[style].has(name)) throw new Error(`CouiIcons.${style}.${name} must refer to Monochrome.${name}`);
+      specs.set(`${match[1]}:${style}`, { ...source, style, source: name });
+    }
+  }
+  for (const style of ['Filled', 'Outlined']) {
+    for (const name of aliases[style]) {
+      if (!sharedResources.has(name)) throw new Error(`Missing Monochrome icon ${name}`);
+    }
   }
 
   const entries = [...specs.values()];

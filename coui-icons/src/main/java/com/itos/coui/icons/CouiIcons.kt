@@ -11,26 +11,52 @@ import androidx.compose.ui.graphics.vector.ImageVector
  */
 object CouiIcons {
 
-    object Filled {
-        /** com.android.settings:drawable/coui_search_view_icon_normal。 */
+    private object Monochrome {
         val Search: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_search_filled)
 
-        /** com.android.settings:drawable/coui_back_arrow_normal。 */
         val Back: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_back_filled)
 
-        /** com.android.settings:drawable/ic_close。 */
         val Close: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_close_filled)
 
-        /** com.coloros.alarmclock:drawable/color_floating_button_icon_add。 */
         val Add: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_add_filled)
 
-        /** com.android.settings:drawable/dark_theme。 */
         val DarkLight: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_dark_light_filled)
+
+        val LayoutSpliced: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_layout_spliced_outlined)
+
+        val SliderCustom: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_slider_custom_outlined)
+
+        val ListFilter: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_list_filter_outlined)
+    }
+
+    object Filled {
+        /** com.android.settings:drawable/coui_search_view_icon_normal。 */
+        val Search: ImageVector
+            @Composable get() = Monochrome.Search
+
+        /** com.android.settings:drawable/coui_back_arrow_normal。 */
+        val Back: ImageVector
+            @Composable get() = Monochrome.Back
+
+        /** com.android.settings:drawable/ic_close。 */
+        val Close: ImageVector
+            @Composable get() = Monochrome.Close
+
+        /** com.coloros.alarmclock:drawable/color_floating_button_icon_add。 */
+        val Add: ImageVector
+            @Composable get() = Monochrome.Add
+
+        /** com.android.settings:drawable/dark_theme。 */
+        val DarkLight: ImageVector
+            @Composable get() = Monochrome.DarkLight
 
         /** com.android.settings:drawable/settings_brightness_ic。 */
         val Sun: ImageVector
@@ -222,23 +248,32 @@ object CouiIcons {
         /** com.coloros.gallery3d:drawable/main_tab_creation_icon_selected。 */
         val WandSpark: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_wand_spark_filled)
+
+        val LayoutSpliced: ImageVector
+            @Composable get() = Monochrome.LayoutSpliced
+
+        val SliderCustom: ImageVector
+            @Composable get() = Monochrome.SliderCustom
+
+        val ListFilter: ImageVector
+            @Composable get() = Monochrome.ListFilter
     }
 
     object Outlined {
         val Search: ImageVector
-            @Composable get() = Filled.Search
+            @Composable get() = Monochrome.Search
 
         val Back: ImageVector
-            @Composable get() = Filled.Back
+            @Composable get() = Monochrome.Back
 
         val Close: ImageVector
-            @Composable get() = Filled.Close
+            @Composable get() = Monochrome.Close
 
         val Add: ImageVector
-            @Composable get() = Filled.Add
+            @Composable get() = Monochrome.Add
 
         val DarkLight: ImageVector
-            @Composable get() = Filled.DarkLight
+            @Composable get() = Monochrome.DarkLight
 
         /** com.coloros.gallery3d:drawable/main_tab_photo_icon_normal。 */
         val Photo: ImageVector
@@ -254,14 +289,14 @@ object CouiIcons {
 
         /** com.coloros.gallery3d:drawable/main_ic_picked。 */
         val LayoutSpliced: ImageVector
-            @Composable get() = couiIconResource(R.drawable.coui_layout_spliced_outlined)
+            @Composable get() = Monochrome.LayoutSpliced
 
         /** com.coloros.gallery3d:drawable/main_ic_segment_album_sort。 */
         val SliderCustom: ImageVector
-            @Composable get() = couiIconResource(R.drawable.coui_slider_custom_outlined)
+            @Composable get() = Monochrome.SliderCustom
 
         /** com.coloros.gallery3d:drawable/main_ic_segment_filter。 */
         val ListFilter: ImageVector
-            @Composable get() = couiIconResource(R.drawable.coui_list_filter_outlined)
+            @Composable get() = Monochrome.ListFilter
     }
 }
