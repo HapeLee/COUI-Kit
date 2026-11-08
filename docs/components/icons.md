@@ -27,11 +27,13 @@ Icon(
 )
 ```
 
-图标按 `CouiIcons.Filled` 和 `CouiIcons.Outlined` 提供。`Search`、`Back`、`Close`、`Add`、`DarkLight`、`LayoutSpliced`、`SliderCustom` 和 `ListFilter` 在两种样式中使用相同图形。它们默认日间为黑色、夜间为白色，其中 `Back` 支持 RTL 自动镜像。
+图标按 `CouiIcons.Filled` 和 `CouiIcons.Outlined` 提供。`Back`、`Close`、`Add`、`DarkLight`、`ListFilter` 和 `More` 在两种样式中使用相同图形；`Search`、`Headset`、`SliderCustom` 和 `LayoutSpliced` 仅提供 `Outlined`。它们默认日间为黑色、夜间为白色，其中 `Back` 支持 RTL 自动镜像。
 
 图形保存在 VectorDrawable 资源中，传统 View 可直接引用，例如 `@drawable/coui_wifi_filled`。Compose 入口根据 `CouiTheme` 加载日夜资源；传统 View 的资源则根据 Android 配置选择。
 
 ## 指定颜色与特殊图标
+
+`CouiColor.Day` 和 `CouiColor.Night` 均提供 `GRAY`（`#474747`）和 `DARK_GRAY`（`#191919`）。
 
 - **单色图标指定 `tint`**：可结合 `CouiTheme.isDark` 从 `CouiColor.Day` / `CouiColor.Night` 选择颜色并传给 `Icon`：
 

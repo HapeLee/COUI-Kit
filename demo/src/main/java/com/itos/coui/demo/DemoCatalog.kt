@@ -38,7 +38,7 @@ internal val DemoComponentGroups = listOf(
     listOf(DemoCatalogEntry("dialogs", R.string.dialog_title) { DemoIcons.Dialogs },
         DemoCatalogEntry("menu", R.string.menu_title) { CouiIcons.Filled.Grid }),
     listOf(DemoCatalogEntry("appbar", R.string.catalog_appbar) { DemoIcons.Title },
-        DemoCatalogEntry("search", R.string.catalog_search) { CouiIcons.Filled.Search },
+        DemoCatalogEntry("search", R.string.catalog_search) { CouiIcons.Outlined.Search },
         DemoCatalogEntry("navigation", R.string.catalog_navigation) { CouiIcons.Filled.Lab },
         DemoCatalogEntry("chip", R.string.chip_tab_title) { CouiIcons.Filled.Grid },
         DemoCatalogEntry("fab", R.string.catalog_fab) { CouiIcons.Filled.Add }),

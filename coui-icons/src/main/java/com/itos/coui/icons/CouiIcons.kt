@@ -12,9 +12,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 object CouiIcons {
 
     private object Monochrome {
-        val Search: ImageVector
-            @Composable get() = couiIconResource(R.drawable.coui_search_filled)
-
         val Back: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_back_filled)
 
@@ -27,21 +24,14 @@ object CouiIcons {
         val DarkLight: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_dark_light_filled)
 
-        val LayoutSpliced: ImageVector
-            @Composable get() = couiIconResource(R.drawable.coui_layout_spliced_outlined)
-
-        val SliderCustom: ImageVector
-            @Composable get() = couiIconResource(R.drawable.coui_slider_custom_outlined)
-
         val ListFilter: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_list_filter_outlined)
+
+        val More: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_more_outlined)
     }
 
     object Filled {
-        /** com.android.settings:drawable/coui_search_view_icon_normal。 */
-        val Search: ImageVector
-            @Composable get() = Monochrome.Search
-
         /** com.android.settings:drawable/coui_back_arrow_normal。 */
         val Back: ImageVector
             @Composable get() = Monochrome.Back
@@ -149,6 +139,10 @@ object CouiIcons {
         val CloudLink: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_cloud_link_filled)
 
+        /** com.heytap.cloud:drawable/ic_homepage_tab_cloud_space_checked。 */
+        val CloudData: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_cloud_data_filled)
+
         val Setting: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_setting_filled)
 
@@ -249,19 +243,17 @@ object CouiIcons {
         val WandSpark: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_wand_spark_filled)
 
-        val LayoutSpliced: ImageVector
-            @Composable get() = Monochrome.LayoutSpliced
-
-        val SliderCustom: ImageVector
-            @Composable get() = Monochrome.SliderCustom
-
         val ListFilter: ImageVector
             @Composable get() = Monochrome.ListFilter
+
+        val More: ImageVector
+            @Composable get() = Monochrome.More
     }
 
     object Outlined {
+        /** com.android.settings:drawable/coui_search_view_icon_normal。 */
         val Search: ImageVector
-            @Composable get() = Monochrome.Search
+            @Composable get() = couiIconResource(R.drawable.coui_search_outlined)
 
         val Back: ImageVector
             @Composable get() = Monochrome.Back
@@ -274,6 +266,18 @@ object CouiIcons {
 
         val DarkLight: ImageVector
             @Composable get() = Monochrome.DarkLight
+
+        /** com.heytap.cloud:drawable/ic_homepage_tab_cloud_service_normal。 */
+        val CloudLink: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_cloud_link_outlined)
+
+        /** com.heytap.cloud:drawable/ic_homepage_tab_cloud_space_normal。 */
+        val CloudData: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_cloud_data_outlined)
+
+        /** com.heytap.cloud:drawable/ic_homepage_lucky_center。 */
+        val Gift: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_gift_outlined)
 
         /** com.coloros.gallery3d:drawable/main_tab_photo_icon_normal。 */
         val Photo: ImageVector
@@ -289,14 +293,22 @@ object CouiIcons {
 
         /** com.coloros.gallery3d:drawable/main_ic_picked。 */
         val LayoutSpliced: ImageVector
-            @Composable get() = Monochrome.LayoutSpliced
+            @Composable get() = couiIconResource(R.drawable.coui_layout_spliced_outlined)
 
         /** com.coloros.gallery3d:drawable/main_ic_segment_album_sort。 */
         val SliderCustom: ImageVector
-            @Composable get() = Monochrome.SliderCustom
+            @Composable get() = couiIconResource(R.drawable.coui_slider_custom_outlined)
 
         /** com.coloros.gallery3d:drawable/main_ic_segment_filter。 */
         val ListFilter: ImageVector
             @Composable get() = Monochrome.ListFilter
+
+        /** com.heytap.cloud:drawable/ic_homepage_online_service。 */
+        val Headset: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_headset_outlined)
+
+        /** com.heytap.cloud:drawable/coui_toolbar_menu_icon_more_normal。 */
+        val More: ImageVector
+            @Composable get() = Monochrome.More
     }
 }

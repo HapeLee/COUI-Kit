@@ -11,6 +11,8 @@ object CouiColor {
         val YELLOW = Color(0xFFFFB200)
         val RED = Color(0xFFEB3B2F)
         val ORANGE = Color(0xFFFF7700)
+        val GRAY = Color(0xFF474747)
+        val DARK_GRAY = Color(0xFF191919)
         /** 从原始风扇图标提取；夜间入口沿用此值，未证实为 COUI 日夜主题色。 */
         val CYAN_BLUE = Color(0xFF00A1FF)
 
@@ -26,6 +28,8 @@ object CouiColor {
         val YELLOW = Color(0xFFE5A100)
         val RED = Color(0xFFEB493D)
         val ORANGE = Color(0xFFF08222)
+        val GRAY = Day.GRAY
+        val DARK_GRAY = Day.DARK_GRAY
         val CYAN_BLUE = Day.CYAN_BLUE
 
         val HOME_BLUE = BLUE
