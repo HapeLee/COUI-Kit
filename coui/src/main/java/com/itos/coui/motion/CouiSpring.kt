@@ -7,7 +7,7 @@ import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
 import kotlin.math.PI
 
-/** 普通 COUI 弹簧通道；运行中重定向保留速度，硬重置同时清除 pending 目标。 */
+/** 普通 COUI 弹簧通道；运行中重定向保留速度，硬重置额外清除速度与监听状态。 */
 internal class CouiSpring(
     initial: Float,
     private val minimumChange: Float = 1f,
@@ -63,7 +63,7 @@ internal class CouiSpring(
 
     fun cancelComplete() {
         cancel()
-        // AndroidX cancel 不清 pending、速度和 endRequested；用新实例表达原厂完整重置。
+        // 1.1.0 的 cancel 会清 pending 目标；完整重置仍用新实例表达原厂停止语义。
         if (needsReset) {
             animation = newAnimation()
             needsReset = false

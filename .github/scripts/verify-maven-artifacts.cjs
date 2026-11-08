@@ -28,7 +28,13 @@ for (const artifact of ['coui', 'coui-material3']) {
   assert(!dependencies.some(dep => ['demo', 'capsule'].includes(dep.module)), `${artifact} 发行依赖包含 Demo 装配`);
   assert(!dependencies.some(dep => dep.group === 'androidx.compose.material'), `${artifact} 不应引入 Material Icons`);
   if (core) {
-    assert(dependencies.some(dep => dep.group === 'androidx.dynamicanimation' && dep.module === 'dynamicanimation' && dep.version?.strictly), '丢失动画严格版本约束');
+    const animationDependencies = [...dependencies,
+      ...metadata.variants.flatMap(variant => variant.dependencyConstraints ?? [])].filter(dep =>
+      dep.group === 'androidx.dynamicanimation' && dep.module === 'dynamicanimation');
+    assert(animationDependencies.some(dep => dep.version?.requires === '1.1.0'),
+      '核心动画依赖应请求 1.1.0');
+    assert(animationDependencies.every(dep => !dep.version?.strictly),
+      '核心动画依赖不应使用严格版本约束');
     assert(!dependencies.some(dep => dep.group === 'androidx.compose.material3'), '核心不应依赖 Material 3');
   } else {
     assert(dependencies.some(dep => dep.group === group && dep.module === 'coui' && dep.version?.requires === version), '适配模块必须依赖同版本核心');
