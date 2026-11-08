@@ -31,7 +31,7 @@ Icon(
 
 图形保存在 VectorDrawable 资源中，传统 View 可直接引用，例如 `@drawable/coui_wifi_filled`。Compose 入口根据 `CouiTheme` 加载日夜资源；传统 View 的资源则根据 Android 配置选择。
 
-`Search`、`Back`、`Close`、`Add`、`DarkLight`、`CloudData`、`Album` 和 `WandSpark` 的可见图形均为不透明单色，默认日间黑色、夜间白色。底栏状态透明度由 `NavigationBar` 应用，独立 FAB 通过内容色提供选中态透明度。
+`Search`、`Back`、`Close`、`Add`、`DarkLight`、`CloudData`、`Album` 和 `WandSpark` 的可见图形均为不透明单色，默认日间黑色、夜间白色。底栏状态透明度由 `NavigationBar` 应用；独立 FAB 默认以不透明白色染色，可通过 `contentColor` 覆盖。
 
 ## 指定颜色与特殊图标
 

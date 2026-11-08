@@ -121,7 +121,7 @@ internal fun FabSampleButton(modifier: Modifier = Modifier, dark: Boolean, prese
         val renderer = rendering.getOrNull()
         if (renderer != null) {
             val color = CouiFabDefaults.containerColor(preset, dark)
-            Fab(modifier, renderer = renderer, dark = dark,
+            Fab(modifier, renderer = renderer, onClick = {}, dark = dark,
                 shape = if (rounded) CouiFabDefaults.roundedSquareShape else CouiFabDefaults.circleShape,
                 material = CouiFabDefaults.material(color, dark),
                 shadow = CouiFabDefaults.shadow(color, LocalDensity.current.density,

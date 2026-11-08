@@ -130,7 +130,7 @@ fun NavigationBar(
     themeTint: Color = CouiTheme.materialTintFor(dark),
     circleShape: Shape = CouiTopAppBarButtonDefaults.circleShape,
     capsuleShape: Shape = CouiCapsuleShape,
-    selectedColor: Color = CouiFabDefaults.contentColor(dark),
+    selectedColor: Color = (if (dark) Color.White else Color.Black).copy(alpha = 230f / 255f),
     unselectedColor: Color = (if (dark) Color.White else Color.Black).copy(alpha = 184f / 255f),
     onSelection: (Int) -> Unit,
 ) {

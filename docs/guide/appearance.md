@@ -58,7 +58,7 @@ Chip 从 `labelLarge` 取字体族。Dialog 从 `titleLarge`、`bodyMedium`、`l
 
 关闭染色时，菜单使用 `CouiMenuDefaults.style().copy(themeTint = Color.Transparent)`，底栏显式传 `themeTint = Color.Transparent`。自定义局部 `CouiTheme` 也可提供自己的 `materialTint`；透明表示关闭。显式材质始终优先。
 
-默认 FAB 材质取强调色，阴影取最终 `material.firstColor`，不叠加页面 tint。FAB 默认内容色与底栏选中态一致，可通过 `contentColor` 覆盖；传入 `Color.Unspecified` 时继承外部内容色。子图标的显式 tint 始终优先。配色预设见 [FAB](../components/fab.md)。底栏右附件图标固定为白色。
+默认 FAB 材质取强调色，阴影取最终 `material.firstColor`，不叠加页面 tint。FAB 在日间和夜间的默认内容色均为不透明白色，可通过 `contentColor` 覆盖；传入 `Color.Unspecified` 时继承外部内容色。子图标的显式 tint 始终优先。配色预设见 [FAB](../components/fab.md)。底栏右附件图标固定为白色。
 
 ## 内容插槽与最小交互尺寸
 
