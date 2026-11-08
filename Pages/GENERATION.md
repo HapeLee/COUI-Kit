@@ -26,7 +26,7 @@ python3 -m http.server 8080 --directory Pages
 
 ## 新增或修改图标
 
-1. 按仓库现有已支持的 Kotlin `ImageVector` 写法在 `CouiIconVectors.kt`（或 `CouiIcons.kt` 内部）提供日间与夜间定义，并在 `CouiIcons.kt` 注册公开图标属性。
+1. 按仓库现有已支持的 Kotlin `ImageVector` 写法在 `CouiIconVectors.kt`（或 `CouiIcons.kt` 内部）提供日间与夜间定义，并在 `CouiIcons.kt` 对应样式下注册公开图标属性。
 2. 在仓库根目录重新运行 `node Pages/generate.mjs`。
 3. 生成器仅解析当前仓库已支持的 Kotlin DSL 子集，不是所有 Kotlin 写法都支持。若运行报 `Unsupported ...` 等解析或自检错误，先根据报错检查图标写法，或在 `Pages/generate.mjs` 中扩展对应解析规则后重试。
 
@@ -40,7 +40,7 @@ python3 -m http.server 8080 --directory Pages
 图标染色模式与特殊规则由 `Pages/generate.mjs` 处理：
 
 - **原色图标（禁止改色）**：`ORIGINAL_ICONS` 名单中的 `AI`、`Google`、`Setting`、`Phone`，以及 `ImageVector.Builder` 中 `tintColor = Color.Unspecified` 的常规多色图标，会由生成器自动识别并保持原色，网页不对其进行单色染色。
-- **背景改色图标**：`AppUpdate` 保留白色前景（`#FFFFFF`），仅对圆形背景路径标记可改色，并对应 `CouiIcons.AppUpdate(color = ...)` 调用。
+- **背景改色图标**：`AppUpdate` 保留白色前景（`#FFFFFF`），仅对圆形背景路径标记可改色。
 - 一般原色与单色图标可由生成器自动识别；若新增未支持的特殊染色或背景效果，需扩展 `Pages/generate.mjs` 中的分类与标记逻辑，并在本地预览中核对实际渲染与生成代码。
 
 ## GitHub Pages 发布

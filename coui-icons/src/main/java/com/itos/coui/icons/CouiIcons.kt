@@ -96,8 +96,8 @@ object CouiIcons {
         @Composable get() = if (CouiTheme.isDark) CouiIconVectors.BellNight else CouiIconVectors.BellDay
 
     /** com.android.settings:drawable/settings_personalise_ic。 */
-    val PhoneVibrate: ImageVector
-        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.PhoneVibrateNight else CouiIconVectors.PhoneVibrateDay
+    val MultiPhone: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.MultiPhoneNight else CouiIconVectors.MultiPhoneDay
 
     /** com.android.settings:drawable/settings_sound_settings_ic。 */
     val Volume: ImageVector
@@ -133,8 +133,8 @@ object CouiIcons {
     val Lock: ImageVector
         @Composable get() = if (CouiTheme.isDark) CouiIconVectors.LockNight else CouiIconVectors.LockDay
 
-    val UserShield: ImageVector
-        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.UserShieldNight else CouiIconVectors.UserShieldDay
+    val ShieldUser: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.ShieldUserNight else CouiIconVectors.ShieldUserDay
 
     val Sos: ImageVector
         @Composable get() = if (CouiTheme.isDark) CouiIconVectors.SosNight else CouiIconVectors.SosDay
@@ -197,6 +197,70 @@ object CouiIcons {
     val BookOpen: ImageVector
         @Composable get() = if (CouiTheme.isDark) CouiIconVectors.BookOpenNight else CouiIconVectors.BookOpenDay
 
+    /** com.oplus.securitypermission:drawable/permission_list_ic_locationgroup_default。 */
+    val LocationMarker: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.LocationMarkerNight else CouiIconVectors.LocationMarkerDay
+
+    /** com.oplus.securitypermission:drawable/permission_list_ic_cameragroup_default。 */
+    val Camera: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.CameraNight else CouiIconVectors.CameraDay
+
+    /** com.oplus.securitypermission:drawable/permission_list_ic_microphonegroup_default。 */
+    val Microphone: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.MicrophoneNight else CouiIconVectors.MicrophoneDay
+
+    /** com.oplus.securitypermission:drawable/permission_list_ic_readmediavisual_default。 */
+    val Photo: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.PhotoNight else CouiIconVectors.PhotoDay
+
+    /** com.oplus.securitypermission:drawable/permission_list_ic_contactsgroup_default。 */
+    val Users: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.UsersNight else CouiIconVectors.UsersDay
+
+    /** com.oplus.securitypermission:drawable/permission_list_ic_callloggroup_default。 */
+    val Call: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.CallNight else CouiIconVectors.CallDay
+
+    /** com.oplus.securitypermission:drawable/privacy_permission_manager_ic。 */
+    val GridSliders: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.GridSlidersNight else CouiIconVectors.GridSlidersDay
+
+    /** com.oplus.securitypermission:drawable/privacy_apps_lock_ic。 */
+    val SquareLock: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.SquareLockNight else CouiIconVectors.SquareLockDay
+
+    /** com.oplus.securitypermission:drawable/privacy_apps_hidden_ic。 */
+    val SquareEyeClosed: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.SquareEyeClosedNight else CouiIconVectors.SquareEyeClosedDay
+
+    /** com.oplus.securitypermission:drawable/security_data_protect_kit_ic。 */
+    val SafeBox: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.SafeBoxNight else CouiIconVectors.SafeBoxDay
+
+    /** com.oplus.securitypermission:drawable/security_private_info_protect_ic。 */
+    val PrivacyLock: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.PrivacyLockNight else CouiIconVectors.PrivacyLockDay
+
+    /** com.oplus.securitypermission:drawable/privacy_phone_manager_ic。 */
+    val ShieldFlash: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.ShieldFlashNight else CouiIconVectors.ShieldFlashDay
+
+    /** com.oplus.securitypermission:drawable/privacy_payment_protection_ic。 */
+    val WalletShield: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.WalletShieldNight else CouiIconVectors.WalletShieldDay
+
+    /** com.oplus.securitypermission:drawable/privacy_common_information_password_ic。 */
+    val ShieldKey: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.ShieldKeyNight else CouiIconVectors.ShieldKeyDay
+
+    /** com.oplus.securitypermission:drawable/multi_system_ic。 */
+    val PhoneStack: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.PhoneStackNight else CouiIconVectors.PhoneStackDay
+
+    /** com.oplus.securitypermission:drawable/privacy_system_enhanced_protection_ic。 */
+    val ShieldCheck: ImageVector
+        @Composable get() = if (CouiTheme.isDark) CouiIconVectors.ShieldCheckNight else CouiIconVectors.ShieldCheckDay
+
     /** 当前日夜模式的应用升级图，含原始白色前景。 */
     val AppUpdate: ImageVector
         @Composable get() = if (CouiTheme.isDark) CouiIconVectors.AppUpdateNight else CouiIconVectors.AppUpdateDay
@@ -207,6 +271,200 @@ object CouiIcons {
         AppUpdate
     } else {
         remember(color) { CouiIconVectors.appUpdate(color) }
+    }
+
+    object Filled {
+        val Search: ImageVector
+            @Composable get() = CouiIcons.Search
+
+        val Back: ImageVector
+            @Composable get() = CouiIcons.Back
+
+        val Close: ImageVector
+            @Composable get() = CouiIcons.Close
+
+        val Add: ImageVector
+            @Composable get() = CouiIcons.Add
+
+        val DarkLight: ImageVector
+            @Composable get() = CouiIcons.DarkLight
+
+        val Sun: ImageVector
+            @Composable get() = CouiIcons.Sun
+
+        val Bell: ImageVector
+            @Composable get() = CouiIcons.Bell
+
+        val MultiPhone: ImageVector
+            @Composable get() = CouiIcons.MultiPhone
+
+        val Volume: ImageVector
+            @Composable get() = CouiIcons.Volume
+
+        val Plane: ImageVector
+            @Composable get() = CouiIcons.Plane
+
+        val Wifi: ImageVector
+            @Composable get() = CouiIcons.Wifi
+
+        val Bluetooth: ImageVector
+            @Composable get() = CouiIcons.Bluetooth
+
+        val Transfer: ImageVector
+            @Composable get() = CouiIcons.Transfer
+
+        val Satellite: ImageVector
+            @Composable get() = CouiIcons.Satellite
+
+        val SatelliteBD: ImageVector
+            @Composable get() = CouiIcons.SatelliteBD
+
+        val Radar: ImageVector
+            @Composable get() = CouiIcons.Radar
+
+        val Foldable: ImageVector
+            @Composable get() = CouiIcons.Foldable
+
+        val FlipPhone: ImageVector
+            @Composable get() = CouiIcons.FlipPhone
+
+        val Lock: ImageVector
+            @Composable get() = CouiIcons.Lock
+
+        val ShieldUser: ImageVector
+            @Composable get() = CouiIcons.ShieldUser
+
+        val Sos: ImageVector
+            @Composable get() = CouiIcons.Sos
+
+        val Location: ImageVector
+            @Composable get() = CouiIcons.Location
+
+        val Wallet: ImageVector
+            @Composable get() = CouiIcons.Wallet
+
+        val Health: ImageVector
+            @Composable get() = CouiIcons.Health
+
+        val Grid: ImageVector
+            @Composable get() = CouiIcons.Grid
+
+        val Battery: ImageVector
+            @Composable get() = CouiIcons.Battery
+
+        val PanelEnterRight: ImageVector
+            @Composable get() = CouiIcons.PanelEnterRight
+
+        val PanelEnterLeft: ImageVector
+            @Composable get() = CouiIcons.PanelEnterLeft
+
+        val Fan: ImageVector
+            @Composable get() = CouiIcons.Fan
+
+        val Rings: ImageVector
+            @Composable get() = CouiIcons.Rings
+
+        val Accessibility: ImageVector
+            @Composable get() = CouiIcons.Accessibility
+
+        val AI: ImageVector get() = CouiIcons.AI
+
+        val Gamepad: ImageVector
+            @Composable get() = CouiIcons.Gamepad
+
+        val CloudLink: ImageVector
+            @Composable get() = CouiIcons.CloudLink
+
+        val Setting: ImageVector
+            @Composable get() = CouiIcons.Setting
+
+        val Phone: ImageVector
+            @Composable get() = CouiIcons.Phone
+
+        val UserCircle: ImageVector
+            @Composable get() = CouiIcons.UserCircle
+
+        val Google: ImageVector get() = CouiIcons.Google
+
+        val Certificate: ImageVector
+            @Composable get() = CouiIcons.Certificate
+
+        val Lab: ImageVector
+            @Composable get() = CouiIcons.Lab
+
+        val BookOpen: ImageVector
+            @Composable get() = CouiIcons.BookOpen
+
+        val LocationMarker: ImageVector
+            @Composable get() = CouiIcons.LocationMarker
+
+        val Camera: ImageVector
+            @Composable get() = CouiIcons.Camera
+
+        val Microphone: ImageVector
+            @Composable get() = CouiIcons.Microphone
+
+        val Photo: ImageVector
+            @Composable get() = CouiIcons.Photo
+
+        val Users: ImageVector
+            @Composable get() = CouiIcons.Users
+
+        val Call: ImageVector
+            @Composable get() = CouiIcons.Call
+
+        val GridSliders: ImageVector
+            @Composable get() = CouiIcons.GridSliders
+
+        val SquareLock: ImageVector
+            @Composable get() = CouiIcons.SquareLock
+
+        val SquareEyeClosed: ImageVector
+            @Composable get() = CouiIcons.SquareEyeClosed
+
+        val SafeBox: ImageVector
+            @Composable get() = CouiIcons.SafeBox
+
+        val PrivacyLock: ImageVector
+            @Composable get() = CouiIcons.PrivacyLock
+
+        val ShieldFlash: ImageVector
+            @Composable get() = CouiIcons.ShieldFlash
+
+        val WalletShield: ImageVector
+            @Composable get() = CouiIcons.WalletShield
+
+        val ShieldKey: ImageVector
+            @Composable get() = CouiIcons.ShieldKey
+
+        val PhoneStack: ImageVector
+            @Composable get() = CouiIcons.PhoneStack
+
+        val ShieldCheck: ImageVector
+            @Composable get() = CouiIcons.ShieldCheck
+
+        val AppUpdate: ImageVector
+            @Composable get() = CouiIcons.AppUpdate
+
+        @Composable
+        fun AppUpdate(color: Color): ImageVector = CouiIcons.AppUpdate(color)
+    }
+
+    object Outlined {
+        val Search: ImageVector
+            @Composable get() = CouiIcons.Search
+
+        val Back: ImageVector
+            @Composable get() = CouiIcons.Back
+
+        val Close: ImageVector
+            @Composable get() = CouiIcons.Close
+
+        val Add: ImageVector
+            @Composable get() = CouiIcons.Add
+
+        val DarkLight: ImageVector
+            @Composable get() = CouiIcons.DarkLight
     }
 
     private fun themedVectors(

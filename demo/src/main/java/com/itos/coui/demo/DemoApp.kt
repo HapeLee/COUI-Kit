@@ -60,8 +60,8 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
     val rendering = remember { if (Build.VERSION.SDK_INT >= 34) runCatching { DemoRenderers() } else null }
     val renderers = rendering?.getOrNull()
     val titles = listOf(stringResource(R.string.controls), stringResource(R.string.effects), stringResource(R.string.demo_settings))
-    val navigation = listOf(CouiIcons.Grid, DemoIcons.Effects, DemoIcons.Settings)
-    val selectedNavigation = listOf(CouiIcons.Grid, DemoIcons.EffectsSelected, DemoIcons.SettingsSelected)
+    val navigation = listOf(CouiIcons.Filled.Grid, DemoIcons.Effects, DemoIcons.Settings)
+    val selectedNavigation = listOf(CouiIcons.Filled.Grid, DemoIcons.EffectsSelected, DemoIcons.SettingsSelected)
     val selectPage: (Int) -> Unit = { target ->
         if (target != page) { page = target; query = ""; searching = false }
     }

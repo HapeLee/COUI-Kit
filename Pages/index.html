@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>COUI Icons — 图标浏览与复制</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=7">
 </head>
 <body>
   <div class="page-shell">
@@ -80,90 +80,82 @@
 
     <main class="workspace" aria-label="图标浏览与详情">
       <section class="grid-panel" aria-label="图标列表">
-        <div id="icon-grid" class="icon-grid" role="listbox" aria-label="COUI 图标列表"></div>
+        <div id="icon-grid" class="icon-grid" role="group" aria-label="COUI 图标列表"></div>
         <div id="empty-state" class="empty-state" hidden role="status">
           <p id="empty-state-text">未找到匹配的图标</p>
         </div>
       </section>
 
-      <aside class="detail-panel" aria-label="图标详情与代码">
-        <div class="detail-preview-box">
-          <div id="detail-svg-container" class="detail-svg-container" aria-live="polite"></div>
-          <h2 id="detail-name" class="detail-name">—</h2>
-          <p id="detail-subtitle" class="detail-subtitle">COUI 图标</p>
-        </div>
-
-        <section class="color-section" aria-labelledby="color-section-title">
-          <div class="color-section-header">
-            <h3 id="color-section-title" class="section-label">颜色配置</h3>
-            <button
-              type="button"
-              id="reset-color-btn"
-              class="reset-color-btn"
-              aria-pressed="true"
-            >默认原图</button>
+      <aside id="detail-panel" class="detail-panel" role="dialog" aria-labelledby="detail-name" hidden>
+        <button type="button" id="detail-close-btn" class="detail-close-btn" aria-label="关闭图标详情">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18"/>
+          </svg>
+        </button>
+        <div class="detail-content">
+          <div class="detail-preview-box">
+            <div id="detail-svg-container" class="detail-svg-container" aria-live="polite"></div>
+            <h2 id="detail-name" class="detail-name">—</h2>
+            <p id="detail-subtitle" class="detail-subtitle">COUI 图标</p>
+            <div id="variant-switch" class="theme-segmented variant-switch" role="group" aria-label="图标样式切换" hidden>
+              <button type="button" id="variant-filled-btn" class="theme-btn" aria-pressed="true">Filled</button>
+              <button type="button" id="variant-outlined-btn" class="theme-btn" aria-pressed="false">Outlined</button>
+            </div>
           </div>
 
-          <p id="color-mode-notice" class="color-mode-notice" role="status"></p>
-
-          <div id="color-controls" class="color-controls">
-            <div class="palette-group">
-              <div class="palette-title" id="day-palette-label">COUI Colors · Day（日间预设）</div>
-              <div id="palette-day" class="swatch-list" role="group" aria-labelledby="day-palette-label"></div>
+          <section class="color-section" aria-labelledby="color-section-title">
+            <div class="color-section-header">
+              <h3 id="color-section-title" class="section-label">颜色配置</h3>
+              <button
+                type="button"
+                id="reset-color-btn"
+                class="reset-color-btn"
+                aria-pressed="true"
+              >默认原图</button>
             </div>
 
-            <div class="palette-group">
-              <div class="palette-title" id="night-palette-label">COUI Colors · Night（夜间预设）</div>
-              <div id="palette-night" class="swatch-list" role="group" aria-labelledby="night-palette-label"></div>
-            </div>
+            <p id="color-mode-notice" class="color-mode-notice" role="status"></p>
 
-            <div class="custom-color-row">
-              <label for="custom-color-input" class="custom-color-label">手动选择颜色</label>
-              <div class="custom-color-picker-wrap">
-                <input
-                  type="color"
-                  id="custom-color-input"
-                  class="custom-color-input"
-                  value="#007aff"
-                  aria-label="手动选择十六进制颜色"
-                >
-                <span id="custom-color-hex" class="custom-color-hex">#007AFF</span>
+            <div id="color-controls" class="color-controls">
+              <div class="palette-group">
+                <div class="palette-title" id="day-palette-label">COUI Colors · Day（日间预设）</div>
+                <div id="palette-day" class="swatch-list" role="group" aria-labelledby="day-palette-label"></div>
+              </div>
+
+              <div class="palette-group">
+                <div class="palette-title" id="night-palette-label">COUI Colors · Night（夜间预设）</div>
+                <div id="palette-night" class="swatch-list" role="group" aria-labelledby="night-palette-label"></div>
+              </div>
+
+              <div class="custom-color-row">
+                <label for="custom-color-input" class="custom-color-label">手动选择颜色</label>
+                <div class="custom-color-picker-wrap">
+                  <input
+                    type="color"
+                    id="custom-color-input"
+                    class="custom-color-input"
+                    value="#007aff"
+                    aria-label="手动选择十六进制颜色"
+                  >
+                  <span id="custom-color-hex" class="custom-color-hex">#007AFF</span>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section class="code-section" aria-labelledby="code-section-title">
-          <div class="code-header">
-            <h3 id="code-section-title" class="section-label">Compose 代码</h3>
-            <div class="snippet-tabs" role="group" aria-label="代码样式切换">
-              <button
-                type="button"
-                id="snippet-expr-btn"
-                class="snippet-tab is-active"
-                aria-pressed="true"
-                data-snippet-type="expr"
-              >简短引用</button>
-              <button
-                type="button"
-                id="snippet-comp-btn"
-                class="snippet-tab"
-                aria-pressed="false"
-                data-snippet-type="composable"
-              >Icon / Image</button>
-            </div>
-          </div>
-
-          <pre class="code-box" tabindex="0"><code id="code-output">CouiIcons.Wifi</code></pre>
-
-          <button type="button" id="copy-code-btn" class="copy-btn">复制代码</button>
-          <p id="copy-feedback" class="copy-feedback" role="status" aria-live="polite" hidden></p>
-        </section>
+          <section class="code-section" aria-labelledby="code-section-title">
+            <h3 id="code-section-title" class="section-label">复制图标</h3>
+            <p class="copy-hint">复制当前主题和颜色的图标源码。ImageVector 的颜色为固定值；使用 Icon 时，设置 tint = Color.Unspecified 可保留颜色。</p>
+            <button type="button" id="copy-svg-btn" class="copy-btn">复制 SVG</button>
+            <button type="button" id="copy-vector-btn" class="copy-btn">复制 ImageVector</button>
+            <p id="copy-feedback" class="copy-feedback" role="status" aria-live="polite" hidden></p>
+          </section>
+        </div>
       </aside>
     </main>
   </div>
 
-  <script src="./data.js"></script>
-  <script src="./app.js"></script>
+  <script src="./data.js?v=7"></script>
+  <script src="./app.js?v=5"></script>
 </body>
 </html>

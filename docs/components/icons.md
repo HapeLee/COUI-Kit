@@ -16,18 +16,18 @@ implementation("io.github.itoseo:coui-icons:$couiVersion")
 
 ```kotlin
 Image(
-    imageVector = CouiIcons.Wifi,
+    imageVector = CouiIcons.Filled.Wifi,
     contentDescription = contentDescription,
 )
 
 Icon(
-    imageVector = CouiIcons.Wifi,
+    imageVector = CouiIcons.Filled.Wifi,
     contentDescription = contentDescription,
     tint = Color.Unspecified,
 )
 ```
 
-通用功能图标 `Search`、`Back`、`Close`、`Add`、`DarkLight` 默认日间为黑色、夜间为白色，其中 `Back` 支持 RTL 自动镜像。
+图标按 `CouiIcons.Filled` 和 `CouiIcons.Outlined` 提供。通用功能图标 `Search`、`Back`、`Close`、`Add`、`DarkLight` 在两种样式中使用相同图形，也可直接通过 `CouiIcons.Search` 等入口使用。它们默认日间为黑色、夜间为白色，其中 `Back` 支持 RTL 自动镜像。
 
 ## 指定颜色与特殊图标
 
@@ -36,19 +36,19 @@ Icon(
 ```kotlin
 val iconTint = if (CouiTheme.isDark) CouiColor.Night.BLUE else CouiColor.Day.BLUE
 Icon(
-    imageVector = CouiIcons.Wifi,
+    imageVector = CouiIcons.Filled.Wifi,
     contentDescription = contentDescription,
     tint = iconTint,
 )
 ```
 
 - **多色图标**：`AI`、`Google`、`Setting`、`Phone` 内置多色或渐变路径，应使用 `Image` 或 `Icon(..., tint = Color.Unspecified)`，避免整体 `tint` 覆盖原有配色。
-- **应用更新图标（`AppUpdate`）**：自定义圆形背景色时调用 `CouiIcons.AppUpdate(color = ...)`，并在 `Icon` 中传 `tint = Color.Unspecified` 以保留白色前景：
+- **应用更新图标（`AppUpdate`）**：自定义圆形背景色时调用 `CouiIcons.Filled.AppUpdate(color = ...)`，并在 `Icon` 中传 `tint = Color.Unspecified` 以保留白色前景：
 
 ```kotlin
 val badgeColor = if (CouiTheme.isDark) CouiColor.Night.GREEN else CouiColor.Day.GREEN
 Icon(
-    imageVector = CouiIcons.AppUpdate(color = badgeColor),
+    imageVector = CouiIcons.Filled.AppUpdate(color = badgeColor),
     contentDescription = contentDescription,
     tint = Color.Unspecified,
 )

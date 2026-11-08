@@ -514,12 +514,12 @@ function buildGroupTransform(cmd) {
   return parts.join(' ');
 }
 
-function renderSvg(vectorSpec, iconName, themeKey, mode) {
+function renderSvg(vectorSpec, iconName, style, themeKey, mode) {
   const defs = [];
   const bodyElements = [];
   let gradCounter = 0;
   let clipCounter = 0;
-  const idPrefix = `coui-${iconName}-${themeKey.toLowerCase()}`;
+  const idPrefix = `coui-${iconName}-${style.toLowerCase()}-${themeKey.toLowerCase()}`;
 
   const hasTintColor = vectorSpec.tintColor && vectorSpec.tintColor.type === 'color';
   const tintHex = hasTintColor ? vectorSpec.tintColor.hex : null;
@@ -856,7 +856,7 @@ function parseCouiIconVectorsFile(source, colors) {
   return vectorProperties;
 }
 
-function parseCouiIconsFile(source, colors, vectorProperties) {
+function parseCouiIconsFile(source, colors, vectorProperties, outerIcons = [], style = 'Common') {
   const clean = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
   const objIdx = clean.indexOf('object CouiIcons');
   if (objIdx === -1) {
@@ -874,6 +874,16 @@ function parseCouiIconsFile(source, colors, vectorProperties) {
     if (idx >= body.length) break;
 
     const rest = body.slice(idx);
+
+    const styleMatch = rest.match(/^object\s+(Filled|Outlined)\s*\{/);
+    if (styleMatch) {
+      const openBracePos = idx + styleMatch[0].length - 1;
+      const { body: styleBody, endIdx } = extractBalancedBlock(body, openBracePos);
+      const styledSource = `object CouiIcons { ${styleBody} }`;
+      publicIcons.push(...parseCouiIconsFile(styledSource, colors, vectorProperties, publicIcons, styleMatch[1]));
+      idx = endIdx + 1;
+      continue;
+    }
 
     // 1. private val <xxxVariants>: Pair<ImageVector, ImageVector> by lazy { themedVectors(...) { ... } }
     const privPairMatch = rest.match(/^private\s+val\s+([a-zA-Z0-9_]+)\s*:\s*Pair<ImageVector,\s*ImageVector>\s+by\s+lazy\s*\{/);
@@ -943,19 +953,32 @@ function parseCouiIconsFile(source, colors, vectorProperties) {
         } else {
           throw new Error(`Unsupported conditional getter for ${iconName}: ${getterExpr}`);
         }
-        publicIcons.push({ name: iconName, daySpec, nightSpec });
+        publicIcons.push({ name: iconName, style, daySpec, nightSpec });
       } else if (getterExpr.startsWith('CouiIconVectors.')) {
         const key = getterExpr.slice('CouiIconVectors.'.length);
         const spec = vectorProperties.get(key);
         if (!spec) {
           throw new Error(`Unresolved CouiIconVectors reference for ${iconName}: ${getterExpr}`);
         }
-        publicIcons.push({ name: iconName, daySpec: spec, nightSpec: spec });
+        publicIcons.push({ name: iconName, style, daySpec: spec, nightSpec: spec });
+      } else if (getterExpr.startsWith('CouiIcons.')) {
+        const targetName = getterExpr.slice('CouiIcons.'.length);
+        const target = outerIcons.find((item) => item.name === targetName && item.style === 'Common');
+        if (!target) {
+          throw new Error(`Unresolved CouiIcons reference for ${iconName}: ${getterExpr}`);
+        }
+        publicIcons.push({ name: iconName, style, source: targetName, daySpec: target.daySpec, nightSpec: target.nightSpec });
       } else {
         throw new Error(`Unsupported public ImageVector getter for ${iconName}: ${getterExpr}`);
       }
 
       idx += pubValMatch[0].length;
+      continue;
+    }
+
+    const appUpdateForwardMatch = rest.match(/^@Composable\s+fun\s+AppUpdate\s*\(\s*color\s*:\s*Color\s*\)\s*:\s*ImageVector\s*=\s*CouiIcons\.AppUpdate\s*\(\s*color\s*\)/);
+    if (appUpdateForwardMatch) {
+      idx += appUpdateForwardMatch[0].length;
       continue;
     }
 
@@ -989,7 +1012,8 @@ function parseCouiIconsFile(source, colors, vectorProperties) {
     throw new Error(`Unsupported declaration in CouiIcons.kt near: ${rest.slice(0, 100)}`);
   }
 
-  return publicIcons;
+  const filledNames = new Set(publicIcons.filter((icon) => icon.style === 'Filled').map((icon) => icon.name));
+  return publicIcons.filter((icon) => icon.style !== 'Common' || !filledNames.has(icon.name));
 }
 
 function determineIconMode(iconEntry) {
@@ -1022,10 +1046,11 @@ function validateGeneratedPayload({ icons, colors }) {
     if (!icon.name || typeof icon.name !== 'string') {
       throw new Error('Self-check failed: icon is missing a valid name');
     }
-    if (seenNames.has(icon.name)) {
-      throw new Error(`Self-check failed: duplicate icon name "${icon.name}"`);
+    const key = `${icon.style}:${icon.name}`;
+    if (seenNames.has(key)) {
+      throw new Error(`Self-check failed: duplicate icon "${key}"`);
     }
-    seenNames.add(icon.name);
+    seenNames.add(key);
 
     if (
       typeof icon.day !== 'string' ||
@@ -1036,6 +1061,9 @@ function validateGeneratedPayload({ icons, colors }) {
       !icon.night.includes('<path')
     ) {
       throw new Error(`Self-check failed: missing or invalid day/night SVG for "${icon.name}"`);
+    }
+    if (!icon.vector?.day?.commands?.length || !icon.vector?.night?.commands?.length) {
+      throw new Error(`Self-check failed: missing day/night ImageVector data for "${icon.name}"`);
     }
   }
 
@@ -1079,13 +1107,16 @@ function main() {
 
   const icons = publicIcons.map((entry) => {
     const mode = determineIconMode(entry);
-    const daySvg = renderSvg(entry.daySpec, entry.name, 'Day', mode);
-    const nightSvg = renderSvg(entry.nightSpec, entry.name, 'Night', mode);
+    const daySvg = renderSvg(entry.daySpec, entry.name, entry.style, 'Day', mode);
+    const nightSvg = renderSvg(entry.nightSpec, entry.name, entry.style, 'Night', mode);
     return {
       name: entry.name,
+      style: entry.style,
+      source: entry.source,
       day: daySvg,
       night: nightSvg,
       mode,
+      vector: { day: entry.daySpec, night: entry.nightSpec },
     };
   });
 

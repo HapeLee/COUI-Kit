@@ -26,8 +26,8 @@ private val CatalogRowMinHeight = 52.dp
 
 internal val DemoWheelPickerEntries = listOf(
     DemoCatalogEntry("wheel", R.string.picker_number_title) { DemoIcons.Tune },
-    DemoCatalogEntry("timepicker", R.string.picker_time_title) { CouiIcons.Health },
-    DemoCatalogEntry("countdownpicker", R.string.picker_countdown_title) { CouiIcons.Battery },
+    DemoCatalogEntry("timepicker", R.string.picker_time_title) { CouiIcons.Filled.Health },
+    DemoCatalogEntry("countdownpicker", R.string.picker_countdown_title) { CouiIcons.Filled.Battery },
     DemoCatalogEntry("datepicker", R.string.picker_date_title) { DemoIcons.Date },
 )
 
@@ -36,20 +36,20 @@ internal val DemoComponentGroups = listOf(
         DemoCatalogEntry("sliders", R.string.slider_title) { DemoIcons.Tune },
         DemoCatalogEntry("checkbox", R.string.checkbox_title) { DemoIcons.Checkbox }),
     listOf(DemoCatalogEntry("dialogs", R.string.dialog_title) { DemoIcons.Dialogs },
-        DemoCatalogEntry("menu", R.string.menu_title) { CouiIcons.Grid }),
+        DemoCatalogEntry("menu", R.string.menu_title) { CouiIcons.Filled.Grid }),
     listOf(DemoCatalogEntry("appbar", R.string.catalog_appbar) { DemoIcons.Title },
         DemoCatalogEntry("search", R.string.catalog_search) { CouiIcons.Search },
-        DemoCatalogEntry("navigation", R.string.catalog_navigation) { CouiIcons.Lab },
-        DemoCatalogEntry("chip", R.string.chip_tab_title) { CouiIcons.Grid },
+        DemoCatalogEntry("navigation", R.string.catalog_navigation) { CouiIcons.Filled.Lab },
+        DemoCatalogEntry("chip", R.string.chip_tab_title) { CouiIcons.Filled.Grid },
         DemoCatalogEntry("fab", R.string.catalog_fab) { CouiIcons.Add }),
     listOf(DemoCatalogEntry("wheel", R.string.catalog_wheel) { DemoIcons.Tune },
-        DemoCatalogEntry("calendar", R.string.picker_calendar_title) { CouiIcons.Health }),
+        DemoCatalogEntry("calendar", R.string.picker_calendar_title) { CouiIcons.Filled.Health }),
 )
 
 internal val DemoEffectGroups = listOf(
-    listOf(DemoCatalogEntry("effect_shadow", R.string.shadow_title) { CouiIcons.Rings },
+    listOf(DemoCatalogEntry("effect_shadow", R.string.shadow_title) { CouiIcons.Filled.Rings },
         DemoCatalogEntry("effect_fusion", R.string.fusion_title) { CouiIcons.Add },
-        DemoCatalogEntry("effect_backdrop", R.string.backdrop_title) { CouiIcons.Radar },
+        DemoCatalogEntry("effect_backdrop", R.string.backdrop_title) { CouiIcons.Filled.Radar },
         DemoCatalogEntry("effect_material", R.string.material_title) { DemoIcons.Switch }),
 )
 

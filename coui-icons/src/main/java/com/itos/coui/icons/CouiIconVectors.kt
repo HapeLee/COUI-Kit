@@ -887,8 +887,8 @@ internal object CouiIconVectors {
         }
     }
 
-    val PhoneVibrateDay: ImageVector by lazy {
-        iconVector("CouiIconVectors.PhoneVibrateDay", 24f.dp, 24f.dp, 24f, 24f, tintColor = CouiColor.Day.ORANGE) {
+    val MultiPhoneDay: ImageVector by lazy {
+        iconVector("CouiIconVectors.MultiPhoneDay", 24f.dp, 24f.dp, 24f, 24f, tintColor = CouiColor.Day.ORANGE) {
             iconPath(
                 pathData = "M19.6,4C18.716,4 18,4.716 18,5.6V18.4C18,19.284 18.716,20 19.6,20H21.3C21.687,20 22,19.687 22,19.3V4.7C22,4.313 21.687,4 21.3,4H19.6ZM4.4,20C5.284,20 6,19.284 6,18.4V5.6C6,4.716 5.284,4 4.4,4H2.7C2.313,4 2,4.313 2,4.7V19.3C2,19.687 2.313,20 2.7,20H4.4Z",
                 fill = SolidColor(Color(0xFF000000)),
@@ -922,8 +922,8 @@ internal object CouiIconVectors {
         }
     }
 
-    val PhoneVibrateNight: ImageVector by lazy {
-        iconVector("CouiIconVectors.PhoneVibrateNight", 24f.dp, 24f.dp, 24f, 24f, tintColor = CouiColor.Night.ORANGE) {
+    val MultiPhoneNight: ImageVector by lazy {
+        iconVector("CouiIconVectors.MultiPhoneNight", 24f.dp, 24f.dp, 24f, 24f, tintColor = CouiColor.Night.ORANGE) {
             iconPath(
                 pathData = "M19.6,4C18.716,4 18,4.716 18,5.6V18.4C18,19.284 18.716,20 19.6,20H21.3C21.687,20 22,19.687 22,19.3V4.7C22,4.313 21.687,4 21.3,4H19.6ZM4.4,20C5.284,20 6,19.284 6,18.4V5.6C6,4.716 5.284,4 4.4,4H2.7C2.313,4 2,4.313 2,4.7V19.3C2,19.687 2.313,20 2.7,20H4.4Z",
                 fill = SolidColor(Color(0xFF000000)),
@@ -1168,11 +1168,11 @@ internal object CouiIconVectors {
             )
         }
 
-    val UserShieldDay: ImageVector by lazy {
-        privacyShieldVector("CouiIconVectors.UserShieldDay", CouiColor.Day.BLUE)
+    val ShieldUserDay: ImageVector by lazy {
+        privacyShieldVector("CouiIconVectors.ShieldUserDay", CouiColor.Day.BLUE)
     }
-    val UserShieldNight: ImageVector by lazy {
-        privacyShieldVector("CouiIconVectors.UserShieldNight", CouiColor.Night.BLUE)
+    val ShieldUserNight: ImageVector by lazy {
+        privacyShieldVector("CouiIconVectors.ShieldUserNight", CouiColor.Night.BLUE)
     }
 
     val SosDay: ImageVector by lazy {
@@ -2712,6 +2712,632 @@ internal object CouiIconVectors {
         }
     }
 
+
+    private fun locationMarkerVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M21.277,21.553L19.498,17.995C19.193,17.385 18.57,17 17.888,17H16.032C15.008,18.345 14.003,19.48 13.311,20.222C12.972,20.584 12.495,20.793 12,20.793C11.506,20.793 11.029,20.584 10.69,20.222C9.997,19.48 8.993,18.345 7.968,17H6.113C5.431,17 4.808,17.385 4.503,17.995L2.724,21.553C2.392,22.218 2.875,23 3.618,23H20.382C21.126,23 21.609,22.218 21.277,21.553Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M12,1C8.134,1 5,4.134 5,8C5,12.177 9.885,17.749 11.493,19.471C11.77,19.767 12.23,19.767 12.507,19.471C14.115,17.749 19,12.177 19,8C19,4.134 15.866,1 12,1ZM12,10C10.895,10 10,9.105 10,8C10,6.895 10.895,6 12,6C13.105,6 14,6.895 14,8C14,9.105 13.105,10 12,10Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val LocationMarkerDay: ImageVector by lazy {
+        locationMarkerVector("CouiIconVectors.LocationMarkerDay", CouiColor.Day.YELLOW)
+    }
+    val LocationMarkerNight: ImageVector by lazy {
+        locationMarkerVector("CouiIconVectors.LocationMarkerNight", CouiColor.Night.YELLOW)
+    }
+
+    private fun cameraVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M14.337,3.393C14.605,3.395 14.855,3.41 15.092,3.484C15.35,3.565 15.589,3.697 15.795,3.873C16.046,4.088 16.22,4.379 16.419,4.696L17.176,5.905C17.244,6.015 17.279,6.07 17.325,6.109C17.366,6.144 17.414,6.17 17.465,6.187C17.523,6.205 17.588,6.205 17.717,6.205L19.922,6.208C20.012,6.208 20.099,6.209 20.183,6.209C20.222,6.209 20.26,6.209 20.298,6.21C20.496,6.212 20.675,6.216 20.832,6.229C21.092,6.25 21.355,6.297 21.609,6.427C21.985,6.619 22.291,6.925 22.482,7.301C22.612,7.555 22.659,7.817 22.68,8.077C22.7,8.329 22.7,8.635 22.7,8.987V17.829C22.7,18.181 22.7,18.488 22.68,18.74C22.658,19 22.612,19.263 22.482,19.517C22.291,19.893 21.984,20.2 21.607,20.392C21.354,20.521 21.091,20.568 20.831,20.589C20.579,20.609 20.272,20.608 19.92,20.608L19.765,20.607C19.763,20.608 19.761,20.608 19.76,20.608L12,20.607L4.081,20.606C3.729,20.606 3.422,20.607 3.17,20.586C2.91,20.565 2.647,20.517 2.393,20.388C2.016,20.196 1.71,19.89 1.519,19.514C1.389,19.259 1.341,18.995 1.32,18.735C1.3,18.483 1.301,18.177 1.301,17.824L1.307,8.984C1.307,8.632 1.306,8.326 1.327,8.074C1.349,7.814 1.396,7.551 1.525,7.297C1.717,6.921 2.023,6.615 2.399,6.424C2.653,6.294 2.916,6.247 3.176,6.226C3.313,6.214 3.468,6.209 3.637,6.207C3.638,5.91 3.645,5.747 3.708,5.618C3.776,5.479 3.889,5.366 4.028,5.298C4.174,5.226 4.364,5.227 4.743,5.227C5.122,5.227 5.312,5.226 5.458,5.298C5.597,5.366 5.71,5.479 5.778,5.618C5.841,5.747 5.848,5.909 5.849,6.205H6.573C6.705,6.205 6.772,6.205 6.831,6.187C6.884,6.17 6.932,6.141 6.974,6.104C7.02,6.063 7.055,6.006 7.123,5.893L7.757,4.828C7.815,4.73 7.871,4.634 7.927,4.543C8.077,4.294 8.225,4.07 8.425,3.894C8.632,3.711 8.875,3.573 9.139,3.488C9.38,3.411 9.636,3.395 9.911,3.393H14.337ZM12.001,7.982C9.073,7.982 6.699,10.356 6.699,13.284C6.699,16.212 9.073,18.585 12.001,18.585C14.928,18.585 17.302,16.212 17.302,13.284C17.302,10.356 14.929,7.983 12.001,7.982ZM19.769,8.354C19.327,8.355 18.969,8.713 18.969,9.154C18.969,9.596 19.327,9.954 19.769,9.954C20.21,9.954 20.568,9.596 20.568,9.154C20.568,8.713 20.21,8.354 19.769,8.354Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M15.7,13.283C15.7,15.327 14.043,16.983 12,16.983C9.956,16.983 8.3,15.327 8.3,13.283C8.3,11.24 9.956,9.583 12,9.583C14.043,9.583 15.7,11.24 15.7,13.283Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val CameraDay: ImageVector by lazy {
+        cameraVector("CouiIconVectors.CameraDay", CouiColor.Day.BLUE)
+    }
+    val CameraNight: ImageVector by lazy {
+        cameraVector("CouiIconVectors.CameraNight", CouiColor.Night.BLUE)
+    }
+
+    private fun microphoneVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M18.854,12.073C19.227,12.173 19.449,12.557 19.349,12.931C18.916,14.548 17.961,15.978 16.632,16.997C15.49,17.874 14.125,18.404 12.7,18.535V21.46H14.963C15.432,21.46 15.813,21.84 15.813,22.31C15.813,22.779 15.432,23.159 14.963,23.159H9.042C8.573,23.159 8.193,22.779 8.193,22.31C8.193,21.84 8.573,21.46 9.042,21.46H11.299V18.534C9.875,18.403 8.512,17.873 7.37,16.997C6.041,15.978 5.086,14.548 4.653,12.931C4.553,12.558 4.774,12.174 5.147,12.073C5.52,11.974 5.904,12.195 6.004,12.568C6.358,13.888 7.138,15.054 8.222,15.886C9.306,16.718 10.634,17.169 12,17.169C13.367,17.169 14.696,16.718 15.78,15.886C16.863,15.054 17.643,13.888 17.997,12.568C18.097,12.195 18.481,11.974 18.854,12.073ZM12,0.842C14.263,0.842 16.097,2.676 16.097,4.939V11.62C16.097,13.883 14.262,15.718 12,15.718C9.737,15.718 7.902,13.883 7.902,11.62V4.939C7.902,2.676 9.736,0.842 12,0.842Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val MicrophoneDay: ImageVector by lazy {
+        microphoneVector("CouiIconVectors.MicrophoneDay", CouiColor.Day.GREEN)
+    }
+    val MicrophoneNight: ImageVector by lazy {
+        microphoneVector("CouiIconVectors.MicrophoneNight", CouiColor.Night.GREEN)
+    }
+
+    private fun photoVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M17.458,2.852C18.116,2.852 18.661,2.851 19.104,2.887C19.557,2.924 19.978,3.003 20.375,3.205C20.986,3.517 21.483,4.014 21.794,4.626C21.996,5.022 22.077,5.443 22.114,5.896C22.15,6.338 22.149,6.883 22.149,7.541V16.458C22.149,17.116 22.15,17.661 22.114,18.104C22.077,18.556 21.997,18.978 21.794,19.374C21.483,19.985 20.986,20.482 20.375,20.794C19.978,20.996 19.557,21.075 19.104,21.112C18.661,21.149 18.116,21.148 17.458,21.148H6.541C5.883,21.148 5.338,21.149 4.895,21.112C4.442,21.075 4.022,20.996 3.625,20.794C3.014,20.482 2.516,19.986 2.205,19.374C2.003,18.978 1.923,18.556 1.886,18.104C1.85,17.661 1.851,17.116 1.851,16.458V7.541C1.851,6.883 1.85,6.338 1.886,5.896C1.923,5.443 2.003,5.022 2.205,4.626C2.516,4.014 3.014,3.517 3.625,3.205C4.022,3.003 4.442,2.924 4.895,2.887C5.338,2.851 5.883,2.852 6.541,2.852H17.458ZM16.98,9.423C16.528,9.276 16.042,9.276 15.59,9.423C15.282,9.523 15.034,9.696 14.815,9.882C14.604,10.061 14.367,10.298 14.1,10.565L12.006,12.658C11.979,12.698 11.948,12.737 11.913,12.773L8.512,16.174C8.18,16.505 7.643,16.505 7.311,16.174C6.979,15.842 6.979,15.304 7.311,14.972L9.069,13.212L8.617,12.722C8.351,12.434 8.117,12.179 7.907,11.985C7.689,11.786 7.44,11.598 7.125,11.485C6.666,11.322 6.166,11.311 5.701,11.456C5.382,11.556 5.126,11.733 4.901,11.924C4.683,12.108 4.438,12.355 4.161,12.632L3.55,13.241V16.458C3.55,17.144 3.551,17.608 3.581,17.966C3.609,18.313 3.66,18.485 3.719,18.602C3.868,18.893 4.105,19.131 4.397,19.279C4.514,19.339 4.686,19.39 5.034,19.418C5.391,19.447 5.855,19.448 6.541,19.448H17.458C18.145,19.448 18.609,19.447 18.966,19.418C19.314,19.39 19.486,19.339 19.603,19.279C19.895,19.131 20.131,18.893 20.28,18.602C20.339,18.485 20.391,18.313 20.419,17.966C20.449,17.608 20.449,17.144 20.449,16.458V12.544L18.47,10.565C18.203,10.298 17.966,10.061 17.755,9.882C17.537,9.696 17.289,9.523 16.98,9.423ZM7.682,6.213C6.854,6.213 6.182,6.885 6.182,7.713C6.182,8.541 6.854,9.213 7.682,9.213C8.51,9.213 9.182,8.541 9.182,7.713C9.182,6.885 8.51,6.213 7.682,6.213Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val PhotoDay: ImageVector by lazy {
+        photoVector("CouiIconVectors.PhotoDay", CouiColor.Day.BLUE)
+    }
+    val PhotoNight: ImageVector by lazy {
+        photoVector("CouiIconVectors.PhotoNight", CouiColor.Night.BLUE)
+    }
+
+    private fun usersVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M8.072,12.834C8.508,12.834 8.937,12.87 9.356,12.934C7.651,13.834 6.271,15.189 5.511,16.9C5.398,17.155 5.146,17.688 5.051,18.238C4.986,18.616 4.992,18.987 5.064,19.347H3.958C3.521,19.347 3.052,19.352 2.665,19.266C2.193,19.16 1.787,18.913 1.506,18.438C1.265,18.031 1.18,17.609 1.284,17.154C1.366,16.795 1.568,16.443 1.717,16.173C2.836,14.142 5.317,12.834 8.072,12.834ZM8.444,4.797C8.84,4.817 9.22,4.899 9.574,5.033C9.106,5.86 8.838,6.816 8.838,7.834C8.839,9.299 9.393,10.633 10.302,11.643C9.764,11.998 9.129,12.218 8.444,12.253L8.251,12.258C6.19,12.258 4.52,10.586 4.519,8.525C4.519,6.464 6.19,4.792 8.251,4.792L8.444,4.797Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M14.53,13.829C17.794,13.829 20.569,15.476 21.588,17.772C21.893,18.46 22.046,18.805 21.75,19.259C21.454,19.714 20.971,19.713 20.005,19.713H9.056C8.089,19.713 7.605,19.714 7.31,19.259C7.014,18.805 7.167,18.46 7.472,17.772C8.49,15.476 11.266,13.829 14.53,13.829ZM14.534,4.286C16.493,4.286 18.082,5.874 18.082,7.833C18.082,9.793 16.493,11.38 14.534,11.38C12.575,11.38 10.986,9.793 10.986,7.833C10.986,5.874 12.575,4.286 14.534,4.286Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M14.53,13.829L14.53,12.979H14.53V13.829ZM21.588,17.772L22.365,17.427L22.365,17.427L21.588,17.772ZM21.75,19.259L22.462,19.723L22.463,19.723L21.75,19.259ZM20.005,19.713V20.563V19.713ZM7.31,19.259L6.597,19.723L6.597,19.723L7.31,19.259ZM7.472,17.772L6.695,17.427L6.695,17.427L7.472,17.772ZM14.534,4.286L14.534,3.436H14.534V4.286ZM18.082,7.833L18.932,7.834V7.833H18.082ZM14.534,11.38V12.23H14.534L14.534,11.38ZM10.986,7.833H10.136L10.136,7.834L10.986,7.833ZM14.53,13.829L14.53,14.679C17.542,14.679 19.96,16.198 20.811,18.117L21.588,17.772L22.365,17.427C21.178,14.753 18.046,12.979 14.53,12.979L14.53,13.829ZM21.588,17.772L20.811,18.117C20.89,18.294 20.947,18.424 20.991,18.537C21.034,18.649 21.051,18.712 21.057,18.747C21.061,18.775 21.057,18.772 21.061,18.757C21.063,18.743 21.065,18.753 21.037,18.796L21.75,19.259L22.463,19.723C22.724,19.32 22.809,18.904 22.732,18.459C22.671,18.102 22.501,17.734 22.365,17.427L21.588,17.772ZM21.75,19.259L21.038,18.796C21.025,18.815 21.025,18.809 21.037,18.802C21.044,18.797 21.029,18.81 20.959,18.824C20.785,18.859 20.524,18.863 20.005,18.863V19.713V20.563C20.452,20.563 20.916,20.567 21.299,20.49C21.752,20.397 22.166,20.178 22.462,19.723L21.75,19.259ZM20.005,19.713V18.863H9.056V19.713V20.563H20.005V19.713ZM9.056,19.713V18.863C8.536,18.863 8.275,18.86 8.1,18.824C8.031,18.81 8.015,18.797 8.022,18.802C8.034,18.809 8.035,18.815 8.022,18.796L7.31,19.259L6.597,19.723C6.893,20.178 7.308,20.397 7.762,20.49C8.144,20.568 8.609,20.563 9.056,20.563V19.713ZM7.31,19.259L8.022,18.796C7.994,18.753 7.996,18.743 7.999,18.757C8.002,18.772 7.998,18.775 8.003,18.747C8.009,18.712 8.026,18.649 8.069,18.537C8.113,18.424 8.17,18.294 8.249,18.117L7.472,17.772L6.695,17.427C6.559,17.734 6.389,18.102 6.328,18.459C6.251,18.904 6.335,19.32 6.597,19.723L7.31,19.259ZM7.472,17.772L8.249,18.117C9.1,16.198 11.518,14.679 14.53,14.679V13.829V12.979C11.015,12.979 7.881,14.753 6.695,17.427L7.472,17.772ZM14.534,4.286L14.534,5.136C16.024,5.136 17.232,6.344 17.232,7.833H18.082H18.932C18.932,5.405 16.963,3.436 14.534,3.436L14.534,4.286ZM18.082,7.833L17.232,7.833C17.232,9.323 16.024,10.53 14.534,10.53L14.534,11.38L14.534,12.23C16.962,12.23 18.932,10.262 18.932,7.834L18.082,7.833ZM14.534,11.38V10.53C13.044,10.53 11.836,9.323 11.836,7.833L10.986,7.833L10.136,7.834C10.137,10.262 12.106,12.23 14.534,12.23V11.38ZM10.986,7.833H11.836C11.836,6.344 13.044,5.136 14.534,5.136V4.286V3.436C12.106,3.436 10.136,5.405 10.136,7.833H10.986Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val UsersDay: ImageVector by lazy {
+        usersVector("CouiIconVectors.UsersDay", CouiColor.Day.YELLOW)
+    }
+    val UsersNight: ImageVector by lazy {
+        usersVector("CouiIconVectors.UsersNight", CouiColor.Night.YELLOW)
+    }
+
+    private fun callVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M5.802,2.196C6.179,2.241 6.533,2.404 6.813,2.66C6.984,2.817 7.108,3.013 7.225,3.261C7.341,3.506 7.46,3.821 7.611,4.222L8.882,7.581C9.126,8.229 8.974,8.96 8.491,9.456C7.829,10.135 7.712,11.175 8.253,11.924C8.78,12.655 9.353,13.336 10.122,14.104C10.891,14.873 11.571,15.447 12.302,15.975C13.046,16.511 14.08,16.384 14.74,15.714C15.226,15.22 15.958,15.061 16.606,15.306L19.965,16.575C20.365,16.727 20.681,16.845 20.926,16.961C21.173,17.078 21.37,17.202 21.526,17.373C21.783,17.653 21.945,18.007 21.99,18.384C22.017,18.614 21.983,18.843 21.91,19.107C21.838,19.369 21.723,19.685 21.577,20.088L21.467,20.39C21.255,20.971 21.129,21.331 20.856,21.615C20.643,21.838 20.298,22.039 19.999,22.115C19.619,22.213 19.297,22.156 18.779,22.069C15.146,21.465 11.3,19.403 8.042,16.146C4.784,12.887 2.721,9.041 2.117,5.407C2.031,4.889 1.974,4.567 2.071,4.187C2.148,3.889 2.349,3.544 2.571,3.33C2.855,3.057 3.215,2.931 3.797,2.72L4.098,2.609C4.501,2.463 4.817,2.348 5.079,2.276C5.343,2.204 5.573,2.169 5.802,2.196Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val CallDay: ImageVector by lazy {
+        callVector("CouiIconVectors.CallDay", CouiColor.Day.BLUE)
+    }
+    val CallNight: ImageVector by lazy {
+        callVector("CouiIconVectors.CallNight", CouiColor.Night.BLUE)
+    }
+
+    private fun gridSlidersVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M8.274,13C9.78,13 11,14.22 11,15.726V19.274C11,20.78 9.78,22 8.274,22H4.726C3.22,22 2,20.78 2,19.274V15.726C2,14.22 3.22,13 4.726,13H8.274ZM8.274,2C9.78,2 11,3.22 11,4.726V8.274C11,9.78 9.78,11 8.274,11H4.726C3.22,11 2,9.78 2,8.274V4.726C2,3.22 3.22,2 4.726,2H8.274ZM19.274,2C20.78,2 22,3.22 22,4.726V8.274C22,9.78 20.78,11 19.274,11H15.726C14.22,11 13,9.78 13,8.274V4.726C13,3.22 14.22,2 15.726,2H19.274Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M14.996,13.5C15.383,13.5 15.696,13.814 15.696,14.2V17.873C16.172,18.125 16.496,18.625 16.496,19.2C16.496,19.775 16.172,20.274 15.696,20.525V21.2C15.696,21.587 15.383,21.9 14.996,21.9C14.61,21.9 14.296,21.587 14.296,21.2V20.525C13.821,20.274 13.496,19.775 13.496,19.2C13.496,18.625 13.82,18.125 14.296,17.873V14.2C14.296,13.814 14.609,13.5 14.996,13.5ZM19.996,13.5C20.383,13.5 20.696,13.814 20.696,14.2V14.873C21.172,15.125 21.496,15.625 21.496,16.2C21.496,16.776 21.172,17.275 20.696,17.526V21.2C20.696,21.587 20.383,21.9 19.996,21.9C19.61,21.9 19.296,21.587 19.296,21.2V17.526C18.82,17.275 18.496,16.776 18.496,16.2C18.496,15.625 18.82,15.125 19.296,14.873V14.2C19.296,13.814 19.61,13.5 19.996,13.5Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val GridSlidersDay: ImageVector by lazy {
+        gridSlidersVector("CouiIconVectors.GridSlidersDay", CouiColor.Day.BLUE)
+    }
+    val GridSlidersNight: ImageVector by lazy {
+        gridSlidersVector("CouiIconVectors.GridSlidersNight", CouiColor.Night.BLUE)
+    }
+
+    private fun squareLockVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M15.459,2.017C16.287,2.017 16.951,2.016 17.486,2.06C18.03,2.104 18.503,2.198 18.94,2.42C19.635,2.775 20.201,3.341 20.556,4.037C20.778,4.473 20.872,4.946 20.916,5.489C20.96,6.024 20.959,6.688 20.959,7.517V11.696C20.156,10.895 19.046,10.399 17.822,10.399C15.37,10.399 13.381,12.389 13.381,14.841V15.515C13.159,15.703 12.976,15.935 12.842,16.197L12.841,16.198C12.68,16.515 12.634,16.821 12.616,17.043C12.599,17.249 12.6,17.488 12.6,17.693V19.387C12.6,19.82 12.599,20.23 12.627,20.572C12.629,20.593 12.632,20.613 12.634,20.634H7.843C7.014,20.634 6.351,20.635 5.815,20.591C5.272,20.546 4.799,20.452 4.363,20.23C3.667,19.876 3.101,19.31 2.746,18.614C2.524,18.178 2.43,17.705 2.386,17.161C2.342,16.626 2.343,15.962 2.343,15.134V7.517C2.343,6.688 2.342,6.024 2.386,5.489C2.43,4.946 2.524,4.473 2.746,4.037C3.101,3.341 3.667,2.775 4.363,2.42C4.799,2.198 5.272,2.104 5.815,2.06C6.351,2.016 7.014,2.017 7.843,2.017H15.459Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M17.822,12.2C19.281,12.2 20.463,13.382 20.463,14.841V16.387C20.844,16.387 21.049,16.395 21.208,16.476C21.361,16.554 21.486,16.68 21.565,16.833C21.653,17.008 21.653,17.236 21.653,17.693V19.387C21.653,20.301 21.653,20.758 21.476,21.107C21.319,21.415 21.069,21.665 20.762,21.821C20.413,21.999 19.955,21.999 19.041,21.999H16.612C15.698,21.999 15.241,21.999 14.892,21.821C14.584,21.665 14.334,21.415 14.178,21.107C14,20.758 14,20.301 14,19.387V17.693C14,17.237 14,17.008 14.089,16.833C14.167,16.679 14.293,16.554 14.446,16.476C14.604,16.395 14.807,16.388 15.182,16.387V14.841C15.182,13.382 16.364,12.2 17.822,12.2ZM17.822,13.399C17.027,13.399 16.381,14.045 16.381,14.841V16.387H19.263V14.841C19.263,14.045 18.618,13.399 17.822,13.399Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val SquareLockDay: ImageVector by lazy {
+        squareLockVector("CouiIconVectors.SquareLockDay", CouiColor.Day.BLUE)
+    }
+    val SquareLockNight: ImageVector by lazy {
+        squareLockVector("CouiIconVectors.SquareLockNight", CouiColor.Night.BLUE)
+    }
+
+    private fun squareEyeClosedVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M15.155,2.302C15.816,2.302 16.353,2.301 16.788,2.337C17.232,2.373 17.631,2.45 18.003,2.64C18.586,2.937 19.06,3.411 19.357,3.994C19.547,4.366 19.624,4.766 19.66,5.209C19.696,5.644 19.695,6.182 19.695,6.842V14.031C19.62,14.084 19.544,14.135 19.466,14.184C19.42,14.208 19.375,14.234 19.33,14.262C18.644,14.657 17.859,14.882 17.026,14.885C17.018,14.885 17.01,14.884 17.001,14.884C16.994,14.884 16.987,14.885 16.979,14.885C15.405,14.875 14,14.083 13.119,12.822C12.469,11.891 11.186,11.663 10.255,12.314C9.323,12.964 9.096,14.246 9.746,15.178C10.052,15.615 10.395,16.024 10.771,16.4L10.725,16.466C10.064,17.39 10.279,18.675 11.203,19.335C11.49,19.54 11.812,19.661 12.14,19.702H6.835C6.175,19.702 5.637,19.702 5.202,19.667C4.759,19.631 4.359,19.554 3.987,19.364C3.404,19.067 2.93,18.593 2.633,18.01C2.443,17.638 2.366,17.238 2.33,16.795C2.295,16.36 2.295,15.822 2.295,15.162V6.842C2.295,6.182 2.295,5.644 2.33,5.209C2.366,4.766 2.443,4.366 2.633,3.994C2.93,3.411 3.404,2.937 3.987,2.64C4.359,2.45 4.759,2.373 5.202,2.337C5.637,2.301 6.175,2.302 6.835,2.302H15.155Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M21.986,13.585C22.217,13.255 22.671,13.174 23.001,13.404C23.331,13.634 23.411,14.089 23.181,14.419C22.705,15.1 22.122,15.697 21.46,16.19L22.207,17.236C22.441,17.563 22.365,18.019 22.037,18.253C21.71,18.486 21.254,18.411 21.021,18.084L20.209,16.947C19.446,17.312 18.614,17.548 17.736,17.633V19.001C17.735,19.403 17.409,19.729 17.007,19.729C16.605,19.729 16.279,19.403 16.278,19.001V17.633C15.401,17.548 14.57,17.311 13.808,16.947L12.996,18.084C12.762,18.411 12.307,18.486 11.98,18.253C11.653,18.019 11.577,17.563 11.811,17.236L12.557,16.19C11.895,15.697 11.312,15.1 10.836,14.419C10.606,14.089 10.687,13.634 11.017,13.404C11.347,13.174 11.801,13.255 12.031,13.585C12.526,14.293 13.157,14.889 13.883,15.334C13.927,15.354 13.971,15.378 14.012,15.408L14.014,15.41C14.89,15.917 15.897,16.208 16.971,16.215C16.983,16.214 16.995,16.212 17.007,16.212C17.019,16.212 17.032,16.214 17.044,16.215C18.118,16.208 19.124,15.917 20,15.411C20.002,15.41 20.003,15.409 20.005,15.408C20.046,15.378 20.09,15.354 20.135,15.334C20.861,14.889 21.492,14.293 21.986,13.585Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val SquareEyeClosedDay: ImageVector by lazy {
+        squareEyeClosedVector("CouiIconVectors.SquareEyeClosedDay", CouiColor.Day.GREEN)
+    }
+    val SquareEyeClosedNight: ImageVector by lazy {
+        squareEyeClosedVector("CouiIconVectors.SquareEyeClosedNight", CouiColor.Night.GREEN)
+    }
+
+    private fun safeBoxVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M19,2.3C21.044,2.3 22.7,3.957 22.7,6V17C22.7,19.044 21.044,20.7 19,20.7H18.43C18.593,20.828 18.7,21.026 18.7,21.25C18.7,21.637 18.387,21.95 18,21.95H17C16.613,21.95 16.3,21.637 16.3,21.25C16.3,21.026 16.407,20.828 16.57,20.7H7.43C7.593,20.828 7.7,21.026 7.7,21.25C7.7,21.637 7.387,21.95 7,21.95H6C5.613,21.95 5.3,21.637 5.3,21.25C5.3,21.026 5.407,20.828 5.57,20.7H5C2.957,20.7 1.3,19.044 1.3,17V6C1.3,3.957 2.957,2.3 5,2.3H19ZM5,3.7C3.73,3.7 2.7,4.73 2.7,6V17C2.7,18.27 3.73,19.3 5,19.3H19C20.27,19.3 21.3,18.27 21.3,17V6C21.3,4.73 20.27,3.7 19,3.7H5Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M19,5C19.552,5 20,5.448 20,6V17C20,17.552 19.552,18 19,18H5C4.448,18 4,17.552 4,17V6C4,5.448 4.448,5 5,5H19ZM14.601,7.5C12.392,7.5 10.601,9.291 10.601,11.5C10.601,13.709 12.391,15.5 14.601,15.5C16.81,15.5 18.601,13.709 18.601,11.5C18.6,9.291 16.809,7.5 14.601,7.5ZM6.301,9.1C5.804,9.1 5.4,9.503 5.4,10V13C5.4,13.497 5.804,13.9 6.301,13.9C6.798,13.9 7.2,13.497 7.2,13V10C7.2,9.503 6.798,9.1 6.301,9.1Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M14.6,14.2C16.092,14.2 17.3,12.991 17.3,11.5C17.3,10.009 16.092,8.8 14.6,8.8C13.109,8.8 11.9,10.009 11.9,11.5C11.9,12.991 13.109,14.2 14.6,14.2Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val SafeBoxDay: ImageVector by lazy {
+        safeBoxVector("CouiIconVectors.SafeBoxDay", CouiColor.Day.YELLOW)
+    }
+    val SafeBoxNight: ImageVector by lazy {
+        safeBoxVector("CouiIconVectors.SafeBoxNight", CouiColor.Night.YELLOW)
+    }
+
+    private fun privacyLockVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M12,2.561C16.404,2.561 20.52,5.227 23.01,9.691C23.129,9.903 23.129,10.161 23.01,10.373C22.308,11.633 21.472,12.744 20.541,13.698C19.965,13.284 19.263,13.032 18.5,13.032C16.57,13.032 15,14.595 15,16.516V17.078C14.026,17.354 13.021,17.504 12,17.504C7.595,17.504 3.479,14.838 0.989,10.373C0.871,10.161 0.871,9.903 0.989,9.691C3.479,5.227 7.595,2.561 12,2.561ZM12,5.582C9.54,5.582 7.55,7.572 7.55,10.032C7.55,12.492 9.54,14.482 12,14.482C14.46,14.482 16.45,12.492 16.45,10.032C16.45,7.572 14.46,5.582 12,5.582ZM11.998,6.982C13.678,6.982 15.047,8.352 15.048,10.032C15.048,11.712 13.678,13.083 11.998,13.083C10.318,13.083 8.948,11.712 8.948,10.032C8.948,9.477 9.109,8.962 9.371,8.513C9.646,8.829 10.046,9.032 10.498,9.032C11.326,9.032 11.998,8.361 11.998,7.532C11.998,7.342 11.959,7.161 11.894,6.993C11.929,6.992 11.962,6.982 11.998,6.982Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M18.72,14.4C19.91,14.4 20.876,15.366 20.876,16.556V17.819C21.187,17.819 21.354,17.825 21.484,17.891C21.61,17.955 21.712,18.057 21.775,18.182C21.848,18.325 21.848,18.512 21.848,18.885V20.268C21.848,21.014 21.847,21.387 21.702,21.672C21.574,21.923 21.371,22.128 21.12,22.255C20.835,22.401 20.461,22.401 19.715,22.401H17.732C16.986,22.401 16.612,22.401 16.327,22.255C16.076,22.128 15.873,21.923 15.745,21.672C15.6,21.387 15.6,21.014 15.6,20.268V18.885C15.6,18.512 15.599,18.325 15.672,18.182C15.736,18.057 15.839,17.955 15.964,17.891C16.093,17.826 16.257,17.819 16.563,17.819V16.556C16.564,15.366 17.529,14.4 18.72,14.4ZM18.72,15.38C18.07,15.38 17.544,15.907 17.544,16.556V17.819H19.896V16.556C19.896,15.907 19.369,15.38 18.72,15.38Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val PrivacyLockDay: ImageVector by lazy {
+        privacyLockVector("CouiIconVectors.PrivacyLockDay", CouiColor.Day.BLUE)
+    }
+    val PrivacyLockNight: ImageVector by lazy {
+        privacyLockVector("CouiIconVectors.PrivacyLockNight", CouiColor.Night.BLUE)
+    }
+
+    private fun shieldFlashVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M11.478,1.217C11.824,1.167 12.176,1.167 12.521,1.217C12.931,1.276 13.318,1.428 13.818,1.616L13.819,1.615L13.837,1.621L19.155,3.616C19.87,3.884 20.481,4.096 20.944,4.504C21.324,4.839 21.616,5.261 21.796,5.734C22.015,6.31 22,6.957 22,7.721V10.97C22,13.916 21.153,16.269 19.651,18.152C18.164,20.015 16.088,21.353 13.73,22.38C13.325,22.557 12.994,22.707 12.556,22.78C12.222,22.835 11.778,22.835 11.443,22.78C11.006,22.707 10.675,22.557 10.269,22.38C7.911,21.353 5.835,20.015 4.348,18.152C2.847,16.269 2,13.916 2,10.97V7.721C2,6.958 1.985,6.31 2.204,5.734C2.384,5.261 2.676,4.839 3.055,4.504C3.518,4.096 4.13,3.884 4.844,3.616L10.163,1.621C10.672,1.43 11.064,1.277 11.478,1.217ZM12.76,5.19C12.656,5.21 12.538,5.376 12.302,5.705L8.207,11.44C8.05,11.659 7.972,11.768 7.975,11.86C7.978,11.939 8.017,12.013 8.08,12.062C8.152,12.117 8.287,12.118 8.555,12.118H10.509C10.658,12.118 10.733,12.118 10.791,12.147C10.841,12.172 10.882,12.213 10.908,12.263C10.937,12.32 10.937,12.396 10.937,12.546V16.137C10.937,16.542 10.937,16.745 11.01,16.823C11.074,16.889 11.167,16.919 11.257,16.902C11.361,16.881 11.479,16.716 11.715,16.386L15.81,10.652C15.966,10.433 16.045,10.324 16.042,10.233C16.039,10.153 16,10.079 15.937,10.031C15.865,9.975 15.731,9.974 15.462,9.974H13.509C13.359,9.974 13.284,9.975 13.226,9.946C13.176,9.92 13.135,9.879 13.109,9.828C13.08,9.771 13.08,9.696 13.08,9.546V5.954C13.08,5.549 13.08,5.346 13.007,5.269C12.943,5.202 12.851,5.172 12.76,5.19Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val ShieldFlashDay: ImageVector by lazy {
+        shieldFlashVector("CouiIconVectors.ShieldFlashDay", CouiColor.Day.GREEN)
+    }
+    val ShieldFlashNight: ImageVector by lazy {
+        shieldFlashVector("CouiIconVectors.ShieldFlashNight", CouiColor.Night.GREEN)
+    }
+
+    private fun walletShieldVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M20.416,22.392C22.272,21.607 23.569,20.097 23.569,17.918L23.569,16.68C23.569,16.358 23.569,16.197 23.516,16.059C23.47,15.936 23.394,15.827 23.296,15.741C23.185,15.643 23.034,15.586 22.733,15.473L20.706,14.713C20.497,14.635 20.392,14.595 20.285,14.58C20.189,14.566 20.092,14.566 19.996,14.58C19.889,14.595 19.784,14.635 19.575,14.713L17.549,15.473L17.549,15.473C17.247,15.586 17.096,15.643 16.985,15.741C16.887,15.827 16.811,15.936 16.765,16.059C16.712,16.197 16.712,16.358 16.712,16.68L16.712,17.918C16.712,20.097 18.009,21.607 19.865,22.392C19.957,22.43 20.003,22.45 20.062,22.459C20.108,22.467 20.173,22.467 20.219,22.459C20.278,22.45 20.324,22.43 20.416,22.392Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M5.484,8.086C5.484,7.379 6.057,6.806 6.764,6.806H17.204C17.911,6.806 18.484,7.379 18.484,8.086C18.484,8.263 18.341,8.406 18.164,8.406H5.804C5.628,8.406 5.484,8.263 5.484,8.086Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M4.983,10.685C4.983,9.978 5.556,9.405 6.263,9.405H17.703C18.41,9.405 18.983,9.978 18.983,10.685C18.983,10.862 18.84,11.005 18.663,11.005H5.303C5.127,11.005 4.983,10.862 4.983,10.685Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M18.272,3.509C20.316,3.509 21.973,5.166 21.973,7.209V13.932L21.119,13.613C20.997,13.567 20.831,13.501 20.645,13.455L20.453,13.417L20.297,13.4C20.193,13.392 20.088,13.392 19.984,13.4L19.828,13.417C19.566,13.454 19.324,13.552 19.162,13.613L17.136,14.373C16.924,14.452 16.52,14.584 16.208,14.859C16.027,15.018 15.877,15.209 15.765,15.421L15.666,15.641C15.555,15.933 15.538,16.245 15.536,16.478V17.919C15.536,18.886 15.745,19.747 16.11,20.496H5.7C3.657,20.496 2.001,18.838 2,16.795V7.209C2,5.166 3.657,3.509 5.7,3.509H18.272ZM5.7,4.91C4.43,4.91 3.4,5.939 3.4,7.209V12.332C3.653,12.279 3.996,12.278 4.482,12.278H8.434C8.78,12.278 8.953,12.278 9.097,12.33C9.241,12.382 9.72,12.779 10.677,13.572C11.033,13.867 11.49,14.044 11.988,14.044C12.487,14.044 12.944,13.866 13.3,13.572C14.256,12.779 14.736,12.382 14.88,12.33C15.024,12.278 15.197,12.278 15.543,12.278H19.491C19.978,12.278 20.321,12.279 20.573,12.332V7.209C20.573,5.939 19.543,4.91 18.272,4.91H5.7Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val WalletShieldDay: ImageVector by lazy {
+        walletShieldVector("CouiIconVectors.WalletShieldDay", CouiColor.Day.GREEN)
+    }
+    val WalletShieldNight: ImageVector by lazy {
+        walletShieldVector("CouiIconVectors.WalletShieldNight", CouiColor.Night.GREEN)
+    }
+
+    private fun shieldKeyVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M11.478,1.217C11.824,1.167 12.176,1.167 12.521,1.217C12.931,1.276 13.318,1.427 13.818,1.615L13.819,1.614L13.837,1.621L19.155,3.615C19.87,3.883 20.481,4.096 20.944,4.504C21.323,4.838 21.616,5.26 21.796,5.733C22.015,6.31 22,6.957 22,7.721V10.97C22,13.916 21.153,16.269 19.651,18.151C18.164,20.014 16.088,21.352 13.73,22.38C13.325,22.556 12.994,22.706 12.556,22.779C12.222,22.835 11.778,22.835 11.443,22.779C11.006,22.706 10.675,22.556 10.269,22.38C7.911,21.352 5.835,20.014 4.348,18.151C2.847,16.269 2,13.916 2,10.97V7.721C2,6.957 1.985,6.31 2.204,5.733C2.384,5.26 2.676,4.838 3.055,4.504C3.518,4.096 4.13,3.883 4.844,3.615L10.163,1.621C10.672,1.43 11.064,1.277 11.478,1.217ZM12.559,6.052C10.696,5.707 9.07,7.129 9.07,8.93C9.07,10.135 9.8,11.169 10.841,11.618H10.834V12.878L9.943,13.768L11.149,14.951L9.983,16.116L12,18L13.171,16.539V11.618H13.158C14.382,11.09 15.175,9.753 14.858,8.279C14.617,7.159 13.686,6.26 12.559,6.052ZM11.295,7.3C11.684,6.911 12.315,6.911 12.704,7.3C13.093,7.689 13.093,8.32 12.704,8.709C12.315,9.098 11.684,9.098 11.295,8.709C10.906,8.32 10.906,7.689 11.295,7.3Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val ShieldKeyDay: ImageVector by lazy {
+        shieldKeyVector("CouiIconVectors.ShieldKeyDay", CouiColor.Day.BLUE)
+    }
+    val ShieldKeyNight: ImageVector by lazy {
+        shieldKeyVector("CouiIconVectors.ShieldKeyNight", CouiColor.Night.BLUE)
+    }
+
+    private fun phoneStackVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M9.375,0.5C8.388,0.5 7.588,1.233 7.588,2.137V18.864C7.588,19.768 8.388,20.5 9.375,20.5H17.713C18.7,20.5 19.5,19.768 19.5,18.864V2.137C19.5,1.233 18.7,0.5 17.713,0.5H9.375ZM14.99,16.453C15.264,16.453 15.486,16.656 15.486,16.907C15.486,17.158 15.264,17.362 14.99,17.362H12.099C11.825,17.362 11.602,17.158 11.602,16.907C11.602,16.656 11.825,16.453 12.099,16.453H14.99ZM13.545,2.838C13.946,2.838 14.271,3.164 14.271,3.565C14.271,3.967 13.946,4.293 13.545,4.293C13.144,4.293 12.819,3.967 12.819,3.565C12.819,3.164 13.144,2.838 13.545,2.838Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+            iconPath(
+                pathData = "M6.375,3.5C5.388,3.5 4.588,4.233 4.588,5.137V21.864C4.588,22.768 5.388,23.5 6.375,23.5H14.713C15.7,23.5 16.5,22.768 16.5,21.864V21.6H8.271C7.285,21.6 6.484,20.867 6.484,19.963V3.5H6.375Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 0.4f,
+                stroke = null,
+                strokeAlpha = 0.4f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val PhoneStackDay: ImageVector by lazy {
+        phoneStackVector("CouiIconVectors.PhoneStackDay", CouiColor.Day.YELLOW)
+    }
+    val PhoneStackNight: ImageVector by lazy {
+        phoneStackVector("CouiIconVectors.PhoneStackNight", CouiColor.Night.YELLOW)
+    }
+
+    private fun shieldCheckVector(name: String, tintColor: Color): ImageVector =
+        iconVector(name, 24f.dp, 24f.dp, 24f, 24f, tintColor = tintColor) {
+            iconPath(
+                pathData = "M11.478,1.217C11.824,1.167 12.176,1.167 12.521,1.217C12.931,1.276 13.318,1.428 13.818,1.616L13.819,1.615L13.837,1.621L19.155,3.616C19.87,3.884 20.481,4.096 20.944,4.504C21.324,4.839 21.616,5.261 21.796,5.734C22.015,6.31 22,6.957 22,7.721V10.97C22,13.916 21.153,16.269 19.651,18.152C18.164,20.015 16.088,21.353 13.73,22.38C13.325,22.557 12.994,22.707 12.556,22.78C12.222,22.835 11.778,22.835 11.443,22.78C11.006,22.707 10.675,22.557 10.269,22.38C7.911,21.353 5.835,20.015 4.348,18.152C2.847,16.269 2,13.916 2,10.97V7.721C2,6.958 1.985,6.31 2.204,5.734C2.384,5.261 2.676,4.839 3.055,4.504C3.518,4.096 4.13,3.884 4.844,3.616L10.163,1.621C10.672,1.43 11.064,1.277 11.478,1.217ZM16.788,8.396C16.422,8.03 15.828,8.03 15.462,8.396L10.923,12.935C10.835,13.022 10.693,13.022 10.605,12.935L8.538,10.868C8.172,10.502 7.578,10.502 7.212,10.868C6.846,11.235 6.846,11.828 7.212,12.194L10.1,15.082C10.466,15.448 11.06,15.448 11.427,15.082L16.788,9.722C17.154,9.356 17.154,8.762 16.788,8.396Z",
+                fill = SolidColor(Color(0xFF000000)),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 4f,
+                pathFillType = PathFillType.NonZero,
+                trimPathStart = 0f,
+                trimPathEnd = 1f,
+                trimPathOffset = 0f,
+            )
+        }
+
+    val ShieldCheckDay: ImageVector by lazy {
+        shieldCheckVector("CouiIconVectors.ShieldCheckDay", CouiColor.Day.GREEN)
+    }
+    val ShieldCheckNight: ImageVector by lazy {
+        shieldCheckVector("CouiIconVectors.ShieldCheckNight", CouiColor.Night.GREEN)
+    }
 
     val AppUpdateDay: ImageVector by lazy { appUpdate(CouiColor.Day.GREEN) }
     val AppUpdateNight: ImageVector by lazy { appUpdate(CouiColor.Night.GREEN) }

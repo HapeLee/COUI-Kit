@@ -23,8 +23,8 @@ internal fun ToolbarPreviewList(query: String) {
     val titles = stringArrayResource(R.array.toolbar_preview_titles)
     val summaries = stringArrayResource(R.array.toolbar_preview_summaries)
     val values = stringArrayResource(R.array.toolbar_preview_values)
-    val icons = listOf(CouiIcons.Transfer, CouiIcons.Volume, CouiIcons.Bell, CouiIcons.Sun,
-        CouiIcons.Health, CouiIcons.Volume, CouiIcons.PhoneVibrate, CouiIcons.Grid, CouiIcons.Phone, CouiIcons.Foldable)
+    val icons = listOf(CouiIcons.Filled.Transfer, CouiIcons.Filled.Volume, CouiIcons.Filled.Bell, CouiIcons.Filled.Sun,
+        CouiIcons.Filled.Health, CouiIcons.Filled.Volume, CouiIcons.Filled.MultiPhone, CouiIcons.Filled.Grid, CouiIcons.Filled.Phone, CouiIcons.Filled.Foldable)
     val colors = listOf(0xFF1A8CFF, 0xFF6366F1, 0xFFFF9B35, 0xFF34B978, 0xFFF0667B,
         0xFFA884E7, 0xFF45B6AE, 0xFF1A8CFF, 0xFF34B978, 0xFFFF9B35)
     val needle = query.trim()
