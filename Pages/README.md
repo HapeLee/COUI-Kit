@@ -1,6 +1,10 @@
-# COUI Icons 图标画廊
+# COUI 网站
 
-`Pages/` 是 COUI 图标的静态预览与源码复制站点，无外部 CDN 依赖，支持离线或通过任意静态 HTTP 服务运行。
+`Pages/` 提供 COUI 项目首页与图标工具，无外部 CDN 依赖，支持离线或通过任意静态 HTTP 服务运行。首页提供 GitHub 仓库、图标和文档入口；文档直接链接到 GitHub。
+
+- `index.html`：项目首页。
+- `icons/index.html`：图标浏览与源码复制。
+- `style.css`、`theme.js`：两页共用的样式和主题切换。默认日间模式，浏览器允许本地存储时记住用户选择。
 
 ## 功能说明
 
@@ -16,7 +20,7 @@
 
 ## 数据契约
 
-页面从同目录相对路径 `./data.js` 读取 `window.COUI_ICON_DATA`：
+图标页从相对路径 `../data.js` 读取 `window.COUI_ICON_DATA`：
 
 ```js
 window.COUI_ICON_DATA = {
@@ -57,6 +61,6 @@ node Pages/generate.mjs
 python3 -m http.server 8080 --directory Pages
 ```
 
-然后在浏览器访问 `http://localhost:8080`。
+然后在浏览器访问 `http://localhost:8080`，图标工具位于 `http://localhost:8080/icons/`。
 
-也可直接使用双击或浏览器打开 `Pages/index.html`（页面全部采用 `./` 相对路径加载资源）。
+也可直接使用浏览器打开 `Pages/index.html` 或 `Pages/icons/index.html`。页面导航与资源使用相对路径，可部署在 GitHub Pages 的仓库子路径。

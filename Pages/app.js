@@ -18,7 +18,7 @@
     : { Day: {}, Night: {} };
 
   const state = {
-    theme: "day", // "day" | "night"
+    theme: document.documentElement.dataset.theme, // "day" | "night"
     query: "",
     styleFilter: "all",
     selectedIconName: null,
@@ -30,8 +30,6 @@
   let copyFeedbackTimer = null;
 
   const dom = {
-    html: document.documentElement,
-    themeToggleBtn: document.getElementById("theme-toggle-btn"),
     styleFilterButtons: document.querySelectorAll("[data-style-filter]"),
     searchInput: document.getElementById("search-input"),
     searchClearBtn: document.getElementById("search-clear-btn"),
@@ -482,14 +480,6 @@
       return;
     }
     state.theme = nextTheme;
-    dom.html.setAttribute("data-theme", nextTheme);
-
-    const label = nextTheme === "day" ? "切换到夜间模式" : "切换到日间模式";
-    dom.themeToggleBtn.setAttribute("aria-label", label);
-    dom.themeToggleBtn.setAttribute("title", label);
-    dom.themeToggleBtn.setAttribute("aria-pressed", String(nextTheme === "night"));
-    const themeSvg = buildSvgElement(variantsByName.get("DarkLight")[0], false);
-    dom.themeToggleBtn.replaceChildren(...(themeSvg ? [themeSvg] : []));
 
     // 主题切换更新所有网格图标的默认原图以及右侧详情预览
     renderGrid();
@@ -564,7 +554,21 @@
   }
 
   function bindEvents() {
-    dom.themeToggleBtn.addEventListener("click", () => setTheme(state.theme === "day" ? "night" : "day"));
+    const topNav = document.querySelector(".top-nav");
+    let previousScrollY = Math.max(0, window.scrollY);
+    window.addEventListener("scroll", () => {
+      const currentScrollY = Math.max(0, window.scrollY);
+      // 累积小幅滚动，避免触控板微小反向输入让顶栏反复进出。
+      if (currentScrollY <= topNav.offsetHeight || Math.abs(currentScrollY - previousScrollY) >= 8) {
+        document.body.classList.toggle("is-nav-hidden",
+          currentScrollY > topNav.offsetHeight && currentScrollY > previousScrollY);
+        previousScrollY = currentScrollY;
+      }
+    }, { passive: true });
+
+    document.addEventListener("coui-theme-change", (event) => {
+      if (state.theme !== event.detail) setTheme(event.detail);
+    });
     dom.styleFilterButtons.forEach((button) => {
       button.addEventListener("click", () => {
         state.styleFilter = button.dataset.styleFilter;

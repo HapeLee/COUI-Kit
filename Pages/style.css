@@ -1,40 +1,43 @@
 :root {
-  --bg-page: #eef1f5;
+  scroll-padding-top: 92px;
+  color-scheme: light;
+  --bg-page: #f0f1f2;
   --bg-card: #ffffff;
-  --bg-subtle: #f2f4f8;
-  --bg-selected: #e2effe;
-  --bg-hover: #f5f7fa;
-  --text-primary: #14171c;
-  --text-secondary: #68707d;
-  --text-muted: #8b93a1;
-  --accent: #007aff;
-  --accent-hover: #0068db;
+  --bg-subtle: #f0f1f2;
+  --bg-selected: #e0efff;
+  --bg-hover: #f5f5f5;
+  --text-primary: rgba(0, 0, 0, 0.9);
+  --text-secondary: rgba(0, 0, 0, 0.62);
+  --text-muted: rgba(0, 0, 0, 0.6);
+  --accent: #0080ff;
+  --accent-hover: #0070e0;
   --accent-text: #ffffff;
-  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-subtle: rgba(0, 0, 0, 0.12);
   --shadow-card: 0 2px 12px rgba(15, 23, 42, 0.04);
   --shadow-sheet: 0 18px 55px rgba(15, 23, 42, 0.18);
-  --focus-ring: 0 0 0 3px rgba(0, 122, 255, 0.35);
+  --focus-ring: 0 0 0 3px rgba(0, 128, 255, 0.45);
   --radius-pill: 999px;
   --radius-card: 28px;
   --radius-item: 18px;
 }
 
 html[data-theme="night"] {
-  --bg-page: #0f1115;
-  --bg-card: #1a1d24;
-  --bg-subtle: #252933;
-  --bg-selected: rgba(10, 132, 255, 0.22);
-  --bg-hover: #222630;
-  --text-primary: #f2f4f8;
-  --text-secondary: #9ba3b0;
-  --text-muted: #727a88;
-  --accent: #0a84ff;
-  --accent-hover: #2492ff;
+  color-scheme: dark;
+  --bg-page: #000000;
+  --bg-card: #1a1a1a;
+  --bg-subtle: #333333;
+  --bg-selected: rgba(26, 140, 255, 0.22);
+  --bg-hover: #292929;
+  --text-primary: rgba(255, 255, 255, 0.9);
+  --text-secondary: rgba(255, 255, 255, 0.62);
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --accent: #1a8cff;
+  --accent-hover: #0878e8;
   --accent-text: #ffffff;
-  --border-subtle: rgba(255, 255, 255, 0.09);
+  --border-subtle: rgba(255, 255, 255, 0.2);
   --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.28);
   --shadow-sheet: 0 18px 55px rgba(0, 0, 0, 0.48);
-  --focus-ring: 0 0 0 3px rgba(10, 132, 255, 0.45);
+  --focus-ring: 0 0 0 3px rgba(26, 140, 255, 0.55);
 }
 
 *,
@@ -70,28 +73,105 @@ body {
   padding: 20px clamp(20px, 2.5vw, 48px) 48px;
 }
 
+/* 分层采样并逐段提高半径，避免用单一模糊的透明度渐变代替强度变化。 */
+.top-blur {
+  --blur-height: 128px;
+  position: fixed;
+  inset: 0 0 auto;
+  height: var(--blur-height);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.top-blur > span {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--end);
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+  /* 裁掉完全透明的尾部，渐变起点仍按完整高度定位。 */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(var(--blur-height) * var(--solid)), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(var(--blur-height) * var(--solid)), transparent);
+}
+
+.top-blur > span:nth-child(1) { --blur: 1px; --solid: 0.75; --end: 100%; }
+.top-blur > span:nth-child(2) { --blur: 2px; --solid: 0.6; --end: 85%; }
+.top-blur > span:nth-child(3) { --blur: 4px; --solid: 0.45; --end: 70%; }
+.top-blur > span:nth-child(4) { --blur: 8px; --solid: 0.3; --end: 55%; }
+.top-blur > span:nth-child(5) { --blur: 16px; --solid: 0.15; --end: 40%; }
+.top-blur > span:nth-child(6) { --blur: 24px; --solid: 0; --end: 25%; }
+
 /* 顶部导航栏 */
 .top-nav {
+  position: sticky;
+  top: 20px;
+  z-index: 5;
+  width: 100%;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: var(--bg-card);
   border-radius: var(--radius-pill);
-  padding: 12px 24px;
+  padding: 8px 20px;
   box-shadow: var(--shadow-card);
   margin-bottom: 28px;
 }
 
 .brand {
-  font-size: 1.25rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 1.125rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+.icons-page .top-nav {
+  z-index: 6;
+  transition: transform 0.2s ease, visibility 0s;
+}
+
+.icons-page.is-nav-hidden .top-nav {
+  transform: translateY(calc(-100% - 32px));
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 0.2s ease, visibility 0s 0.2s;
+}
+
+.icons-page .search-section {
+  position: sticky;
+  top: 92px;
+  z-index: 5;
+  transition: top 0.2s ease;
+}
+
+.icons-page.is-nav-hidden .search-section {
+  top: 20px;
 }
 
 .top-actions {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.nav-link:hover,
+.nav-link[aria-current="page"] {
+  color: var(--text-primary);
+  background-color: var(--bg-subtle);
 }
 
 .theme-segmented {
@@ -126,7 +206,10 @@ body {
 
 .theme-btn:focus-visible,
 .theme-toggle-btn:focus-visible,
-.github-link:focus-visible,
+.brand:focus-visible,
+.nav-link:focus-visible,
+.home-button:focus-visible,
+.home-footer a:focus-visible,
 .search-clear-btn:focus-visible,
 .icon-card:focus-visible,
 .detail-close-btn:focus-visible,
@@ -138,19 +221,13 @@ body {
   box-shadow: var(--focus-ring);
 }
 
-.top-divider {
-  width: 1px;
-  height: 22px;
-  background-color: var(--border-subtle);
-}
-
-.theme-toggle-btn,
-.github-link {
+.theme-toggle-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   border-radius: 50%;
   color: var(--text-primary);
   text-decoration: none;
@@ -164,14 +241,165 @@ body {
   cursor: pointer;
 }
 
+.theme-toggle-btn[hidden] {
+  display: none;
+}
+
 .theme-toggle-btn svg {
   width: 22px;
   height: 22px;
 }
 
-.theme-toggle-btn:hover,
-.github-link:hover {
+.theme-toggle-btn:hover {
   background-color: var(--bg-subtle);
+}
+
+/* 首页与图标页共用导航和主题，首页只保留项目入口。 */
+.home-shell {
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0 auto;
+  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-shell .top-nav {
+  margin-bottom: 0;
+}
+
+.home-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 64px;
+  align-items: center;
+  padding: 80px 24px 104px;
+}
+
+.home-copy {
+  min-width: 0;
+}
+
+.home-title {
+  margin: 0;
+  font-size: clamp(2.5rem, 4.5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.home-name {
+  display: block;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.home-tagline {
+  display: block;
+}
+
+.home-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  isolation: isolate;
+}
+
+.home-art::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(130%, 480px);
+  aspect-ratio: 1;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(153, 123, 234, 0.65), transparent 65%),
+    radial-gradient(ellipse at 70% 70%, rgba(238, 113, 67, 0.55), transparent 65%);
+  filter: blur(32px);
+  pointer-events: none;
+}
+
+.home-logo {
+  display: block;
+  width: min(100%, 360px);
+  height: auto;
+}
+
+.home-description {
+  margin: 20px 0 0;
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  text-wrap: balance;
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.home-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  padding: 10px 24px;
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 19px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.16s ease, transform 0.1s ease;
+}
+
+.home-button:hover {
+  background-color: var(--bg-hover);
+}
+
+.home-button-primary {
+  background-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.home-button-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.home-button:active {
+  transform: scale(0.97);
+}
+
+.home-footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.home-footer p {
+  margin: 0;
+}
+
+.home-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-pill);
+}
+
+.home-footer a:hover {
+  color: var(--text-primary);
 }
 
 /* 标题区 */
@@ -194,7 +422,7 @@ body {
 
 /* 搜索栏与计数 */
 .search-section {
-  margin-bottom: 18px;
+  margin-bottom: 0;
 }
 
 .search-bar {
@@ -251,6 +479,7 @@ body {
 }
 
 .toolbar-meta {
+  margin-bottom: 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -408,6 +637,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .detail-panel { animation: none; }
+  *, *::before, *::after { transition: none !important; }
 }
 
 .detail-preview-box {
@@ -688,15 +918,57 @@ html[data-theme="night"] .copy-feedback.is-error {
   color: #ff7b6e;
 }
 
+/* 窄屏将标识放到文案上方，保留完整的项目介绍与操作入口。 */
+@media (max-width: 960px) {
+  .home-main {
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 32px;
+    padding: 56px 16px 72px;
+    text-align: center;
+  }
+
+  .home-art {
+    grid-row: 1;
+    justify-self: center;
+    width: min(100%, 280px);
+  }
+
+  .home-art::before {
+    width: 125%;
+  }
+
+  .home-actions {
+    justify-content: center;
+  }
+}
+
 /* 响应式与手机布局 */
 @media (max-width: 600px) {
+  html {
+    scroll-padding-top: 80px;
+  }
+
   .page-shell {
     padding: 14px 14px 36px;
   }
 
+  .top-blur {
+    --blur-height: 112px;
+  }
+
   .top-nav {
-    padding: 10px 14px;
+    top: 14px;
+    padding: 6px 14px;
     margin-bottom: 20px;
+  }
+
+  .icons-page .search-section {
+    top: 80px;
+  }
+
+  .icons-page.is-nav-hidden .search-section {
+    top: 14px;
   }
 
   .brand {
@@ -709,7 +981,38 @@ html[data-theme="night"] .copy-feedback.is-error {
   }
 
   .top-actions {
-    gap: 10px;
+    gap: 4px;
+  }
+
+  .nav-link {
+    padding: 0 10px;
+  }
+
+  .home-shell {
+    padding-bottom: 16px;
+  }
+
+  .home-main {
+    gap: 24px;
+    padding: 40px 8px 56px;
+  }
+
+  .home-art {
+    width: 200px;
+  }
+
+  .home-title {
+    font-size: 2.25rem;
+  }
+
+  .home-description {
+    max-width: 20em;
+    margin-top: 20px;
+    font-size: 1rem;
+  }
+
+  .home-button {
+    padding-inline: 20px;
   }
 
   .page-title {

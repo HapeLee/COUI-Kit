@@ -1,4 +1,4 @@
-name: 部署 COUI Icons 页面
+name: 部署 COUI 网站
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   deploy-pages:
-    name: 构建并部署 COUI Icons 静态站点
+    name: 构建并部署 COUI 静态站点
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment:
@@ -39,7 +39,9 @@ jobs:
           set -euo pipefail
           node Pages/generate.mjs
           test -s Pages/index.html
+          test -s Pages/icons/index.html
           test -s Pages/style.css
+          test -s Pages/theme.js
           test -s Pages/app.js
           test -s Pages/data.js
 

@@ -12,7 +12,7 @@ node Pages/generate.mjs
 python3 -m http.server 8080 --directory Pages
 ```
 
-浏览器访问 `http://localhost:8080`。修改资源后，再运行 `node Pages/generate.mjs` 并刷新页面。
+浏览器访问 `http://localhost:8080/icons/`。修改资源后，再运行 `node Pages/generate.mjs` 并刷新页面。
 
 ## XML 来源
 
@@ -30,4 +30,4 @@ python3 -m http.server 8080 --directory Pages
 
 `.github/workflows/coui-icons-pages.yml` 使用 `workflow_dispatch` 手动触发。工作流会安装 `Pages/package-lock.json` 中锁定的依赖，再从 XML 生成 `Pages/data.js` 并部署静态站点。
 
-首次发布前，在仓库 `Settings -> Pages -> Build and deployment` 中将 `Source` 设为 **GitHub Actions**。之后在 GitHub `Actions` 页面运行 **部署 COUI Icons 页面** 工作流。
+首次发布前，在仓库 `Settings -> Pages -> Build and deployment` 中将 `Source` 设为 **GitHub Actions**。之后在 GitHub `Actions` 页面运行 **部署 COUI 网站** 工作流。
