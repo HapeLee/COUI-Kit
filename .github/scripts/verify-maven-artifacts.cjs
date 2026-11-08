@@ -28,7 +28,13 @@ for (const artifact of ['coui', 'coui-material3', 'coui-icons']) {
   assert(!dependencies.some(dep => dep.group === 'androidx.compose.material'), `${artifact} 不应引入 Material Icons`);
 
   if (artifact === 'coui') {
-    assert(dependencies.some(dep => dep.group === 'androidx.dynamicanimation' && dep.module === 'dynamicanimation' && dep.version?.strictly), '丢失动画严格版本约束');
+    const isDynamicAnimation = dep => dep.group === 'androidx.dynamicanimation' && dep.module === 'dynamicanimation';
+    const animationDependencies = dependencies.filter(isDynamicAnimation);
+    const animationConstraints = metadata.variants
+      .flatMap(variant => variant.dependencyConstraints ?? []).filter(isDynamicAnimation);
+    assert(animationDependencies.some(dep => dep.version?.requires === '1.1.0'), '核心动画依赖应请求 1.1.0');
+    assert([...animationDependencies, ...animationConstraints].every(dep => dep.version?.strictly === undefined),
+      '核心动画依赖不应使用严格版本约束');
     assert(!dependencies.some(dep => dep.group === 'androidx.compose.material3'), '核心不应依赖 Material 3');
     assert(!dependencies.some(dep => dep.module === 'coui-icons'), '核心模块元数据不应引入 coui-icons');
   } else if (artifact === 'coui-material3') {

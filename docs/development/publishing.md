@@ -32,7 +32,7 @@
 
 [核心配置](../../coui/build.gradle.kts)与两个可选模块配置均只发布 release 变体，包含 AAR、源码包、Dokka HTML 文档包、POM 和 Gradle Module Metadata。源码与文档归档附带根许可、来源与名称声明；核心与图标模块归档包含 ICON_SOURCES.md，核心还包含既有 Skia/AndroidX 声明。不发布 Demo、不提前混淆库，也不上传 Demo 密钥。
 
-两个发布工作流先生成三个模块的本地 Maven 文件仓库，调用与 PR 相同的[真实产物检查](../../.github/scripts/verify-maven-artifacts.cjs)。脚本检查独立坐标、非空产物、源码与 HTML、许可、Compose BOM、核心动画严格约束，以及各模块依赖边界。全部通过后再上传三个 artifact。Packages 检查远端版本元数据；Central 接受上传后继续异步校验和发布。POM 不具备完整表达 Gradle 严格约束的能力，不能用 POM 存在代替 `.module` 检查。每次发行仍须确认对应运行结果，不能以历史成功代替当前版本验收。
+两个发布工作流先生成三个模块的本地 Maven 文件仓库，调用与 PR 相同的[真实产物检查](../../.github/scripts/verify-maven-artifacts.cjs)。脚本检查独立坐标、非空产物、源码与 HTML、许可、Compose BOM、核心动画依赖的版本声明，以及各模块依赖边界。全部通过后再上传三个 artifact。Packages 检查远端版本元数据；Central 接受上传后继续异步校验和发布。Gradle 的版本约束以 `.module` 为准。每次发行仍须确认对应运行结果，不能以历史成功代替当前版本验收。
 
 Packages 按分支、Central 按 Tag 串行执行，不取消正在上传的任务。重新运行相同提交的 Packages 任务仍是 SNAPSHOT 发布；SHA 只能标识源码，不把 SNAPSHOT 当作不可变发行版本。
 

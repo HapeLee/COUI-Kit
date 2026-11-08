@@ -123,7 +123,7 @@ dependencies {
 }
 ```
 
-源码模块还引用了 Maven Publish 和 Dokka 等插件别名。插件版本由项目统一声明，DynamicAnimation 的 `strictly` 约束也要保留。工具链和依赖对齐见[兼容要求](compatibility.md)。
+源码模块还引用了 Maven Publish 和 Dokka 等插件别名。插件与依赖版本由项目统一声明。工具链和依赖对齐见[兼容要求](compatibility.md)。
 
 需要 M3 适配时，同样复制 `coui-material3/`，在 settings 增加 `include(":coui-material3")`，并在调用模块依赖 `project(":coui-material3")`。
 
@@ -139,7 +139,7 @@ dependencies {
 
 ## 常见问题
 
-**依赖解析失败或 Compose 编译失败**：检查 Maven Central 和项目的 Compose 插件。使用源码模块时，还要检查模块引用的库、插件别名和 DynamicAnimation 约束。
+**依赖解析失败或 Compose 编译失败**：检查 Maven Central 和项目的 Compose 插件。使用源码模块时，还要检查模块引用的库、插件别名和 DynamicAnimation 解析版本。
 
 **组件显示了，但背景材质不对**：检查系统版本，并确认背景源覆盖不透明内容，组件位于源节点之外。材质弹窗还需要传入 `material` 和宿主窗口的背景源。
 
