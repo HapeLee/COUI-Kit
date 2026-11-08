@@ -25,11 +25,11 @@ android {
 }
 
 dependencies {
-    implementation("io.github.itoseo:coui:0.0.1-alpha7")
+    implementation("io.github.itoseo:coui:0.0.1-alpha8")
 }
 ```
 
-`0.0.1-alpha7` 需要 Android 12（API 31）及以上，编译时需要 `compileSdk` 37 和 AGP 9.1.0 或更高版本。应用仍需配置自己的 Android 与 Compose 插件。组件的具体系统要求见[兼容要求](compatibility.md)。
+`0.0.1-alpha8` 需要 Android 12（API 31）及以上，编译时需要 `compileSdk` 37 和 AGP 9.1.0 或更高版本。应用仍需配置自己的 Android 与 Compose 插件。组件的具体系统要求见[兼容要求](compatibility.md)。
 
 当前版本为早期预览版，API 可能发生不兼容的变化。
 
@@ -42,8 +42,6 @@ dependencies {
 平台要求按能力分：普通控件跟随库的最低系统；渐进模糊、轮廓和融合要 API 33；底栏、FAB、顶栏按钮/展开式搜索、ChipTab 和普通阴影要 API 34。常驻 `SearchBar` 在 API 31–33 使用普通填色，API 34 起提供浮动材质与融合。调用 API 34 的组件前先判断版本，完整表格见[兼容要求](compatibility.md#效果门槛)。
 
 ## 显示第一个组件
-
-以下示例使用 `0.0.1-alpha7` 的无前缀组件名。旧版升级的名称和参数迁移规则见 [CHANGELOG](../../CHANGELOG.md#组件命名迁移)。
 
 在 Compose 页面中加入下面的滑条，拖动时更新 `value`：
 
