@@ -15,7 +15,7 @@ android {
     namespace = "com.itos.coui"
     compileSdk = 37
     defaultConfig {
-        minSdk = 31
+        minSdk = 26
         aarMetadata {
             minCompileSdk = 37
             minAgpVersion = "9.1.0"

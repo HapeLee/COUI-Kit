@@ -6,6 +6,7 @@ import android.graphics.LinearGradient
 import android.graphics.RenderEffect
 import android.graphics.Shader
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -84,6 +85,7 @@ fun TopAppBarSurface(
 ) {
     val density = LocalDensity.current.density
     val destination = rememberCouiBackdrop(parent = backdrop)
+    val resolvedGradientColor = gradientColor.takeOrElse { if (dark) Color.Black else Color.White }
     val backgroundModifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         Modifier.drawCouiGradientBackdrop(
             backdrop = backdrop,
@@ -91,7 +93,7 @@ fun TopAppBarSurface(
             referenceBlurRadiusPx = referenceBlurRadius.value * density,
             gradientSpeed = gradientSpeed,
         )
-    } else {
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val blurEffects = remember(density) {
             BlurLayers.map { (radius, _) -> CouiCoverageBlurEffect(radius.value * density) }
         }
@@ -100,8 +102,10 @@ fun TopAppBarSurface(
             shape = { RectangleShape },
             effects = { progressiveBlur(blurEffects, fadeHeight) },
         )
+    } else {
+        // API 26–30 没有平台 RenderEffect；沿用遮罩色作无模糊实底，Transparent 时不铺底。
+        if (resolvedGradientColor.alpha > 0f) Modifier.background(resolvedGradientColor) else Modifier
     }
-    val resolvedGradientColor = gradientColor.takeOrElse { if (dark) Color.Black else Color.White }
     val gradient = remember(resolvedGradientColor, dark) {
         // 扩展色彩编码保留渐变透明度精度，避免每个节点先量化为 8 位。
         val color = resolvedGradientColor.convert(ColorSpaces.ExtendedSrgb)
@@ -160,6 +164,7 @@ private fun topBarGradientAlpha(position: Float, dark: Boolean): Float {
         span * t * (1f - t) * (startSlope * (1f - t) - endSlope * t)).coerceIn(0f, 1f)
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 private fun CouiBackdropEffectScope.progressiveBlur(blurEffects: List<CouiCoverageBlurEffect>, fadeHeight: androidx.compose.ui.unit.Dp) {
     if (!size.isSpecified || size.height <= 0f) return
 
@@ -178,6 +183,7 @@ private fun CouiBackdropEffectScope.progressiveBlur(blurEffects: List<CouiCovera
     renderEffect = combined.asComposeRenderEffect()
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 private fun CouiBackdropEffectScope.fadeEffect(positions: FloatArray, fadeHeight: androidx.compose.ui.unit.Dp): RenderEffect {
     // 渐变沿固定长度展开并锚定背景下沿, 折叠时只平移, 不随栏高压缩。
     // 起点允许超出顶部; 由渐变自身延续端点颜色, 不裁短坐标区间。

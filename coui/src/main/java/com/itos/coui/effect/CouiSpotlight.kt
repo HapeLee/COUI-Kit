@@ -34,13 +34,16 @@ import com.itos.coui.input.isCouiTouchCancelled
 import kotlin.math.PI
 import kotlin.math.pow
 
+/** 平台混色对象只在 API 33+ 绘制链创建，预设不持有 API 29 类型。 */
+internal enum class SpotlightBlend { Overlay, Plus, SrcOver }
+
 /** 原厂跟手光预设; 半径及光源高度使用设备像素, 不随 density 换算。 */
 enum class SpotlightPreset(
     internal val lightIntensity: Float,
     internal val darkIntensity: Float,
     internal val endRadius: Float,
-    internal val darkBlendMode: BlendMode = BlendMode.OVERLAY,
-    internal val lightBlendMode: BlendMode = BlendMode.OVERLAY,
+    internal val darkBlend: SpotlightBlend = SpotlightBlend.Overlay,
+    internal val lightBlend: SpotlightBlend = SpotlightBlend.Overlay,
     internal val ambient: Float = 0.4f,
     internal val diffuse: Float = 0.4f,
     internal val noise: Float = 0.08f,
@@ -48,9 +51,9 @@ enum class SpotlightPreset(
     TranslucentLarge1(0.6f, 0.1f, 800f),
     OpaqueSmall1(0.6f, 0.5f, 500f),
     OpaqueMedium1(0.6f, 0.8f, 500f),
-    OpaqueSmall2(1f, 0.15f, 500f, BlendMode.PLUS),
-    OpaqueMedium2(1f, 0.15f, 500f, BlendMode.PLUS),
-    ChipTab(0.2f, 0.3f, 600f, BlendMode.SRC_OVER, BlendMode.PLUS, 0.1f, 0.5f, 0f),
+    OpaqueSmall2(1f, 0.15f, 500f, SpotlightBlend.Plus),
+    OpaqueMedium2(1f, 0.15f, 500f, SpotlightBlend.Plus),
+    ChipTab(0.2f, 0.3f, 600f, SpotlightBlend.SrcOver, SpotlightBlend.Plus, 0.1f, 0.5f, 0f),
 }
 
 private data class SpotlightStyle(
@@ -60,7 +63,8 @@ private data class SpotlightStyle(
     val lightHeight: Float,
     val noise: Float,
     val dither: Float,
-    val blendMode: BlendMode = BlendMode.OVERLAY,
+    val blend: SpotlightBlend = SpotlightBlend.Overlay,
+    val blendMode: BlendMode? = null,
     val startRadius: Float = 100f,
     val endRadius: Float = 800f,
     val color: Color = Color.White,
@@ -105,7 +109,8 @@ fun rememberCouiSpotlight(
             lightHeight = lightHeight ?: 200f,
             noise = noise ?: preset.noise,
             dither = dither ?: 0f,
-            blendMode = blendMode ?: if (dark) preset.darkBlendMode else preset.lightBlendMode,
+            blendMode = blendMode,
+            blend = if (dark) preset.darkBlend else preset.lightBlend,
             startRadius = startRadius ?: 100f,
             endRadius = endRadius ?: preset.endRadius,
             color = color ?: Color.White,
@@ -114,6 +119,14 @@ fun rememberCouiSpotlight(
     } else {
         Modifier to null
     }
+
+/** 平台混色只在 API 33+ 的跟手光绘制链构造，避免旧系统初始化 API 29 类型。 */
+@RequiresApi(Build.VERSION_CODES.Q)
+private fun SpotlightBlend.toPlatformBlendMode(): BlendMode = when (this) {
+    SpotlightBlend.Overlay -> BlendMode.OVERLAY
+    SpotlightBlend.Plus -> BlendMode.PLUS
+    SpotlightBlend.SrcOver -> BlendMode.SRC_OVER
+}
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -136,7 +149,9 @@ private fun runtimeSpotlight(
         derivedStateOf(structuralEqualityPolicy()) { light.progress > 0f }
     }
     val shader = remember { RuntimeShader(SpotlightShader) }
-    val paint = remember(style.blendMode) { Paint().apply { blendMode = style.blendMode } }
+    val paint = remember(style.blendMode, style.blend) {
+        Paint().apply { blendMode = style.blendMode ?: style.blend.toPlatformBlendMode() }
+    }
     var inputCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
     val touchModifier = Modifier
         .onGloballyPositioned { inputCoordinates = it }

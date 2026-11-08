@@ -1,6 +1,7 @@
 package com.itos.coui.floatingactionbutton
 
 import android.graphics.BlendMode
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -21,6 +22,7 @@ object CouiFabDefaults {
         CouiFabColor.Recorder -> Color(if (dark) 0xFFEB493D else 0xFFEB3B2F)
     }
 
+    @RequiresApi(29)
     fun material(color: Color, dark: Boolean, extension: Int = 0): CouiFloatingMaterial =
         CouiFloatingMaterial(
             firstColor = color,

@@ -1,6 +1,7 @@
 package com.itos.coui.topappbar
 
 import android.graphics.BlendMode
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalDensity
@@ -21,6 +22,7 @@ internal val LocalCouiToolbarContentColor = staticCompositionLocalOf { Color.Uns
 object CouiTopAppBarButtonDefaults {
     val circleShape = CouiShape(999.dp, cornerWeight = 2f)
 
+    @RequiresApi(29)
     @Composable
     fun style(dark: Boolean = CouiTheme.isDark, search: Boolean = false): CouiToolbarStyle {
         val density = LocalDensity.current.density
@@ -35,6 +37,7 @@ object CouiTopAppBarButtonDefaults {
     }
 
     /** ToolbarMaterialEffectResolver 的 TOP_BAR 与 CAPSULE_1/CIRCLE_1；不含项目原有加深特化。 */
+    @RequiresApi(29)
     fun systemMaterial(dark: Boolean, capsule: Boolean): CouiFloatingMaterial = CouiFloatingMaterial(
         firstColor = Color(if (dark) 0xCC262626 else 0x66333333),
         firstBlendMode = if (dark) BlendMode.SRC_OVER else BlendMode.COLOR_DODGE,
@@ -46,6 +49,7 @@ object CouiTopAppBarButtonDefaults {
         innerGlowScale = if (capsule && !dark) 1.15f else 1f,
     )
 
+    @RequiresApi(29)
     fun material(dark: Boolean, capsule: Boolean, search: Boolean = false): CouiFloatingMaterial = CouiFloatingMaterial(
         firstColor = Color(if (dark) 0x80666666 else 0xA3666666),
         firstBlendMode = if (dark) BlendMode.OVERLAY else BlendMode.COLOR_DODGE,

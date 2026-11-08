@@ -194,7 +194,8 @@ internal fun CouiDialogWindow(
         window.setGravity(if (placement == CouiDialogPlacement.Bottom) Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL else Gravity.CENTER)
         window.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
         window.clearFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-        window.setBackgroundBlurRadius(0)
+        // 平台窗口背景模糊从 API 31 起可用；旧系统只清除标记并沿用普通遮罩。
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) window.setBackgroundBlurRadius(0)
         window.setDimAmount(colors.dimAmount)
         // 撤销压暗请求才会触发系统淡出；保留标记并把强度设为 0 会跳过动画。
         if (visible == false) {

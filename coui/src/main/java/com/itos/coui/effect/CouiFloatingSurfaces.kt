@@ -47,6 +47,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.min
 
+@RequiresApi(29)
 data class CouiFloatingMaterial(
     val firstColor: Color,
     val firstBlendMode: BlendMode,

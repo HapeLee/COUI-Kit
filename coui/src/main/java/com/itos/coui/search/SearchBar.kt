@@ -277,8 +277,9 @@ fun SearchBar(
             val textAlpha = (foreground.alpha * 255f * state.cancelProgress.coerceIn(0f, 1f)).roundToInt() / 255f
             val blur = (1f - state.cancelProgress).coerceAtLeast(0f) * CouiSearchBarDefaults.cancelContentBlurRadius
             BasicText(cancelText, Modifier.graphicsLayer {
-                renderEffect = if (blur > 0f) android.graphics.RenderEffect.createBlurEffect(blur, blur,
-                    android.graphics.Shader.TileMode.DECAL).asComposeRenderEffect() else null
+                renderEffect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && blur > 0f)
+                    android.graphics.RenderEffect.createBlurEffect(blur, blur,
+                        android.graphics.Shader.TileMode.DECAL).asComposeRenderEffect() else null
             }, style = cancelStyle.copy(color = foreground.copy(alpha = textAlpha)), maxLines = 1)
         }
     }) { children, constraints ->

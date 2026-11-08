@@ -91,6 +91,8 @@ internal fun couiMenuMaterial(
     val mix = if (dark) Color(0x99262626) else Color(0x99CDCDCD)
     val blend = if (dark) Color(0x99262626) else Color(0xBFEEEEEE)
     val themeTint = LocalCouiMenuStyle.current.themeTint
+    // 平台 RenderEffect 和 Gaussian 分支从 API 31 起可用；更低系统使用不透明的普通菜单。
+    val materialSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val runtimeShaderSupported = Build.VERSION.SDK_INT >= 33
     val blurredBackdrop = rememberCouiMenuBlur(backdrop, surface)
     val backgroundLayer = rememberGraphicsLayer()
@@ -101,7 +103,7 @@ internal fun couiMenuMaterial(
     val edgeFadeWidth = CouiMenuDefaults.subMenuEdgeFadeWidth.value * density.density
     val edgeFadeRadius = CouiMenuDefaults.subMenuEdgeFadeBlurRadius.value * density.density
     val edgeFadePadding = ceil(edgeFadeWidth + 3f * edgeFadeRadius).toInt()
-    if (edgeFadeLayer != null) {
+    if (materialSupported && edgeFadeLayer != null) {
         edgeFadeLayer.topLeft = IntOffset(-edgeFadePadding, -edgeFadePadding)
         edgeFadeLayer.blendMode = BlendMode.DstOut
         edgeFadeLayer.renderEffect = remember(edgeFadeRadius) {
@@ -109,14 +111,14 @@ internal fun couiMenuMaterial(
         }
     }
     val legacyBlurRadius = 12.dp.value * density.density
-    val blurPadding = if (runtimeShaderSupported) 0 else legacyBlurRadius.toInt()
+    val blurPadding = if (!materialSupported || runtimeShaderSupported) 0 else legacyBlurRadius.toInt()
     val edgeRadiusPx = LocalCouiMenuStyle.current.resolvedRadius.value * density.density
     val edgeWeight = (LocalCouiMenuStyle.current.shape as? CouiShape)?.cornerWeight ?: CouiCornerWeight
     val edge = if (runtimeShaderSupported) {
         rememberCouiMenuEdge(dark, edgeRadiusPx, edgeWeight, mix, blend)
     } else null
-    if (!runtimeShaderSupported) {
-        // shortcut: API 33 以下保留旧 Gaussian/Canvas 混合, 不视为厂商逐像素等价实现。
+    if (materialSupported && !runtimeShaderSupported) {
+        // shortcut: API 31–32 保留旧 Gaussian/Canvas 混合, 不视为厂商逐像素等价实现。
         backgroundLayer.renderEffect = remember(legacyBlurRadius) {
             BlurEffect(null, legacyBlurRadius, edgeTreatment = TileMode.Decal)
         }
@@ -150,7 +152,7 @@ internal fun couiMenuMaterial(
             )
             val target = coordinates
             drawRect(surface)
-            if (target != null && target.isAttached && size.width > 0f && size.height > 0f &&
+            if (materialSupported && target != null && target.isAttached && size.width > 0f && size.height > 0f &&
                 scaleX > 0f && scaleY > 0f && translation.isFinite
             ) {
                 if (Build.VERSION.SDK_INT >= 33) {
@@ -182,15 +184,15 @@ internal fun couiMenuMaterial(
                     drawLayer(mergeLayer)
                 }
             }
-            if (!runtimeShaderSupported) {
+            if (materialSupported && !runtimeShaderSupported) {
                 drawRect(mix, blendMode = BlendMode.Luminosity)
                 drawRect(blend, blendMode = BlendMode.Overlay)
             }
-            if (themeTintEnabled) {
+            if (materialSupported && themeTintEnabled) {
                 // 只引入页面色相, 保留材质亮度, 不让前景参与混色。
                 drawRect(themeTint, blendMode = BlendMode.Color)
             }
-            if (edgeFadeLayer != null && blendProgress > 0f) {
+            if (materialSupported && edgeFadeLayer != null && blendProgress > 0f) {
                 val outline = shape.createOutline(size, layoutDirection, density)
                 edgeFadeLayer.record(
                     density = density,
