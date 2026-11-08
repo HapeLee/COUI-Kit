@@ -20,6 +20,7 @@
   const state = {
     theme: "day", // "day" | "night"
     query: "",
+    styleFilter: "all",
     selectedIconName: null,
     selectedIconStyle: null,
     // colorSelection: null | { type: "preset", palette: "Day" | "Night", key: string, hex: string } | { type: "custom", hex: string }
@@ -30,8 +31,8 @@
 
   const dom = {
     html: document.documentElement,
-    themeDayBtn: document.getElementById("theme-day-btn"),
-    themeNightBtn: document.getElementById("theme-night-btn"),
+    themeToggleBtn: document.getElementById("theme-toggle-btn"),
+    styleFilterButtons: document.querySelectorAll("[data-style-filter]"),
     searchInput: document.getElementById("search-input"),
     searchClearBtn: document.getElementById("search-clear-btn"),
     iconCount: document.getElementById("icon-count"),
@@ -73,10 +74,10 @@
 
   function getFilteredIcons() {
     const q = state.query.trim().toLowerCase();
-    if (!q) {
-      return icons;
-    }
-    return icons.filter((item) => String(item.name || "").toLowerCase().includes(q));
+    return icons.map((icon) => state.styleFilter === "all"
+      ? icon
+      : variantsByName.get(icon.name).find((variant) => variant.style === state.styleFilter)
+    ).filter((icon) => icon && String(icon.name || "").toLowerCase().includes(q));
   }
 
   function getIconRawSvg(icon) {
@@ -307,7 +308,9 @@
 
     if (filtered.length === 0) {
       dom.emptyState.hidden = false;
-      dom.emptyStateText.textContent = `未找到包含 “${state.query.trim()}” 的图标`;
+      dom.emptyStateText.textContent = state.query.trim()
+        ? `未找到包含 “${state.query.trim()}” 的图标`
+        : "没有符合当前样式的图标";
       return;
     }
 
@@ -327,7 +330,7 @@
 
       const svgBox = document.createElement("div");
       svgBox.className = "icon-card-svg";
-      const svgEl = buildSvgElement(isSelected ? getSelectedIcon() : icon, false);
+      const svgEl = buildSvgElement(isSelected && state.styleFilter === "all" ? getSelectedIcon() : icon, false);
       if (svgEl) {
         svgBox.appendChild(svgEl);
       }
@@ -341,9 +344,9 @@
 
       btn.addEventListener("click", () => {
         const resetScroll = dom.detailPanel.hidden || state.selectedIconName !== icon.name;
-        if (state.selectedIconName !== icon.name) {
+        if (state.selectedIconName !== icon.name || state.styleFilter !== "all") {
           state.selectedIconName = icon.name;
-          state.selectedIconStyle = null;
+          state.selectedIconStyle = state.styleFilter === "all" ? null : icon.style;
         }
         dom.detailPanel.hidden = false;
         if (resetScroll) dom.detailContent.scrollTop = 0;
@@ -359,10 +362,13 @@
   }
 
   function syncGridSelection() {
+    const filtered = getFilteredIcons();
     dom.iconGrid.querySelectorAll(".icon-card").forEach((card) => {
       const matched = card.dataset.iconName === state.selectedIconName;
       if (matched || card.classList.contains("is-selected")) {
-        const icon = matched ? getSelectedIcon() : icons.find((item) => item.name === card.dataset.iconName);
+        const icon = matched && state.styleFilter === "all"
+          ? getSelectedIcon()
+          : filtered.find((item) => item.name === card.dataset.iconName);
         const svg = buildSvgElement(icon, false);
         card.querySelector(".icon-card-svg").replaceChildren(...(svg ? [svg] : []));
       }
@@ -478,11 +484,12 @@
     state.theme = nextTheme;
     dom.html.setAttribute("data-theme", nextTheme);
 
-    const isDay = nextTheme === "day";
-    dom.themeDayBtn.classList.toggle("is-active", isDay);
-    dom.themeDayBtn.setAttribute("aria-pressed", isDay ? "true" : "false");
-    dom.themeNightBtn.classList.toggle("is-active", !isDay);
-    dom.themeNightBtn.setAttribute("aria-pressed", !isDay ? "true" : "false");
+    const label = nextTheme === "day" ? "切换到夜间模式" : "切换到日间模式";
+    dom.themeToggleBtn.setAttribute("aria-label", label);
+    dom.themeToggleBtn.setAttribute("title", label);
+    dom.themeToggleBtn.setAttribute("aria-pressed", String(nextTheme === "night"));
+    const themeSvg = buildSvgElement(variantsByName.get("DarkLight")[0], false);
+    dom.themeToggleBtn.replaceChildren(...(themeSvg ? [themeSvg] : []));
 
     // 主题切换更新所有网格图标的默认原图以及右侧详情预览
     renderGrid();
@@ -557,8 +564,26 @@
   }
 
   function bindEvents() {
-    dom.themeDayBtn.addEventListener("click", () => setTheme("day"));
-    dom.themeNightBtn.addEventListener("click", () => setTheme("night"));
+    dom.themeToggleBtn.addEventListener("click", () => setTheme(state.theme === "day" ? "night" : "day"));
+    dom.styleFilterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        state.styleFilter = button.dataset.styleFilter;
+        dom.styleFilterButtons.forEach((item) => {
+          const active = item === button;
+          item.classList.toggle("is-active", active);
+          item.setAttribute("aria-pressed", String(active));
+        });
+        if (state.selectedIconName) {
+          if (!getFilteredIcons().some((icon) => icon.name === state.selectedIconName)) {
+            closeDetailPanel();
+          } else if (state.styleFilter !== "all") {
+            state.selectedIconStyle = state.styleFilter;
+          }
+        }
+        renderGrid();
+        updateDetailPanel();
+      });
+    });
     dom.detailCloseBtn.addEventListener("click", closeDetailPanel);
     dom.detailPanel.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeDetailPanel();
@@ -613,8 +638,7 @@
   function init() {
     renderPalettes();
     bindEvents();
-    renderGrid();
-    updateDetailPanel();
+    setTheme(state.theme);
   }
 
   init();

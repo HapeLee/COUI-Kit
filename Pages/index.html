@@ -4,29 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>COUI Icons — 图标浏览与复制</title>
-  <link rel="stylesheet" href="./style.css?v=7">
+  <link rel="stylesheet" href="./style.css?v=8">
 </head>
 <body>
   <div class="page-shell">
     <header class="top-nav" aria-label="顶部导航">
       <div class="brand">COUI Icons</div>
       <div class="top-actions">
-        <div class="theme-segmented" role="group" aria-label="主题模式切换">
-          <button
-            type="button"
-            id="theme-day-btn"
-            class="theme-btn is-active"
-            aria-pressed="true"
-            data-theme-mode="day"
-          >日间</button>
-          <button
-            type="button"
-            id="theme-night-btn"
-            class="theme-btn"
-            aria-pressed="false"
-            data-theme-mode="night"
-          >夜间</button>
-        </div>
+        <button type="button" id="theme-toggle-btn" class="theme-toggle-btn"
+          aria-label="切换到夜间模式" aria-pressed="false" title="切换到夜间模式"></button>
         <span class="top-divider" aria-hidden="true"></span>
         <a
           class="github-link"
@@ -74,6 +60,11 @@
         >清除</button>
       </div>
       <div class="toolbar-meta">
+        <div id="style-filter" class="theme-segmented" role="group" aria-label="筛选图标样式">
+          <button type="button" class="theme-btn is-active" data-style-filter="all" aria-pressed="true">全部</button>
+          <button type="button" class="theme-btn" data-style-filter="Filled" aria-pressed="false">Filled</button>
+          <button type="button" class="theme-btn" data-style-filter="Outlined" aria-pressed="false">Outlined</button>
+        </div>
         <span id="icon-count" class="icon-count" aria-live="polite">0 个图标</span>
       </div>
     </section>
@@ -156,6 +147,6 @@
   </div>
 
   <script src="./data.js?v=15"></script>
-  <script src="./app.js?v=6"></script>
+  <script src="./app.js?v=7"></script>
 </body>
 </html>

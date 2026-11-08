@@ -7,9 +7,9 @@ import com.itos.coui.icons.CouiIcons
 /** 各演示场景复用已核对调用来源的库图标。 */
 internal object DemoIcons {
     val Effects: ImageVector
-        @Composable get() = CouiIcons.Filled.Lab
+        @Composable get() = CouiIcons.Outlined.WandSpark
     val EffectsSelected: ImageVector
-        @Composable get() = CouiIcons.Filled.Lab
+        @Composable get() = CouiIcons.Filled.WandSpark
     val Settings: ImageVector
         @Composable get() = CouiIcons.Filled.Setting
     val SettingsSelected: ImageVector
