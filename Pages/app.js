@@ -11,6 +11,8 @@
   const icons = Array.from(variantsByName.values(), (variants) =>
     variants.find((icon) => icon.style === "Filled") || variants[0]
   );
+  const searchIndex = icons.findIndex((icon) => icon.name === "Search");
+  if (searchIndex > 0) icons.unshift(icons.splice(searchIndex, 1)[0]);
   const colors = rawData.colors && typeof rawData.colors === "object"
     ? rawData.colors
     : { Day: {}, Night: {} };
@@ -231,7 +233,7 @@
     return lines.join("\n");
   }
 
-  const PALETTE_KEYS = ["BLUE", "GREEN", "YELLOW", "RED", "ORANGE", "CYAN_BLUE"];
+  const PALETTE_KEYS = ["BLUE", "GREEN", "YELLOW", "RED", "ORANGE", "CYAN_BLUE", "GRAY", "DARK_GRAY"];
 
   /**
    * 在驼峰单词边界插入零宽空格，使长名称仅在词边界自然换行，避免在单词中间断行。
