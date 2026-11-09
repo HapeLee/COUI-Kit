@@ -10,9 +10,7 @@
   });
   const icons = Array.from(variantsByName.values(), (variants) =>
     variants.find((icon) => icon.style === "Filled") || variants[0]
-  );
-  const searchIndex = icons.findIndex((icon) => icon.name === "Search");
-  if (searchIndex > 0) icons.unshift(icons.splice(searchIndex, 1)[0]);
+  ).sort((a, b) => a.name.localeCompare(b.name, "en"));
   const colors = rawData.colors && typeof rawData.colors === "object"
     ? rawData.colors
     : { Day: {}, Night: {} };
@@ -46,6 +44,8 @@
     variantSwitch: document.getElementById("variant-switch"),
     variantFilledBtn: document.getElementById("variant-filled-btn"),
     variantOutlinedBtn: document.getElementById("variant-outlined-btn"),
+    colorSection: document.querySelector(".color-section"),
+    codeSection: document.querySelector(".code-section"),
     resetColorBtn: document.getElementById("reset-color-btn"),
     colorModeNotice: document.getElementById("color-mode-notice"),
     colorControls: document.getElementById("color-controls"),
@@ -78,7 +78,7 @@
     ).filter((icon) => icon && String(icon.name || "").toLowerCase().includes(q));
   }
 
-  function getIconRawSvg(icon) {
+  function getIconArtwork(icon) {
     if (!icon) {
       return "";
     }
@@ -100,7 +100,7 @@
    * 其余路径、渐变和透明度原样保留；original 模式禁止改色。
    */
   function buildSvgElement(icon, applySelectedColor) {
-    const rawSvg = getIconRawSvg(icon);
+    const rawSvg = getIconArtwork(icon);
     const wrapper = document.createElement("div");
     wrapper.innerHTML = rawSvg.trim();
     const svg = wrapper.querySelector("svg");
@@ -128,6 +128,14 @@
     }
 
     return svg;
+  }
+
+  function buildPreviewElement(icon, applySelectedColor) {
+    if (icon?.style !== "Bitmap") return buildSvgElement(icon, applySelectedColor);
+    const img = document.createElement("img");
+    img.alt = "";
+    img.src = getIconArtwork(icon);
+    return img;
   }
 
   function kotlinFloat(value) {
@@ -328,9 +336,9 @@
 
       const svgBox = document.createElement("div");
       svgBox.className = "icon-card-svg";
-      const svgEl = buildSvgElement(isSelected && state.styleFilter === "all" ? getSelectedIcon() : icon, false);
-      if (svgEl) {
-        svgBox.appendChild(svgEl);
+      const preview = buildPreviewElement(isSelected && state.styleFilter === "all" ? getSelectedIcon() : icon, false);
+      if (preview) {
+        svgBox.appendChild(preview);
       }
 
       const nameSpan = document.createElement("span");
@@ -367,8 +375,8 @@
         const icon = matched && state.styleFilter === "all"
           ? getSelectedIcon()
           : filtered.find((item) => item.name === card.dataset.iconName);
-        const svg = buildSvgElement(icon, false);
-        card.querySelector(".icon-card-svg").replaceChildren(...(svg ? [svg] : []));
+        const preview = buildPreviewElement(icon, false);
+        card.querySelector(".icon-card-svg").replaceChildren(...(preview ? [preview] : []));
       }
       card.classList.toggle("is-selected", matched);
       card.setAttribute("aria-expanded", matched ? "true" : "false");
@@ -435,6 +443,9 @@
 
   function updateDetailPanel() {
     const icon = getSelectedIcon();
+    const isBitmap = icon?.style === "Bitmap";
+    dom.colorSection.hidden = isBitmap;
+    dom.codeSection.hidden = isBitmap;
     dom.detailSvgContainer.innerHTML = "";
 
     if (!icon) {
@@ -447,11 +458,11 @@
       return;
     }
 
-    dom.copySvgBtn.disabled = false;
-    dom.copyVectorBtn.disabled = false;
-    const svgEl = buildSvgElement(icon, true);
-    if (svgEl) {
-      dom.detailSvgContainer.appendChild(svgEl);
+    dom.copySvgBtn.disabled = isBitmap;
+    dom.copyVectorBtn.disabled = isBitmap;
+    const preview = buildPreviewElement(icon, true);
+    if (preview) {
+      dom.detailSvgContainer.appendChild(preview);
     }
 
     dom.detailName.textContent = formatWrappableName(icon.name);
@@ -464,7 +475,8 @@
     const filled = variants.find((item) => item.style === "Filled");
     const outlined = variants.find((item) => item.style === "Outlined");
     const sharedGraphic = filled && outlined && filled.source && filled.source === outlined.source;
-    dom.detailSubtitle.textContent = `${icon.style} · ${modeLabelMap[icon.mode] || "COUI 图标"}${sharedGraphic ? " · 共用图形" : ""}`;
+    const modeLabel = isBitmap ? "PNG 原图" : modeLabelMap[icon.mode] || "COUI 图标";
+    dom.detailSubtitle.textContent = `${icon.style} · ${modeLabel}${sharedGraphic ? " · 共用图形" : ""}`;
     dom.variantSwitch.hidden = !(filled && outlined);
     [[dom.variantFilledBtn, "Filled"], [dom.variantOutlinedBtn, "Outlined"]].forEach(([button, style]) => {
       const active = icon.style === style;

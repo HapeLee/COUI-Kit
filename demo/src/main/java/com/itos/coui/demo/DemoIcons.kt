@@ -11,9 +11,9 @@ internal object DemoIcons {
     val EffectsSelected: ImageVector
         @Composable get() = CouiIcons.Filled.WandSpark
     val Settings: ImageVector
-        @Composable get() = CouiIcons.Filled.Setting
+        @Composable get() = CouiIcons.Filled.SettingDetail
     val SettingsSelected: ImageVector
-        @Composable get() = CouiIcons.Filled.Setting
+        @Composable get() = CouiIcons.Filled.SettingDetail
     val Tune: ImageVector
         @Composable get() = CouiIcons.Filled.Sun
     val Switch: ImageVector

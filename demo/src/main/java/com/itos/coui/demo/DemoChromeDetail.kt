@@ -69,7 +69,7 @@ private fun NavigationSample(dark: Boolean) {
                         CouiNavigationItem(title = titles[1], icon = DemoIcons.Effects, selectedIcon = DemoIcons.EffectsSelected),
                         CouiNavigationItem(title = titles[2], icon = DemoIcons.Settings, selectedIcon = DemoIcons.SettingsSelected)),
                     selectedIndex = selected, onSelection = { selected = it },
-                    leftIcon = CouiIcons.Filled.Setting, leftDescription = stringResource(R.string.nav_left_description),
+                    leftIcon = CouiIcons.Filled.SettingDetail, leftDescription = stringResource(R.string.nav_left_description),
                     rightIcon = CouiIcons.Filled.Add, rightDescription = stringResource(R.string.nav_right_description),
                     leftVisible = left, rightVisible = right,
                     rightContainerColor = CouiFabDefaults.containerColor(CouiFabColor.Notes, dark),

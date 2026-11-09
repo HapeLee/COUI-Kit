@@ -79,7 +79,8 @@ function parseIconOrder(source) {
   const order = {};
   const aliases = {};
   const sharedResources = new Map();
-  for (const style of ['Filled', 'Outlined', 'Monochrome']) {
+  const bitmapResources = new Map();
+  for (const style of ['Filled', 'Outlined', 'Monochrome', 'Bitmap']) {
     const declaration = new RegExp(`\\bobject\\s+${style}\\s*\\{`).exec(clean);
     if (!declaration) throw new Error(`Could not find CouiIcons.${style}`);
     const openBrace = declaration.index + declaration[0].lastIndexOf('{');
@@ -97,9 +98,17 @@ function parseIconOrder(source) {
     }
     if (endBrace === -1) throw new Error(`Unclosed CouiIcons.${style} declaration`);
     const body = clean.slice(openBrace + 1, endBrace);
-    const properties = [...body.matchAll(/^\s*val\s+([A-Z][A-Za-z0-9_]*)\s*:\s*ImageVector\s+@Composable\s+get\(\)\s*=\s*([^\n]+)/gm)];
+    const type = style === 'Bitmap' ? 'Painter' : 'ImageVector';
+    const propertyPattern = new RegExp(`^\\s*val\\s+([A-Z][A-Za-z0-9_]*)\\s*:\\s*${type}\\s+@Composable\\s+get\\(\\)\\s*=\\s*([^\\n]+)`, 'gm');
+    const properties = [...body.matchAll(propertyPattern)];
     if (properties.length === 0) throw new Error(`CouiIcons.${style} has no icon properties`);
-    if (style === 'Monochrome') {
+    if (style === 'Bitmap') {
+      for (const [, name, getter] of properties) {
+        const resource = getter.trim().match(/^couiBitmapResource\(R\.drawable\.(coui_[a-z0-9_]+)\)$/);
+        if (!resource || bitmapResources.has(name)) throw new Error(`Invalid Bitmap icon ${name}`);
+        bitmapResources.set(name, resource[1]);
+      }
+    } else if (style === 'Monochrome') {
       for (const [, name, getter] of properties) {
         const resource = getter.trim().match(/^couiIconResource\(R\.drawable\.(coui_[a-z0-9_]+)\)$/);
         if (!resource || sharedResources.has(name)) throw new Error(`Invalid Monochrome icon ${name}`);
@@ -110,7 +119,7 @@ function parseIconOrder(source) {
       aliases[style] = new Set(properties.filter(([, name, getter]) => getter.trim() === `Monochrome.${name}`).map((match) => match[1]));
     }
   }
-  return { order, aliases, sharedResources };
+  return { order, aliases, sharedResources, bitmapResources };
 }
 
 function parseXml(source, context) {
@@ -673,6 +682,15 @@ function getShapeSignature(spec) {
   }));
 }
 
+function readBitmapIcon(name, resource) {
+  const fileName = `${resource}.png`;
+  const dayPath = path.join(RESOURCE_DIR, 'drawable-nodpi', fileName);
+  const nightPath = path.join(RESOURCE_DIR, 'drawable-night-nodpi', fileName);
+  const encode = (file) => `data:image/png;base64,${fs.readFileSync(file).toString('base64')}`;
+  const day = encode(dayPath);
+  return { name, style: 'Bitmap', mode: 'original', day, night: fs.existsSync(nightPath) ? encode(nightPath) : day };
+}
+
 function validateGeneratedPayload({ icons, colors }) {
   if (icons.length === 0) throw new Error('Self-check failed: generated icon list is empty');
   if (!Object.keys(colors.Day).length || !Object.keys(colors.Night).length) {
@@ -683,6 +701,7 @@ function validateGeneratedPayload({ icons, colors }) {
     const key = `${icon.style}:${icon.name}`;
     if (seen.has(key)) throw new Error(`Self-check failed: duplicate icon ${key}`);
     seen.add(key);
+    if (icon.style === 'Bitmap') continue;
     if (!icon.day.startsWith('<svg') || !icon.day.includes('<path') || !icon.night.startsWith('<svg') || !icon.night.includes('<path')) {
       throw new Error(`Self-check failed: missing day/night SVG for ${key}`);
     }
@@ -708,7 +727,7 @@ function validateGeneratedPayload({ icons, colors }) {
 
 function main() {
   const couiColors = parseCouiColors(fs.readFileSync(COUI_COLOR_PATH, 'utf8'));
-  const { order: iconOrder, aliases, sharedResources } = parseIconOrder(fs.readFileSync(COUI_ICONS_PATH, 'utf8'));
+  const { order: iconOrder, aliases, sharedResources, bitmapResources } = parseIconOrder(fs.readFileSync(COUI_ICONS_PATH, 'utf8'));
   const rawDayColors = parseResourceColorFile(DAY_COLORS_PATH, true);
   const rawNightColors = new Map(rawDayColors);
   for (const [name, value] of parseResourceColorFile(NIGHT_COLORS_PATH, false)) {
@@ -772,7 +791,7 @@ function main() {
     }
   }
 
-  const originals = new Set(['AI', 'Google', 'Setting', 'Phone']);
+  const originals = new Set(['AI', 'Google', 'SettingDetail', 'Phone']);
   const byName = new Map();
   for (const entry of entries) {
     if (!byName.has(entry.name)) byName.set(entry.name, []);
@@ -806,6 +825,7 @@ function main() {
       vector: { day: entry.daySpec, night: entry.nightSpec },
     };
   });
+  for (const [name, resource] of bitmapResources) icons.push(readBitmapIcon(name, resource));
   const payload = { icons, colors: couiColors };
   validateGeneratedPayload(payload);
   fs.writeFileSync(OUTPUT_DATA_PATH, `window.COUI_ICON_DATA = ${JSON.stringify(payload, null, 2)};\n`, 'utf8');

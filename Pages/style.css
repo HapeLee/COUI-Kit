@@ -544,7 +544,8 @@ body {
   justify-content: center;
 }
 
-.icon-card-svg svg {
+.icon-card-svg svg,
+.icon-card-svg img {
   width: 100%;
   height: 100%;
   display: block;
@@ -657,7 +658,8 @@ body {
   margin-bottom: 16px;
 }
 
-.detail-svg-container svg {
+.detail-svg-container svg,
+.detail-svg-container img {
   width: 100%;
   height: 100%;
   display: block;
@@ -862,6 +864,11 @@ html[data-theme="night"] .swatch-btn {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.color-section[hidden],
+.code-section[hidden] {
+  display: none;
 }
 
 .copy-hint {

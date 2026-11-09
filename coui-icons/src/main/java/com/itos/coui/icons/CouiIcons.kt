@@ -3,11 +3,12 @@ package com.itos.coui.icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
- * 系统实际消费者矢量和已核实的 ColorOS 设置主页矢量；来源见 ICON_SOURCES.md。
- * 使用 M3 Icon 保留矢量内置色时，需传入 Color.Unspecified。
+ * COUI 的矢量与位图图标，来源见 ICON_SOURCES.md。
+ * 使用 M3 Icon 保留图标原色时，需传入 Color.Unspecified。
  */
 object CouiIcons {
 
@@ -29,6 +30,9 @@ object CouiIcons {
 
         val More: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_more_outlined)
+
+        val Scan: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_scan_outlined)
     }
 
     object Filled {
@@ -143,8 +147,8 @@ object CouiIcons {
         val CloudData: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_cloud_data_filled)
 
-        val Setting: ImageVector
-            @Composable get() = couiIconResource(R.drawable.coui_setting_filled)
+        val SettingDetail: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_setting_detail_filled)
 
         val Phone: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_phone_filled)
@@ -248,6 +252,17 @@ object CouiIcons {
 
         val More: ImageVector
             @Composable get() = Monochrome.More
+
+        val Scan: ImageVector
+            @Composable get() = Monochrome.Scan
+
+        /** 保留账号页设置图标的外轮廓与中心孔。 */
+        val Setting: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_setting_filled)
+
+        /** 填实云服务耳机图标的耳罩。 */
+        val Headset: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_headset_filled)
     }
 
     object Outlined {
@@ -310,5 +325,37 @@ object CouiIcons {
         /** com.heytap.cloud:drawable/coui_toolbar_menu_icon_more_normal。 */
         val More: ImageVector
             @Composable get() = Monochrome.More
+
+        /** com.oplus.account:drawable/ac_ic_menu_scan。 */
+        val Scan: ImageVector
+            @Composable get() = Monochrome.Scan
+
+        /** com.oplus.account:drawable/menu_ic_setting_normal。 */
+        val Setting: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_setting_outlined)
+    }
+
+    /** 位图原件按 COUI 主题选择日夜资源。 */
+    object Bitmap {
+        val IdCard: Painter
+            @Composable get() = couiBitmapResource(R.drawable.coui_id_card)
+
+        val RadarSweep: Painter
+            @Composable get() = couiBitmapResource(R.drawable.coui_radar_sweep)
+
+        val Family: Painter
+            @Composable get() = couiBitmapResource(R.drawable.coui_family)
+
+        val Smile: Painter
+            @Composable get() = couiBitmapResource(R.drawable.coui_smile)
+
+        val WarrantyCard: Painter
+            @Composable get() = couiBitmapResource(R.drawable.coui_warranty_card)
+
+        val GamepadWired: Painter
+            @Composable get() = couiBitmapResource(R.drawable.coui_gamepad_wired)
+
+        val DevicePair: Painter
+            @Composable get() = couiBitmapResource(R.drawable.coui_device_pair)
     }
 }

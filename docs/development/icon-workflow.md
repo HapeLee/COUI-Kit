@@ -1,6 +1,6 @@
 # 新增图标
 
-新增图标时，先确认目标应用和页面实际使用的资源，再将图形接入 `CouiIcons`。图形保存在 VectorDrawable XML 中，Compose 从同一份资源读取 `ImageVector`；网页生成器从 XML 生成预览。
+新增图标时，先确认目标应用和页面实际使用的资源，再将图形接入 `CouiIcons`。矢量保存在 VectorDrawable XML 中，供 Compose 加载 `ImageVector` 和网页生成预览。位图保留原始资源，通过 `CouiIcons.Bitmap` 提供 `Painter`。
 
 ## 确认目标和资源
 
@@ -13,7 +13,7 @@
 ## 处理资源与颜色
 
 - 对矢量资源，保留可用的 Android VectorDrawable XML 及必要的颜色资源。XML 需要完整的命名空间、宽高、viewport 和路径；资源表、未解析的主题或资源引用不能直接当作完整图标。预览异常时先检查实际资源类型和依赖，不要只改文件名。
-- 若 PNG 或 WebP 含无法忠实矢量化的细节，保留原图并列为待处理，不生成失真的矢量图。
+- PNG 或 WebP 可保留原图接入位图入口。通用资源放入 `drawable-nodpi`，夜间原图放入 `drawable-night-nodpi` 并使用相同文件名。
 - 单色图标保留各路径的 alpha，再按已确认的日夜色值使用 [CouiColor](../../coui/src/main/java/com/itos/coui/theme/CouiColor.kt)。多条路径只是透明度不同，仍可使用同一颜色；不能把未证实的颜色近似归入现有色板。需要新色时，先确认日夜值，再补充对应角色。
 - 多色和渐变图标保留各路径颜色及渐变，不使用整体单色 tint。若只有部分图层可换色，应分别处理：`AppUpdate` 只更改背景，白色前景保持不变。
 

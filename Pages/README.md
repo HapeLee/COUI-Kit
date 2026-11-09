@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-- **图标搜索与预览**：按名称搜索，并筛选全部、Filled 或 Outlined；点击图标，在右侧详情中查看和复制。
+- **图标搜索与预览**：列表按名称从 A 到 Z 排序，可按名称搜索并筛选 Filled、Outlined 或 Bitmap。Bitmap 详情显示当前主题的 PNG 原图。
 - **图标样式**：同名图标同时提供 `Filled` 和 `Outlined` 时，可在详情中切换；共用图形的样式会标明。
 - **日间 / 夜间模式切换**：点击顶部 DarkLight 图标按钮，切换页面主题与图标的日夜默认原图。
 - **COUI Colors 预设与手动选色**：
@@ -19,6 +19,8 @@
 - **复制图标源码**：复制当前主题和颜色的 SVG，或包含导入语句的 Compose `ImageVector` Kotlin 定义。复制的颜色为当前选择的固定值，不自动切换日夜主题。使用 `Icon` 显示时，设置 `tint = Color.Unspecified` 可保留颜色。
 
 ## 数据契约
+
+Bitmap 条目的 `style` 为 `Bitmap`，`day` 和 `night` 保存 PNG 数据地址。矢量条目提供 `vector` 供生成 ImageVector 源码。
 
 图标页从相对路径 `../data.js` 读取 `window.COUI_ICON_DATA`：
 
