@@ -9,7 +9,7 @@ COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和�
 - 新增 7 个账号页位图，通过 `CouiIcons.Bitmap` 获取 `Painter`。`DevicePair` 提供日间和夜间原图。
 - 新增 `CouiIcons.Outlined.Scan` 和设置齿轮的 Filled、Outlined 样式。原多色设置图标改名为 `CouiIcons.Filled.SettingDetail`，升级时请更新原有引用。
 - 新增 `CouiIcons.Filled.Headset`，在原耳机轮廓上填实两个耳罩。
-- 网页图标库新增 Bitmap 筛选，图标按名称从 A 到 Z 排序。
+- 网页图标库新增 Bitmap 筛选，图标按名称从 A 到 Z 排序。首页和图标库默认以 80% 比例显示。
 - 将 AndroidX DynamicAnimation 升至 `1.1.0`，解除严格锁版。修复关闭系统动画时 Slider 松手后仍停在按下高度的问题。[PR #22](https://github.com/ItosEO/COUI-Kit/pull/22)
 
 ## [0.0.1-alpha8] - 2026-11-09

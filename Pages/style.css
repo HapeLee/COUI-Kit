@@ -1,4 +1,6 @@
 :root {
+  --page-scale: 0.8;
+  zoom: var(--page-scale);
   scroll-padding-top: 92px;
   color-scheme: light;
   --bg-page: #f0f1f2;
@@ -256,8 +258,8 @@ body {
 
 /* 首页与图标页共用导航和主题，首页只保留项目入口。 */
 .home-shell {
-  min-height: 100vh;
-  min-height: 100svh;
+  min-height: calc(100vh / var(--page-scale));
+  min-height: calc(100svh / var(--page-scale));
   margin: 0 auto;
   padding-bottom: 24px;
   display: flex;
@@ -580,8 +582,8 @@ body {
   top: 92px;
   right: clamp(20px, 2.5vw, 48px);
   width: min(420px, calc(100% - 40px));
-  max-height: calc(100vh - 112px);
-  max-height: calc(100dvh - 112px);
+  max-height: calc(100vh / var(--page-scale) - 112px);
+  max-height: calc(100dvh / var(--page-scale) - 112px);
   overflow: hidden;
   background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
@@ -1045,8 +1047,8 @@ html[data-theme="night"] .copy-feedback.is-error {
     top: 78px;
     right: 12px;
     width: min(420px, calc(100% - 24px));
-    max-height: calc(100vh - 90px);
-    max-height: calc(100dvh - 90px);
+    max-height: calc(100vh / var(--page-scale) - 90px);
+    max-height: calc(100dvh / var(--page-scale) - 90px);
     border-radius: 22px;
   }
 
