@@ -37,7 +37,7 @@ android {
         minSdk = 31
         targetSdk = 37
         versionCode = gitCommitCount.get()
-        versionName = "0.0.1-alpha8"
+        versionName = "0.0.1-alpha9"
     }
     buildFeatures { compose = true }
     val demoSigning = if (signingValues.isNotEmpty()) {

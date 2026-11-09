@@ -2,6 +2,16 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
+## [0.0.1-alpha9] - 2026-11-09
+
+`coui`、`coui-material3` 与 `coui-icons` 同版本发行。源码见 [v0.0.1-alpha9](https://github.com/ItosEO/COUI-Kit/tree/v0.0.1-alpha9)，Demo 下载见 [Release](https://github.com/ItosEO/COUI-Kit/releases/tag/v0.0.1-alpha9)。
+
+- 新增 7 个账号页位图，通过 `CouiIcons.Bitmap` 获取 `Painter`。`DevicePair` 提供日间和夜间原图。
+- 新增 `CouiIcons.Outlined.Scan` 和设置齿轮的 Filled、Outlined 样式。原多色设置图标改名为 `CouiIcons.Filled.SettingDetail`，升级时请更新原有引用。
+- 新增 `CouiIcons.Filled.Headset`，在原耳机轮廓上填实两个耳罩。
+- 网页图标库新增 Bitmap 筛选，图标按名称从 A 到 Z 排序。
+- 将 AndroidX DynamicAnimation 升至 `1.1.0`，解除严格锁版。修复关闭系统动画时 Slider 松手后仍停在按下高度的问题。[PR #22](https://github.com/ItosEO/COUI-Kit/pull/22)
+
 ## [0.0.1-alpha8] - 2026-11-09
 
 `coui`、`coui-material3` 与 `coui-icons` 同版本发行。源码见 [v0.0.1-alpha8](https://github.com/ItosEO/COUI-Kit/tree/v0.0.1-alpha8)，发行附件见 [Release](https://github.com/ItosEO/COUI-Kit/releases/tag/v0.0.1-alpha8)。以下为相对 alpha7 的主要变更。
