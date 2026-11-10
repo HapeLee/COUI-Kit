@@ -81,7 +81,8 @@ internal fun DemoSettingsPage(
                             contentColor = colors.title,
                             textStyle = rememberCouiTextStyle(CouiTextKind.Toolbar), cursorColor = colors.accent,
                             material = { CouiTopAppBarButtonDefaults.systemMaterial(dark, it) },
-                            shadow = { CouiTopAppBarButtonDefaults.shadow(dark, it, density, contour, alphaScale = 1f) })) {
+                            shadow = { CouiTopAppBarButtonDefaults.shadow(dark, it, density, contour, alphaScale = 1f) },
+                        ).withDemoThemeTint()) {
                             Icon(CouiIcons.Filled.Back, backDescription, Modifier.size(24.dp))
                         }
                     } else Box(Modifier.size(48.dp).clip(CouiShape(24.dp, 2f))

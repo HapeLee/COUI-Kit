@@ -63,7 +63,8 @@ internal fun ToolbarSample() {
                     verticalAlignment = Alignment.CenterVertically) {
                     if (Build.VERSION.SDK_INT >= 34) {
                         val state = rememberCouiTopAppBarSearchState(expanded)
-                        TopAppBarSearch(Modifier.weight(1f), state = state,
+                        val style = CouiTopAppBarButtonDefaults.style(search = true).withDemoThemeTint()
+                        TopAppBarSearch(Modifier.weight(1f), state = state, style = style,
                             query = query, onQueryChange = { query = it },
                             onSearch = { keyboard?.hide() },
                             placeholder = stringResource(R.string.toolbar_search_hint),
@@ -76,7 +77,7 @@ internal fun ToolbarSample() {
                         }
                         TopAppBarButtonGroup {
                             TopAppBarActionVisibility(visible = showIcon) {
-                                TopAppBarSearchButton(state = state,
+                                TopAppBarSearchButton(state = state, style = style,
                                     onClick = { expanded = true; focusPending = true },
                                     contentDescription = stringResource(R.string.search_toolbar))
                             }
@@ -142,9 +143,10 @@ internal fun SearchSamples(dark: Boolean) {
                 if (Build.VERSION.SDK_INT >= 34) {
                     val state = rememberCouiTopAppBarSearchState(toolbarExpanded)
                     TopAppBarSurface(Modifier.fillMaxWidth(), backdrop, gradientColor = LocalDemoTopBarGradient.current) {
+                        val style = CouiTopAppBarButtonDefaults.style(search = true).withDemoThemeTint()
                         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically) {
-                            TopAppBarSearch(modifier = Modifier.weight(1f), state = state,
+                            TopAppBarSearch(modifier = Modifier.weight(1f), state = state, style = style,
                                 query = query, onQueryChange = { query = it },
                                 onSearch = { keyboard?.hide() },
                                 placeholder = stringResource(R.string.toolbar_search_hint),
@@ -157,7 +159,7 @@ internal fun SearchSamples(dark: Boolean) {
                                     color = MaterialTheme.colorScheme.onSurface)
                             }
                             TopAppBarButtonGroup {
-                                TopAppBarSearchButton(state = state,
+                                TopAppBarSearchButton(state = state, style = style,
                                     onClick = {
                                         if (active == null) {
                                             active = SearchSampleMode.Toolbar
