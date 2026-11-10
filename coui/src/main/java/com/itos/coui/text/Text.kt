@@ -54,21 +54,34 @@ fun Text(modifier: Modifier = Modifier, text: String, kind: CouiTextKind, color:
 }
 
 @Composable
-fun rememberCouiTextStyle(kind: CouiTextKind): TextStyle {
+fun rememberCouiTextStyle(kind: CouiTextKind): TextStyle = rememberCouiTextStyle(kind, kind.weight)
+
+@Composable
+internal fun rememberCouiSystemTextStyle(kind: CouiTextKind, size: Float = kind.size): TextStyle {
+    val weight = kind.weight
+    val adjustment = LocalConfiguration.current.fontWeightAdjustment
+    // Compose 的已加载字体会直接返回 Typeface，需在创建字体前应用系统字重补偿。
+    val adjustedWeight = if (adjustment == Configuration.FONT_WEIGHT_ADJUSTMENT_UNDEFINED) weight
+        else (weight + adjustment).coerceIn(1, 1000)
+    return rememberCouiTextStyle(kind, adjustedWeight, size)
+}
+
+@Composable
+private fun rememberCouiTextStyle(kind: CouiTextKind, weight: Int, size: Float = kind.size): TextStyle {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
-    return remember(kind, configuration, density) {
-        val typeface = Typeface.create(Typeface.create(kind.family, Typeface.NORMAL), kind.weight, false)
-        val fixedDp = kind == CouiTextKind.Toolbar || kind == CouiTextKind.PageTitle || kind == CouiTextKind.PreferenceValue
-        val pixels = if (fixedDp) kind.size * density.density else couiTextSize(kind, configuration) { with(density) { it.sp.toPx() } }
-        couiTextStyle(typeface, kind.weight, pixels, couiLineSpacing(kind),
+    return remember(kind, weight, size, configuration, density) {
+        val typeface = Typeface.create(Typeface.create(kind.family, Typeface.NORMAL), weight, false)
+        val fixedDp = kind == CouiTextKind.PageTitle || kind == CouiTextKind.PreferenceValue
+        val pixels = if (fixedDp) size * density.density else couiTextSize(kind, size, configuration) { with(density) { it.sp.toPx() } }
+        couiTextStyle(typeface, weight, pixels, couiLineSpacing(kind),
             includeFontPadding = kind != CouiTextKind.Toolbar && kind != CouiTextKind.PageTitle && kind != CouiTextKind.HomeTitle,
             density = density)
     }
 }
 
-private fun couiTextSize(kind: CouiTextKind, configuration: Configuration, spToPx: (Float) -> Float): Float {
-    val pixels = spToPx(kind.size).roundToInt().toFloat()
+private fun couiTextSize(kind: CouiTextKind, size: Float, configuration: Configuration, spToPx: (Float) -> Float): Float {
+    val pixels = spToPx(size).roundToInt().toFloat()
     if (kind == CouiTextKind.SearchCancel) {
         val base = (pixels / configuration.fontScale).roundToInt()
         return base * if (configuration.fontScale < 1.15f) 1f else 1.15f
