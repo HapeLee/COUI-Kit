@@ -143,7 +143,8 @@ fun SearchBar(
     val cancelSource = remember { MutableInteractionSource() }
     val press = rememberCouiPressMotion()
     val touch = rememberCouiTouchMotion(enabled && state.expanded && !state.running)
-    val bodyTouch = rememberCouiTouchMotion(enabled && !state.expanded && !state.running)
+    // 输入胶囊的跟手位移与宽度动画可同时运行。
+    val bodyTouch = rememberCouiTouchMotion(enabled)
     val bodyPress = rememberCouiPressMotion()
     val (bodyLightInput, bodyLight) = rememberCouiSpotlight(enabled, SpotlightPreset.OpaqueMedium2, dark)
     val (cancelLightInput, cancelLight) = rememberCouiSpotlight(enabled && state.expanded, SpotlightPreset.OpaqueMedium2, dark)
@@ -231,7 +232,7 @@ fun SearchBar(
             translationY = bodyTouch.translationY.value
             scaleX = node.scaleX
             scaleY = node.scaleY
-        }.couiTouchMotion(bodyTouch, enabled && !state.expanded && !state.running)
+        }.couiTouchMotion(bodyTouch, enabled)
             .couiPressMotion(bodyPress, enabled && !state.expanded && !state.running)
             .then(bodyLightInput).then(recordBody).clip(shape).couiToolbarFeedback(dark, bodySource, enabled && !state.expanded)
             .then(if (!state.expanded) Modifier.semantics { contentDescription = placeholder }

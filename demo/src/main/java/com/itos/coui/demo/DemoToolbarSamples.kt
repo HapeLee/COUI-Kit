@@ -2,6 +2,9 @@ package com.itos.coui.demo
 
 import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.ScrollState
 import androidx.compose.material3.MaterialTheme
@@ -128,7 +131,10 @@ internal fun SearchSamples(dark: Boolean) {
                 ToolbarPreviewList(query)
             }
         }) { backdrop ->
-            Column(Modifier.align(Alignment.TopCenter).fillMaxWidth()) {
+            // 搜索控件自行处理跟手变形，纵向拖动留在预览区，避免带动详情页滚动。
+            val dragBoundary = rememberDraggableState { }
+            Column(Modifier.align(Alignment.TopCenter).fillMaxWidth()
+                .draggable(dragBoundary, Orientation.Vertical)) {
                 SearchBar(Modifier.padding(vertical = 6.dp),
                     state = persistent, query = query, onQueryChange = { query = it },
                     onExpandedChange = {
