@@ -41,7 +41,7 @@ object CouiTopAppBarDefaults {
     /** 普通顶栏标题样式，跟随系统字体大小和字重补偿。 */
     @Composable
     fun titleTextStyle(): TextStyle =
-        rememberCouiSystemTextStyle(CouiTextKind.HomeTitle, size = CouiTextKind.Toolbar.size)
+        rememberCouiSystemTextStyle(CouiTextKind.HomeTitle, size = CouiTextKind.TopBar.size)
 
     @Composable
     internal fun expandedTitleTextStyle(): TextStyle =

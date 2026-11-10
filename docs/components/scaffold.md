@@ -28,7 +28,7 @@ fun NativePage(
             ) {
                 items(entries) { entry ->
                     Group {
-                        Item { Text(text = entry, kind = CouiTextKind.PreferenceTitle) }
+                        Item { Text(text = entry, kind = CouiTextKind.ItemTitle) }
                     }
                 }
             }
