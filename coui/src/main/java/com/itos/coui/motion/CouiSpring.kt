@@ -7,7 +7,7 @@ import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
 import kotlin.math.PI
 
-/** 普通 COUI 弹簧通道；运行中重定向保留速度，硬重置额外清除速度与监听状态。 */
+/** 普通 COUI 弹簧通道。运行中重定向保留速度，硬重置清除速度和动画内部状态。 */
 internal class CouiSpring(
     initial: Float,
     private val minimumChange: Float = 1f,
@@ -18,6 +18,8 @@ internal class CouiSpring(
     private var onFrame: ((Float) -> Unit)? = null
     private var onEnd: (() -> Unit)? = null
     private var needsReset = false
+    private var minValue = -Float.MAX_VALUE
+    private var maxValue = Float.MAX_VALUE
     private var animation = newAnimation()
 
     val state: State<Float> get() = position
@@ -25,6 +27,13 @@ internal class CouiSpring(
     val isRunning: Boolean get() = animation.isRunning
     var velocity: Float = 0f
         private set
+
+    /** 可选边界交给 AndroidX 积分器；仅裁剪绘制结果会改变越界期间的速度和回弹时机。 */
+    fun setBounds(minimum: Float, maximum: Float) {
+        require(minimum.isFinite() && maximum.isFinite() && minimum <= maximum)
+        minValue = minimum
+        maxValue = maximum
+    }
 
     fun animateTo(
         target: Float,
@@ -41,7 +50,9 @@ internal class CouiSpring(
         animation.spring.dampingRatio = 1f - bounce
         animation.spring.stiffness = ((2.0 * PI / response) * (2.0 * PI / response)).toFloat()
         animation.setMinimumVisibleChange(minimumChange)
-        if (!animation.isRunning) animation.setStartValue(value)
+        animation.setMinValue(minValue)
+        animation.setMaxValue(maxValue)
+        if (!animation.isRunning) animation.setStartValue(value.coerceIn(minValue, maxValue))
         if (velocity != null) {
             this.velocity = velocity
             animation.setStartVelocity(velocity)
@@ -63,7 +74,7 @@ internal class CouiSpring(
 
     fun cancelComplete() {
         cancel()
-        // 1.1.0 的 cancel 会清 pending 目标；完整重置仍用新实例表达原厂停止语义。
+        // DynamicAnimation 1.1.0 的 cancel 会清除待定目标，完整重置仍需清除速度和结束请求。
         if (needsReset) {
             animation = newAnimation()
             needsReset = false

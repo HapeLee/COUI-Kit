@@ -25,11 +25,13 @@ android {
 }
 
 dependencies {
-    implementation("io.github.itoseo:coui:0.0.1-alpha7")
+    implementation("io.github.itoseo:coui:0.0.1-alpha10")
 }
 ```
 
-库模块以 Android 8.0（API 26）为最低系统，编译时需要 `compileSdk` 37 和 AGP 9.1.0 或更高版本。应用仍需配置自己的 Android 与 Compose 插件。API 26–30 的顶栏、常驻搜索、菜单和弹窗使用不含模糊的明确填色，其余能力按平台门槛降级，详见[兼容要求](compatibility.md#效果门槛)。
+本 fork 源码的库模块以 Android 8.0（API 26）为最低系统，编译时需要 `compileSdk` 37 和 AGP 9.1.0 或更高版本。应用仍需配置自己的 Android 与 Compose 插件。API 26–30 的顶栏、常驻搜索、菜单和弹窗使用不含模糊的明确填色，其余能力按平台门槛降级，详见[兼容要求](compatibility.md#效果门槛)。
+
+本页 Maven 示例对应上游 `0.0.1-alpha10` 发行版，其最低系统仍为 API 31。需要 API 26 支持时，使用本 fork 的源码模块或自行发行的 fork 产物；不能用上游同名版本代替。
 
 当前版本为早期预览版，API 可能发生不兼容的变化。
 
@@ -42,8 +44,6 @@ dependencies {
 平台要求按能力分：普通控件、布局、输入和动画跟随库的最低系统；API 26–30 的顶栏、常驻搜索、菜单和弹窗使用无模糊的明确填色；渐进模糊、轮廓和融合要 API 33；底栏、FAB、顶栏按钮/展开式搜索、ChipTab 和普通阴影要 API 34。常驻 `SearchBar` 在 API 26–33 使用普通填色，API 34 起提供浮动材质与融合。调用 API 34 的组件前先判断版本，完整表格见[兼容要求](compatibility.md#效果门槛)。
 
 ## 显示第一个组件
-
-以下示例使用 `0.0.1-alpha7` 的无前缀组件名。旧版升级的名称和参数迁移规则见 [CHANGELOG](../../CHANGELOG.md#组件命名迁移)。
 
 在 Compose 页面中加入下面的滑条，拖动时更新 `value`：
 
@@ -123,9 +123,11 @@ dependencies {
 }
 ```
 
-源码模块还引用了 Maven Publish 和 Dokka 等插件别名。插件版本由项目统一声明，DynamicAnimation 的 `1.1.0` 版本声明也要保留，不使用严格锁版。工具链和依赖对齐见[兼容要求](compatibility.md)。
+源码模块还引用了 Maven Publish 和 Dokka 等插件别名。插件与依赖版本由项目统一声明。工具链和依赖对齐见[兼容要求](compatibility.md)。
 
 需要 M3 适配时，同样复制 `coui-material3/`，在 settings 增加 `include(":coui-material3")`，并在调用模块依赖 `project(":coui-material3")`。
+
+需要 `CouiIcons` 时，复制 `coui-icons/`，在 settings 增加 `include(":coui-icons")`，并在调用模块依赖 `project(":coui-icons")`。该模块依赖 `coui` 读取主题；只使用核心组件时不需要它。Maven 坐标及使用方式见[图标用法](../components/icons.md)。
 
 [demo/build.gradle.kts](../../demo/build.gradle.kts) 是完整示例，但不用照抄它的签名、应用标识或 Capsule 依赖。
 
@@ -137,7 +139,7 @@ dependencies {
 
 ## 常见问题
 
-**依赖解析失败或 Compose 编译失败**：检查 Maven Central 和项目的 Compose 插件。使用源码模块时，还要检查模块引用的库、插件别名和 DynamicAnimation 版本声明。
+**依赖解析失败或 Compose 编译失败**：检查 Maven Central 和项目的 Compose 插件。使用源码模块时，还要检查模块引用的库、插件别名和 DynamicAnimation 解析版本。
 
 **组件显示了，但背景材质不对**：检查系统版本，并确认背景源覆盖不透明内容，组件位于源节点之外。材质弹窗还需要传入 `material` 和宿主窗口的背景源。
 

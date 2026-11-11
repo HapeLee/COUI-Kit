@@ -99,11 +99,13 @@ import com.itos.coui.theme.ProvideCouiContent
 import com.itos.coui.topappbar.CouiTopAppBarButtonDefaults
 import com.itos.coui.shape.CouiCapsuleShape
 
-data class CouiNavigationItem(val title: String, val icon: ImageVector, val selectedIcon: ImageVector)
+/** [selectedIcon] 用于选中和拖动预选，省略时两种状态共用 [icon]。 */
+data class CouiNavigationItem(val title: String, val icon: ImageVector, val selectedIcon: ImageVector = icon)
 
 /**
  * 只负责底栏装配，页面状态和导航提交仍由宿主持有。
  * 附件点击回调为空时只显示图标并保留拖拽，不创建点击或 Button 语义。
+ * 省略 [renderer] 时创建独立的三主体绘制器。宿主可先创建绘制器并处理失败，再显式传入。
  */
 @RequiresApi(34)
 @Composable
@@ -112,7 +114,7 @@ fun NavigationBar(
     backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) {
         "底栏需要显式 backdrop 或 COUI Scaffold 的独立栏位"
     },
-    renderer: CouiFloatingRenderer,
+    renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer() },
     items: List<CouiNavigationItem>,
     selectedIndex: Int,
     leftIcon: ImageVector? = null,
@@ -129,6 +131,8 @@ fun NavigationBar(
     themeTint: Color = CouiTheme.materialTintFor(dark),
     circleShape: Shape = CouiTopAppBarButtonDefaults.circleShape,
     capsuleShape: Shape = CouiCapsuleShape,
+    selectedColor: Color = (if (dark) Color.White else Color.Black).copy(alpha = 230f / 255f),
+    unselectedColor: Color = (if (dark) Color.White else Color.Black).copy(alpha = 184f / 255f),
     onSelection: (Int) -> Unit,
 ) {
     require(items.isNotEmpty() && selectedIndex in items.indices)
@@ -346,6 +350,7 @@ fun NavigationBar(
                     ) {
                         items.forEachIndexed { index, item ->
                             val isSelected = previewSelection == index
+                            val itemContentColor = if (isSelected) selectedColor else unselectedColor
                             val interactionSource = remember { MutableInteractionSource() }
                             Box(
                                 Modifier.weight(1f).height(48.dp)
@@ -371,10 +376,10 @@ fun NavigationBar(
                                     verticalArrangement = Arrangement.Top,
                                 ) {
                                     Icon(modifier = Modifier.size(24.dp), imageVector = if (isSelected) item.selectedIcon else item.icon,
-                                        contentDescription = null, tint = foreground)
+                                        contentDescription = null, tint = itemContentColor)
                                     Spacer(Modifier.height(2.dp))
                                     ProvideCouiContent {
-                                        Text(text = item.title, color = foreground.copy(alpha = if (isSelected) 230f / 255f else 184f / 255f), fontSize = 10.sp,
+                                        Text(text = item.title, color = itemContentColor, fontSize = 10.sp,
                                             lineHeight = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                     }
                                 }

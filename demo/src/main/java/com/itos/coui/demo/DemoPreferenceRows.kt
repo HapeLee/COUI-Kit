@@ -47,7 +47,7 @@ internal fun DemoPreference(
     val colors = CouiPageDefaults.themeColors(dark)
     DemoPreferenceRow(modifier, title, summary, enabled, icon, onClick = onClick) {
         if (!value.isNullOrEmpty()) Text(Modifier.widthIn(max = 162.dp).padding(start = 16.dp),
-            text = value, kind = CouiTextKind.PreferenceValue,
+            text = value, kind = CouiTextKind.ItemValue,
             color = if (enabled) colors.summary else colors.disabled, textAlign = TextAlign.End,
             maxLines = 2, overflow = TextOverflow.Ellipsis)
         if (showChevron) DemoSettingsArrow(Modifier.padding(start = 4.dp).size(width = 12.dp, height = 24.dp),
@@ -139,10 +139,10 @@ internal fun DemoPreferenceRow(modifier: Modifier, title: String, summary: Strin
     val colors = CouiPageDefaults.themeColors()
     Item(modifier, icon = icon, onClick = onClick, enabled = enabled,
         contentPadding = contentPadding, title = {
-        Text(text = title, kind = CouiTextKind.PreferenceTitle, color = if (enabled) colors.title else colors.disabled,
+        Text(text = title, kind = CouiTextKind.ItemTitle, color = if (enabled) colors.title else colors.disabled,
             textAlign = TextAlign.Start)
     }, summary = summary?.takeIf { it.isNotEmpty() }?.let { text -> @Composable {
-        Text(text = text, kind = CouiTextKind.PreferenceSummary, color = if (enabled) colors.summary else colors.disabled,
+        Text(text = text, kind = CouiTextKind.ItemSummary, color = if (enabled) colors.summary else colors.disabled,
             textAlign = TextAlign.Start)
     } }, trailing = trailing)
 }
@@ -150,5 +150,6 @@ internal fun DemoPreferenceRow(modifier: Modifier, title: String, summary: Strin
 /** 原始 VectorDrawable 保留 RTL 镜像与原生 viewport。 */
 @Composable
 internal fun DemoSettingsArrow(modifier: Modifier, back: Boolean, color: Color) {
-    Icon(if (back) CouiIcons.Back else CouiIcons.Next, null, modifier, tint = color)
+    val icon = if (back) CouiIcons.Filled.Back else CouiIcons.Filled.Next
+    Icon(icon, null, modifier, tint = color)
 }

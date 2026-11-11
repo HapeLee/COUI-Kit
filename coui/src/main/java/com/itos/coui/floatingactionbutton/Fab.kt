@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
@@ -49,6 +50,7 @@ import com.itos.coui.shape.CouiShape
 /**
  * 使用 CouiShape 时, 裁剪与材质共用半径和权重, 普通投影使用相同半径的 caster。
  * 相邻 FAB 可启用 foregroundComposition, 在不透明 SDR 背景上只叠加自身前景, 避免背景回填擦除兄弟节点。
+ * 省略 [renderer] 时创建独立的单主体绘制器。宿主可先创建绘制器并处理失败，再显式传入。
  */
 @RequiresApi(34)
 @Composable
@@ -57,13 +59,14 @@ fun Fab(
     backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) {
         "FAB 需要显式 backdrop 或 COUI Scaffold 的独立栏位"
     },
-    renderer: CouiFloatingRenderer,
-    onClick: (() -> Unit)? = null,
+    renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
+    onClick: () -> Unit,
     dark: Boolean = CouiTheme.isDark,
     shape: Shape = CouiFabDefaults.circleShape,
     material: CouiFloatingMaterial? = null,
     shadow: CouiFloatingShadow? = null,
     foregroundComposition: Boolean = false,
+    contentColor: Color = CouiFabDefaults.contentColor,
     content: @Composable () -> Unit,
 ) {
     val contour = LocalCouiContourGlowEnabled.current
@@ -106,13 +109,12 @@ fun Fab(
                 .drawWithContent { contentLayer.record { this@drawWithContent.drawContent() } }
                 .clip(shape).drawBehind { drawLight?.invoke(this) }
                 .couiFabFeedback(dark, interactionSource)
-                .then(if (onClick != null) Modifier.clickable(
+                .clickable(
                     interactionSource = interactionSource, indication = null, role = Role.Button, onClick = onClick,
-                ) else Modifier),
+                ),
             contentAlignment = Alignment.Center,
         ) {
-            ProvideCouiContent(color = if (material == null) colors.onAccent else androidx.compose.ui.graphics.Color.Unspecified,
-                content = content)
+            ProvideCouiContent(color = contentColor, content = content)
         }
     }
 }

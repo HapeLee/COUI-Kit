@@ -79,10 +79,11 @@ internal fun DemoSettingsPage(
                     if (Build.VERSION.SDK_INT >= 34) {
                         TopAppBarButton(onClick = onBack, style = CouiTopAppBarButtonDefaults.style(dark).copy(
                             contentColor = colors.title,
-                            textStyle = rememberCouiTextStyle(CouiTextKind.Toolbar), cursorColor = colors.accent,
+                            textStyle = rememberCouiTextStyle(CouiTextKind.TopBar), cursorColor = colors.accent,
                             material = { CouiTopAppBarButtonDefaults.systemMaterial(dark, it) },
-                            shadow = { CouiTopAppBarButtonDefaults.shadow(dark, it, density, contour, alphaScale = 1f) })) {
-                            Icon(CouiIcons.Back, backDescription, Modifier.size(24.dp))
+                            shadow = { CouiTopAppBarButtonDefaults.shadow(dark, it, density, contour, alphaScale = 1f) },
+                        ).withDemoThemeTint()) {
+                            Icon(CouiIcons.Filled.Back, backDescription, Modifier.size(24.dp))
                         }
                     } else Box(Modifier.size(48.dp).clip(CouiShape(24.dp, 2f))
                         .couiButtonFeedback(dark, source, true)
@@ -91,7 +92,8 @@ internal fun DemoSettingsPage(
                         DemoSettingsArrow(Modifier.size(24.dp), back = true, color = colors.title)
                     }
             }
-            val barColors = CouiTopAppBarDefaults.colors(titleColor = colors.title, dark = dark)
+            val barColors = CouiTopAppBarDefaults.colors(backgroundColor = LocalDemoTopBarGradient.current,
+                titleColor = colors.title, dark = dark)
             LargeTopAppBar(title = {
                 androidx.compose.material3.Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }, navigationIcon = navigation, actions = { actions() },

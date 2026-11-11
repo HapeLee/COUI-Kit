@@ -4,7 +4,7 @@
 
 ## 最小调用
 
-FAB 需要 API 34、页面背景源和单独的 standalone renderer。放入 COUI Scaffold 的 `floatingActionButton` 时可省略 `backdrop`，容器自动提供正文源；显式参数优先。下面示例显式接收背景源，适用于第三方容器。页面提供内容，需要业务操作时再传入点击回调：
+FAB 需要 API 34 和页面背景源。放入 COUI Scaffold 的 `floatingActionButton` 时可省略 `backdrop`，容器自动提供正文源。显式参数优先。下面示例适用于第三方容器，页面提供背景源、按钮内容和点击回调。
 
 ~~~kotlin
 @RequiresApi(34)
@@ -15,12 +15,11 @@ fun PageFab(
     onClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val renderer = remember { CouiFloatingRenderer.standalone() }
-    Fab(modifier = modifier, backdrop = backdrop, renderer = renderer, onClick = onClick, content = content)
+    Fab(modifier = modifier, backdrop = backdrop, onClick = onClick, content = content)
 }
 ~~~
 
-省略 material 时，底色取 COUI 强调色，内容色取 `onAccent`；省略 shadow 时，阴影颜色从最终 `material.firstColor` 取得。显式 material 使用宿主 ambient 内容色，子内容的显式颜色优先。FAB 不使用页面 `themeTint`。通用主题规则见[外观与预设](../guide/appearance.md)；强调色生成策略（包括 HCT）由宿主负责。
+省略 material 时，底色取 COUI 强调色；省略 shadow 时，阴影颜色从最终 `material.firstColor` 取得。内容色在日间和夜间默认均为不透明白色，也适用于显式 material。可用 `contentColor` 覆盖，子内容的显式颜色优先。FAB 不使用页面 `themeTint`。通用主题规则见[外观与预设](../guide/appearance.md)；强调色生成策略（包括 HCT）由宿主负责。
 
 ## 使用显式配色预设
 
@@ -37,14 +36,12 @@ fun PresetFab(
     onClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val renderer = remember { CouiFloatingRenderer.standalone() }
     val color = CouiFabDefaults.containerColor(preset, dark)
     val density = LocalDensity.current.density
     val contour = LocalCouiContourGlowEnabled.current
     Fab(
         modifier = modifier,
         backdrop = backdrop,
-        renderer = renderer,
         onClick = onClick,
         dark = dark,
         shape = CouiShape(999.dp, cornerWeight = 2f),
@@ -55,7 +52,7 @@ fun PresetFab(
 }
 ~~~
 
-`preset` 可以选择 `Notes`、`Phone`、`InfraredRemote` 或 `Recorder`。按钮内容通过 `content` 传入，点击时调用 `onClick`。省略回调时保留展示和拖拽反馈，不添加点击或 Button 语义。
+`preset` 可以选择 `Notes`、`Phone`、`InfraredRemote` 或 `Recorder`。按钮内容通过 `content` 传入，点击时调用必传的 `onClick`。仅展示交互效果时可传入 `onClick = {}`，按钮仍保留点击、焦点和无障碍语义。
 
 拖拽超过系统触摸阈值后，FAB 接管移动事件，避免带动父级滚动；轻触仍交给已提供的点击回调。
 
@@ -67,13 +64,11 @@ COUI Scaffold 的 `floatingActionButton` 已应用正文占位 Padding 并消费
 
 ~~~kotlin
 val color = Color(0xFF0080FF)
-val renderer = remember { CouiFloatingRenderer.standalone() }
 val density = LocalDensity.current.density
 val contour = LocalCouiContourGlowEnabled.current
 
 Fab(
     backdrop = backdrop,
-    renderer = renderer,
     onClick = onClick,
     dark = dark,
     shape = CouiShape(999.dp, cornerWeight = 2f),
@@ -87,7 +82,7 @@ Fab(
 
 ## 图标和轮廓光
 
-启用 M3 适配后，省略材质的 FAB 会向 M3 图标提供主题 `onAccent`。显式材质保持 ambient 内容色；预设或自定义底色可显式设置 `tint`。
+启用 M3 适配后，FAB 会向 M3 `Icon` 提供内容色，图标可省略 `tint`。要覆盖整个内容槽，可传入 `contentColor = Color.Black` 等颜色；`contentColor = Color.Unspecified` 表示继承外部内容色。子图标显式指定 `tint` 时优先使用该值，`Image` 不会自动读取内容色。
 
 轮廓光由 `LocalCouiContourGlowEnabled` 控制；关闭后，`CouiFabDefaults.shadow` 使用普通有色投影。
 
@@ -98,7 +93,6 @@ Fab(
 ~~~kotlin
 Fab(
     backdrop = backdrop,
-    renderer = renderer,
     onClick = onClick,
     shape = CouiFabDefaults.roundedSquareShape,
     content = content,
@@ -111,7 +105,7 @@ Fab(
 
 ## 版本和绘制空间
 
-每个 FAB 使用独立的 `CouiFloatingRenderer.standalone()`，不要与其他绘制节点共用。
+每个 FAB 默认创建独立的单主体绘制器。宿主需要处理 Shader 初始化失败时，可以先用 `CouiFloatingRenderer.standalone()` 创建绘制器，成功后通过 `renderer` 传入 FAB。每个 FAB 各用一个实例。
 
 组合相邻 FAB 时，传入 `foregroundComposition = true`。材质和外光晕将以透明前景叠加，拖拽形变时不会用矩形背景回填覆盖相邻按钮。此模式要求背景源覆盖不透明 SDR 页面，并排除所有 FAB；各按钮仍保留自己的 renderer、输入和动画。重叠区域的光效不包含兄弟前景采样，合成边界见[浮动表面](../effects/floating-surfaces.md#几何与绘制)。
 
