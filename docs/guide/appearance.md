@@ -90,7 +90,7 @@ MaterialTheme {
 `shape`、`color`、`onClick` 与 `content` 由宿主提供。蒙层覆盖内容，真实圆角由外层 clip 决定。
 按下开始和取消遵守 Foundation 点击识别，复用列表的最低按压进度与失焦收尾；不会在原始 DOWN
 就点亮，因此与显式 `couiButtonFeedback(list = true)` 的提前触摸反馈并非完全相同。
-这种装配使子按钮的按压不会直接驱动父卡片的蒙层。默认纵向回弹的能力边界见[边界回弹](../effects/overscroll.md)。
+这种装配使子按钮的按压不会直接驱动父卡片的蒙层。默认横向/纵向回弹的能力边界见[边界回弹](../effects/overscroll.md)。
 
 局部替换 `LocalIndication` 或 `LocalOverscrollFactory` 应放在 CouiTheme 内层；后者提供 null 可关闭默认回弹。
 中型操作按钮若要复用顶栏动效，由宿主选择顶栏组件或组合已有运动与光效，不由 Theme 按尺寸推断。

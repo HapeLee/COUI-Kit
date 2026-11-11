@@ -45,8 +45,10 @@ val scrolling = Modifier.couiVerticalScroll(scroll, overscrollEffect = edge)
 ## 接入其他滚动容器
 
 `CouiTheme` 默认通过 `LocalOverscrollFactory` 为子树中未显式指定效果的 Foundation 容器创建
-独立 `CouiOverscrollEffect`。例如 `LazyColumn { … }` 不再需要逐个传入边界效果。
-这是**纵向边界效果**：不提供横向回弹，不修改列表惯性，短内容和空内容是否接受拖动仍取决于容器。
+独立 `CouiOverscrollEffect`。例如 `LazyColumn { … }`、`LazyRow { … }` 不再需要逐个传入边界效果，
+标准 `verticalScroll` / `horizontalScroll` 也可继承。工厂实例按首个非零滚动或 fling 确定物理轴，
+直到节点移除前不换轴；同一实例不提供二维平移。零位移不会提前锁定纵向。
+效果不修改列表惯性，短内容和空内容是否接受拖动仍取决于容器。
 不能把主题包裹当成接入完整 COUI RecyclerView 滚动物理。
 
 仅调整一棵子树的触觉时，可在主题内使用：
@@ -59,6 +61,27 @@ CompositionLocalProvider(
 
 显式 `overscrollEffect = null` 或局部提供 `LocalOverscrollFactory provides null` 可关闭对应效果。
 一个工厂创建多个独立 effect，不共享动画节点；节点移除停止其运动。
+
+### 显式横向回弹
+
+已知方向时可直接指定，避免依赖自动选轴：
+
+```kotlin
+val edge = rememberCouiOverscrollEffect(orientation = Orientation.Horizontal)
+LazyRow(overscrollEffect = edge) {
+    // 列表内容
+}
+```
+
+同一个 effect 也能传给 `Modifier.horizontalScroll(state, overscrollEffect = edge)`，但不能同时挂到
+两个容器，也不要再额外叠加 `Modifier.overscroll(edge)`。RTL / reverseLayout 的正负方向由
+Foundation 容器转换，回弹按物理 X 轴移动，不再自行翻转。
+
+横向路径复用现有 Chip 分类栏的整数阻尼、屏幕宽度映射与 SpringOverScroller 轴配置；纵向保留
+Settings 列表的高度映射、反向阻尼与高速释放规则。横向反向越界先收回边界，再把剩余输入交回容器。
+这是 Foundation 单轴容器的适配，不替换完整 COUIHorizontalScrollView，也不改动 ChipTabRow。
+默认不带方向参数的 `rememberCouiOverscrollEffect()` 继续创建纵向实例；`couiVerticalScroll`
+只接受纵向或尚未选轴的实例。
 
 `CouiOverscrollEffect` 实现 Foundation 的 `OverscrollEffect`，可传给支持它的容器。此时正常惯性由该容器负责。标准接口不提供每帧速度，effect 只能在宿主 `performFling` 返回后取得剩余速度，触边时序与 `couiVerticalScroll` 不同。
 

@@ -11,6 +11,6 @@
 | [轮廓与跟手光](lighting.md) | 独立光效、预设与状态反馈 |
 | [运动与跟随回弹](motion.md) | 触摸形变、按压与双主体跟随 |
 | [横向双主体融合](metaball.md) | 同色融合背景及 DstIn 内容遮罩 |
-| [边界回弹](overscroll.md) | COUI 纵向惯性及长、短、空内容的边缘反馈 |
+| [边界回弹](overscroll.md) | 横向/纵向边界反馈，以及完整纵向惯性入口 |
 
 运行要求见[兼容要求](../guide/compatibility.md)，Shape 和组件 Defaults 见[外观与预设](../guide/appearance.md)。

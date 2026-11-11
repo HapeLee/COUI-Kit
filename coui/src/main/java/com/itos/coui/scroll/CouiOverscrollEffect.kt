@@ -51,32 +51,63 @@ import kotlin.math.sign
 import kotlin.math.sqrt
 
 /**
- * Settings COUIRecyclerView 的纵向越界阻尼和回弹；不绘制平台 glow / Compose stretch。
- * 每个滚动容器持有独立实例，传给 verticalScroll 的 overscrollEffect，不能多节点共用。
+ * 单轴越界阻尼和回弹；纵向沿用 Settings 列表，横向复用 Chip 分类栏的物理配置。
+ * 每个滚动容器持有独立实例，传给容器的 overscrollEffect，不能多节点共用。
  * 只持有边界运动，常规滚动、列表数据与 fling owner 仍由宿主滚动容器提供。
  */
 class CouiOverscrollEffect internal constructor(private val scope: CoroutineScope, private val overscrollDistance: Int,
     private val nominalFrameSeconds: Float, private val view: View,
-    private val hapticFeedbackEnabled: Boolean) : OverscrollEffect {
+    private val hapticFeedbackEnabled: Boolean, private val orientation: Orientation? = Orientation.Vertical) : OverscrollEffect {
     private var translation by mutableFloatStateOf(0f)
-    private var mappingScreenHeight = overscrollDistance
-    private val physics = CouiScrollPhysics(1, springBackTensionMultiple = 2.15f, scrollView = false)
+    private val horizontalDistance = view.resources.displayMetrics.widthPixels.coerceAtLeast(1)
+    internal var selectedOrientation = orientation
+        private set
+    private var dragDistance = if (orientation == Orientation.Horizontal) horizontalDistance else overscrollDistance
+    private var mappingScreenExtent = dragDistance
+    private var axisPhysics = orientation?.let(::createPhysics)
+    private val physics: CouiScrollPhysics get() = checkNotNull(axisPhysics)
     private var animation: Job? = null
     private var fling: Job? = null
     private var touched = false
     private var disposed = false
     private var overflowFling = false
-    override val isInProgress: Boolean get() = translation != 0f || physics.running
+    override val isInProgress: Boolean get() = translation != 0f || axisPhysics?.running == true
     override val node: DelegatableNode = EdgeNode()
 
+    private fun createPhysics(axis: Orientation) = CouiScrollPhysics(1,
+        springBackTensionMultiple = if (axis == Orientation.Horizontal) 3.2f else 2.15f,
+        scrollView = axis == Orientation.Horizontal)
+
+    private fun selectAxis(x: Float, y: Float): Boolean {
+        if (selectedOrientation != null) return true
+        if (x == 0f && y == 0f) return false
+        val axis = if (abs(x) > abs(y)) Orientation.Horizontal else Orientation.Vertical
+        selectedOrientation = axis
+        axisPhysics = createPhysics(axis)
+        dragDistance = if (axis == Orientation.Horizontal) horizontalDistance else overscrollDistance
+        mappingScreenExtent = screenExtent()
+        return true
+    }
+
+    private fun screenExtent(): Int = view.resources.displayMetrics.let {
+        (if (selectedOrientation == Orientation.Horizontal) it.widthPixels else it.heightPixels).coerceAtLeast(1)
+    }
+
+    private fun Offset.axis(): Float = if (selectedOrientation == Orientation.Horizontal) x else y
+    private fun Velocity.axis(): Float = if (selectedOrientation == Orientation.Horizontal) x else y
+    private fun Offset.withAxis(value: Float): Offset =
+        if (selectedOrientation == Orientation.Horizontal) copy(x = value) else copy(y = value)
+    private fun Velocity.withAxis(value: Float): Velocity =
+        if (selectedOrientation == Orientation.Horizontal) copy(x = value) else copy(y = value)
+
     override fun applyToScroll(delta: Offset, source: NestedScrollSource, performScroll: (Offset) -> Offset): Offset {
-        if (disposed) return performScroll(delta)
+        if (disposed || !selectAxis(delta.x, delta.y)) return performScroll(delta)
         if (source != NestedScrollSource.UserInput) {
             val consumed = performScroll(delta)
-            val available = delta.y - consumed.y
+            val available = delta.axis() - consumed.axis()
             val edge = -available.toInt()
             if (fling != null && edge != 0) {
-                // ViewFlinger 先绘制本帧剩余位移，再把速度交给 notifyVerticalEdgeReached。
+                // 先绘制本帧剩余位移，再将速度交给对应物理轴的边缘通知。
                 physics.returnToBounds(edge, 0, preserveVelocity = true, initialVelocity = 0f)
                 translation = overFlingTranslation(physics.current)
                 if (!overflowFling) view.performCouiHapticFeedback(CouiHapticFeedback.ScrollEdge, hapticFeedbackEnabled)
@@ -87,27 +118,33 @@ class CouiOverscrollEffect internal constructor(private val scope: CoroutineScop
         }
         stop()
         overflowFling = false
-        var remaining = delta.y
+        var remaining = delta.axis()
         var pre = 0f
         // 越界后先恢复边界，再把剩余位移交回内容；不会跨过 0 后吞掉正常滚动。
         if (translation * remaining < 0f) {
-            // RecyclerView 的纵向反向分支用 scrollX；本入口只滚动纵轴，scrollX 为 0。
-            // 先按原厂整数阻尼求到边界所需输入，再交还跨边界的剩余位移。
-            val toEdge = -sign(translation) * ceil(abs(translation) * 5f / 2f)
+            // 纵向保留 RecyclerView 的 scrollX=0 分支；横向按分类栏当前越界量计算阻尼。
+            // 先恢复到零，再把跨边界的剩余输入交还容器，而不是把回拉误算成新的越界。
+            val displacement = if (selectedOrientation == Orientation.Horizontal) translation else 0f
+            val factor = 1f - (abs(displacement) / dragDistance).coerceAtMost(1f)
+            val toEdge = -sign(translation) * ceil(abs(translation) * 5f / (2f * factor))
             pre = if (abs(remaining) >= abs(toEdge)) toEdge else remaining
-            translation = if (pre == toEdge) 0f else translation + damp(pre, 0f)
+            translation = if (pre == toEdge) 0f else translation + damp(pre, displacement)
             remaining -= pre
         }
-        val consumed = performScroll(Offset(delta.x, remaining))
-        val available = remaining - consumed.y
+        val consumed = performScroll(delta.withAxis(remaining))
+        val available = remaining - consumed.axis()
         if (available != 0f) translation += damp(available)
-        return Offset(consumed.x, consumed.y + pre + available)
+        return consumed.withAxis(consumed.axis() + pre + available)
     }
 
     private fun damp(delta: Float, displacement: Float = translation): Float = ((delta.toInt() *
-        (1f - (abs(displacement) / overscrollDistance).coerceAtMost(1f))) / 5f * 2f).toInt().toFloat()
+        (1f - (abs(displacement) / dragDistance).coerceAtMost(1f))) / 5f * 2f).toInt().toFloat()
 
     override suspend fun applyToFling(velocity: Velocity, performFling: suspend (Velocity) -> Velocity) = coroutineScope {
+        if (disposed || !selectAxis(velocity.x, velocity.y)) {
+            performFling(velocity)
+            return@coroutineScope
+        }
         stop()
         val job = coroutineContext.job
         fling = job
@@ -115,15 +152,20 @@ class CouiOverscrollEffect internal constructor(private val scope: CoroutineScop
         try {
             var remainingVelocity = velocity
             if (translation != 0f) {
-                // 原厂只给高速释放保留速度：同向 springBack，反向恢复边界后交还内容。
-                val fast = abs(velocity.y) > 6000f
-                val reverse = translation * velocity.y < 0 && fast
-                val y = if (reverse) reverseToBoundary(velocity.y) else 0f
-                if (y == 0f) rebound(if (fast && !reverse) velocity.y else 0f, overFling = overflowFling)
-                remainingVelocity = Velocity(velocity.x, y)
+                val speed = velocity.axis()
+                val horizontal = selectedOrientation == Orientation.Horizontal
+                // 横向分类栏反向高速释放转入 fling，其余按系统最低速度决定回弹初速度。
+                // 纵向保留原列表 6000px/s 的高速释放规则。
+                val minimumVelocity = if (horizontal) ViewConfiguration.get(view.context).scaledMinimumFlingVelocity.toFloat() else 6000f
+                val fast = abs(speed) > minimumVelocity && (!horizontal || abs(speed) >= 1500f)
+                val reverse = translation * speed < 0 && fast
+                val remaining = if (reverse) reverseToBoundary(speed) else 0f
+                val keepVelocity = !reverse && abs(speed) > minimumVelocity
+                if (remaining == 0f) rebound(if (keepVelocity) speed else 0f, overFling = overflowFling)
+                remainingVelocity = velocity.withAxis(remaining)
             }
             val consumed = performFling(remainingVelocity)
-            val remaining = remainingVelocity.y - consumed.y
+            val remaining = remainingVelocity.axis() - consumed.axis()
             if (translation != 0f && animation == null) {
                 if (overflowFling) rebound(remaining, from = physics.current, overFling = true) else rebound()
             }
@@ -186,7 +228,7 @@ class CouiOverscrollEffect internal constructor(private val scope: CoroutineScop
     }
 
     private fun overFlingTranslation(position: Int): Float {
-        val limit = mappingScreenHeight * .3731f
+        val limit = mappingScreenExtent * .3731f
         return -((position * limit).toDouble() / sqrt((position * position + limit * limit).toDouble())).toInt().toFloat()
     }
 
@@ -196,7 +238,7 @@ class CouiOverscrollEffect internal constructor(private val scope: CoroutineScop
         runningFling?.cancel()
         animation?.cancel()
         animation = null
-        physics.stop()
+        axisPhysics?.stop()
     }
     internal fun dispose() { disposed = true; stop(); translation = 0f }
 
@@ -226,12 +268,15 @@ class CouiOverscrollEffect internal constructor(private val scope: CoroutineScop
         }
         override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
             val child = measurable.measure(constraints)
-            return layout(child.width, child.height) { child.placeWithLayer(0, translation.toInt()) }
+            return layout(child.width, child.height) {
+                if (selectedOrientation == Orientation.Horizontal) child.placeWithLayer(translation.toInt(), 0)
+                else child.placeWithLayer(0, translation.toInt())
+            }
         }
         override fun onRemeasured(size: IntSize) {
             if (size == lastSize) return
-            // 原厂 onSizeChanged 只更新惯性越界映射高度；拖动距离保持初始化值。
-            mappingScreenHeight = view.resources.displayMetrics.heightPixels.coerceAtLeast(1)
+            // onSizeChanged 只更新惯性越界映射尺寸；拖动距离保持初始化值。
+            mappingScreenExtent = screenExtent()
             lastSize = size
         }
         override fun onPointerEvent(pointerEvent: PointerEvent, pass: PointerEventPass, bounds: IntSize) {
@@ -258,20 +303,36 @@ class CouiOverscrollEffect internal constructor(private val scope: CoroutineScop
             }
         }
         override fun onCancelPointerInput() { finishTouch(cancelled = true) }
-        override fun onDetach() { touched = false; activePointer = null; stop(); translation = 0f }
+        override fun onDetach() {
+            touched = false; activePointer = null; stop(); translation = 0f
+            if (orientation == null) {
+                selectedOrientation = null
+                axisPhysics = null
+            }
+        }
     }
 }
 
 /** 记住容器独占的回弹；空页和短页通过 couiVerticalScroll 接收完整输入。 */
 @Composable
 fun rememberCouiOverscrollEffect(hapticFeedbackEnabled: Boolean = true): CouiOverscrollEffect {
+    return rememberCouiOverscrollEffect(Orientation.Vertical, hapticFeedbackEnabled)
+}
+
+/**
+ * 显式指定滚动轴的独立回弹，适用于 LazyRow / horizontalScroll 等容器。
+ * 方向为物理屏幕轴，RTL 或 reverseLayout 的正负方向由 Foundation 容器转换，不再二次翻转。
+ * 只替换边界反馈；正常惯性、空内容输入和嵌套滚动仍由容器管理。
+ */
+@Composable
+fun rememberCouiOverscrollEffect(orientation: Orientation, hapticFeedbackEnabled: Boolean = true): CouiOverscrollEffect {
     val scope = rememberCoroutineScope()
     val view = LocalView.current
     val refresh = checkNotNull(view.display).refreshRate
     require(refresh.isFinite() && refresh > 0f)
-    val effect = remember(scope, refresh, view, hapticFeedbackEnabled) {
+    val effect = remember(scope, refresh, view, hapticFeedbackEnabled, orientation) {
         val height = view.resources.displayMetrics.heightPixels.coerceAtLeast(1)
-        CouiOverscrollEffect(scope, height, 1f / refresh, view, hapticFeedbackEnabled)
+        CouiOverscrollEffect(scope, height, 1f / refresh, view, hapticFeedbackEnabled, orientation)
     }
     DisposableEffect(effect) { onDispose { effect.dispose() } }
     return effect
@@ -290,6 +351,7 @@ fun Modifier.couiVerticalScroll(
     overscrollEffect: CouiOverscrollEffect? = rememberCouiOverscrollEffect(),
     interactionSource: MutableInteractionSource? = null,
 ): Modifier {
+    require(overscrollEffect?.selectedOrientation != Orientation.Horizontal) { "couiVerticalScroll 不能使用横向回弹实例" }
     // 禁用纵向输入时保留回弹节点，避免移除祖先触摸节点而取消子内容的当前手势。
     val visual = if (overscrollEffect != null) Modifier.overscroll(overscrollEffect) else Modifier
     val flingBehavior = rememberCouiScrollFlingBehavior(overscrollEffect)
