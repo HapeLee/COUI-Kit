@@ -72,6 +72,29 @@ Chip 从 `labelLarge` 取字体族。Dialog 从 `titleLarge`、`bodyMedium`、`l
 
 未启用适配器而在纯 native 核心插槽中使用 M3 内容时，仍需自行桥接其内容 Local；更常见的做法是接入可选模块。
 
+## 默认交互反馈
+
+`CouiTheme` 同时提供 `LocalIndication` 与 `LocalOverscrollFactory`。放在 MaterialTheme 内层，
+普通 `clickable` / `combinedClickable` 默认使用 `CouiIndication`，只有列表蒙层，没有缩放或跟手形变。
+原生 Item、顶栏、FAB 等已有专用反馈的组件保持自己的实现，不再叠加默认反馈。
+M3 Button、IconButton 等内部显式选择 ripple 的组件不会自动替换；应使用库组件或在宿主适配层处理。
+
+```kotlin
+MaterialTheme {
+    CouiTheme {
+        Box(Modifier.clip(shape).background(color).clickable(onClick = onClick)) { content() }
+    }
+}
+```
+
+`shape`、`color`、`onClick` 与 `content` 由宿主提供。蒙层覆盖内容，真实圆角由外层 clip 决定。
+按下开始和取消遵守 Foundation 点击识别，复用列表的最低按压进度与失焦收尾；不会在原始 DOWN
+就点亮，因此与显式 `couiButtonFeedback(list = true)` 的提前触摸反馈并非完全相同。
+这种装配使子按钮的按压不会直接驱动父卡片的蒙层。默认纵向回弹的能力边界见[边界回弹](../effects/overscroll.md)。
+
+局部替换 `LocalIndication` 或 `LocalOverscrollFactory` 应放在 CouiTheme 内层；后者提供 null 可关闭默认回弹。
+中型操作按钮若要复用顶栏动效，由宿主选择顶栏组件或组合已有运动与光效，不由 Theme 按尺寸推断。
+
 ## Shape 与效果开关
 
 [CouiShape](../../coui/src/main/java/com/itos/coui/shape/CouiShape.kt)和[CouiCapsuleShape](../../coui/src/main/java/com/itos/coui/shape/CouiCapsuleShape.kt)可被宿主 Shape 替换。材质距离场、内容 Path 和投影 Outline 有各自的几何要求，不能因圆角同名就互换。

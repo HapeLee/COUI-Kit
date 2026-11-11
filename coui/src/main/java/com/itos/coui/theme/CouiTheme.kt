@@ -1,9 +1,12 @@
 package com.itos.coui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
@@ -12,6 +15,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.itos.coui.effect.CouiIndication
+import com.itos.coui.scroll.rememberCouiOverscrollFactory
 
 /** 组件实际使用的色彩角色；页面染色由主题单独提供，不混入原生材质。 */
 @Immutable
@@ -102,6 +107,7 @@ object CouiTheme {
 /**
  * 可选外观上下文。materialTint 默认为透明；Material 宿主可显式传入页面表面色启用项目染色。
  * 不提供主题时使用初始化策略，未初始化则使用原生预设。业务状态及资源生命周期仍由原接口管理。
+ * 同时提供普通点击区域的列表型蒙层与纵向边界回弹工厂；组件专用动效和滚动惯性不被替换。
  */
 @Composable
 fun CouiTheme(
@@ -111,9 +117,13 @@ fun CouiTheme(
     materialTint: Color = Color.Transparent,
     content: @Composable () -> Unit,
 ) {
+    val indication = remember(darkTheme) { CouiIndication(darkTheme) }
+    val overscrollFactory = rememberCouiOverscrollFactory()
     CompositionLocalProvider(
         LocalCouiTheme provides CouiThemeValues(darkTheme, colorScheme, typography, materialTint),
         LocalCouiDarkTheme provides darkTheme,
+        LocalIndication provides indication,
+        LocalOverscrollFactory provides overscrollFactory,
     ) { ProvideCouiContent(colorScheme.onSurface, typography.body, mergeTextStyle = false, content = content) }
 }
 

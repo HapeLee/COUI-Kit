@@ -45,6 +45,7 @@ fun LitSurface(
 | CouiContour | 真实表面颜色、尺寸、density、像素半径与角权重；输出已包含底色，不再叠一次 |
 | CouiEdge / CouiEdgeStyle | 原始模糊图、材质两次混色、几何与轮廓开关；取得与尺寸匹配的 RenderEffect |
 | rememberCouiSpotlight | 返回触摸 Modifier 与可空绘制回调，不接管业务点击或滚动 |
+| CouiIndication | 主题默认的卡片/列表蒙层；由点击交互源驱动，复用列表最低按压进度，不附带按钮形变 |
 | SpotlightPreset | 跟手光预设；半径和光源高度使用设备像素，不按 dp 再次换算 |
 | couiNavigationFeedback / couiFabFeedback / couiToolbarFeedback | 配合同一 InteractionSource 的组件状态反馈 |
 

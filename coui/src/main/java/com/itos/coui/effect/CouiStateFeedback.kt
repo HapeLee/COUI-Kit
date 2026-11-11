@@ -184,7 +184,7 @@ internal fun Modifier.couiSwitchFocusOutline(
 }
 
 /** ListSelectedItemLayout 的容器蒙层：DOWN 立即启动，短点按/CANCEL 达到 .7 再退场。 */
-private class CouiListPressMask {
+internal class CouiListPressMask {
     private val effect = CouiStateProgress()
     val progress: Float get() = effect.value
     private var touched = false
@@ -218,5 +218,5 @@ private class CouiListPressMask {
 
 private val MaskEvaluator = ArgbEvaluator()
 
-private fun maskColor(progress: Float, target: Int): Color =
+internal fun maskColor(progress: Float, target: Int): Color =
     Color(MaskEvaluator.evaluate(progress.coerceIn(0f, 1f), 0, target) as Int)

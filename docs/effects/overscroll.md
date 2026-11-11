@@ -44,6 +44,22 @@ val scrolling = Modifier.couiVerticalScroll(scroll, overscrollEffect = edge)
 
 ## 接入其他滚动容器
 
+`CouiTheme` 默认通过 `LocalOverscrollFactory` 为子树中未显式指定效果的 Foundation 容器创建
+独立 `CouiOverscrollEffect`。例如 `LazyColumn { … }` 不再需要逐个传入边界效果。
+这是**纵向边界效果**：不提供横向回弹，不修改列表惯性，短内容和空内容是否接受拖动仍取决于容器。
+不能把主题包裹当成接入完整 COUI RecyclerView 滚动物理。
+
+仅调整一棵子树的触觉时，可在主题内使用：
+
+```kotlin
+CompositionLocalProvider(
+    LocalOverscrollFactory provides rememberCouiOverscrollFactory(hapticFeedbackEnabled = false),
+) { content() }
+```
+
+显式 `overscrollEffect = null` 或局部提供 `LocalOverscrollFactory provides null` 可关闭对应效果。
+一个工厂创建多个独立 effect，不共享动画节点；节点移除停止其运动。
+
 `CouiOverscrollEffect` 实现 Foundation 的 `OverscrollEffect`，可传给支持它的容器。此时正常惯性由该容器负责。标准接口不提供每帧速度，effect 只能在宿主 `performFling` 返回后取得剩余速度，触边时序与 `couiVerticalScroll` 不同。
 
 需要 COUI 纵向惯性及同帧触边交接时，使用 `couiVerticalScroll`。它把触边帧的剩余位移和速度交给边界物理轴；已吸收的纵向速度不会再次交给父级消费。与折叠顶栏、Insets 和 IME 的组合见[宿主页面接入](../guide/secondary-pages.md)。
