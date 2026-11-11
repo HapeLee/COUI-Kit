@@ -69,7 +69,7 @@ class CouiBackdrop internal constructor(
     private var activeConsumers = 0
     private val redrawSignal = mutableStateOf(Unit, neverEqualPolicy())
     private val sourceToTarget = Matrix()
-    // 首次采样可能先于源绘制, 就绪状态必须唤醒已等待的消费者。
+    // 首次采样先建立图层依赖, 就绪状态仍用于诊断和唤醒首帧消费者。
     private var recorded by mutableStateOf(false)
     internal var coordinates: LayoutCoordinates? by mutableStateOf(null, neverEqualPolicy())
 
@@ -120,9 +120,10 @@ class CouiBackdrop internal constructor(
         if (CouiRenderDiagnostics.enabled) sampleCount++
         parent?.draw(scope, target)
         val source = coordinates ?: return
-        if (!recorded || !source.isAttached || !target.isAttached) return
-        // 同窗口沿用 RenderNode 依赖更新; 仅跨窗口订阅 PreDraw, 避免持续驱动页面重绘。
-        if (source.findRootCoordinates() !== target.findRootCoordinates()) redrawSignal.value
+        if (!source.isAttached || !target.isAttached || layer.isReleased) return
+        // 未录制也必须 drawLayer, 让先画的材质 patch 引用稍后录制的源 RenderNode。
+        // 首次录制仍唤醒消费者；就绪后的同窗口更新只沿用图层依赖，避免持续重绘页面。
+        if (!recorded || source.findRootCoordinates() !== target.findRootCoordinates()) redrawSignal.value
         val width = source.size.width.toFloat()
         val height = source.size.height.toFloat()
         if (width <= 0f || height <= 0f) return

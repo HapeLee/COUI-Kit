@@ -60,6 +60,8 @@ androidx.compose.material3.Scaffold(
 
 不需要额外的背景容器或全局初始化。源只挂到一个正文节点，顶栏位于源节点之外；图层的创建、更新和释放由库处理。沿用其他 Scaffold 或正文布局时，保留这三处连接即可，见[宿主页面接入](../guide/secondary-pages.md)。
 
+栏位可能先于正文录制。布局坐标就绪后，采样会先保留源图层引用，由随后执行的正文录制填入内容；不需要宿主重复调用 `draw` 或在 FAB 下方额外绘制实色底盘。源尚未布局、尺寸为空或已移除时不采样；没有挂载源的场景仍由宿主显式处理。
+
 ## 可选的页面作用域
 
 高级装配需要共享默认源时，可使用 `ProvideCouiBackdrop(backdrop)`。`TopAppBar`、`LargeTopAppBar`、`TopAppBarSurface`、`CollapsingTopAppBar`、`NavigationBar`、`Fab` 和 `SearchBar` 会读取最近的作用域，显式 `backdrop` 优先。该入口只提供已有源，不创建或挂载节点；第三方容器普通接入直接传参即可。不要向源的内容子树提供它自身。
