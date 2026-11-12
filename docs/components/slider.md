@@ -39,7 +39,7 @@ fun VolumeSlider(
 }
 ~~~
 
-页面需要在 `onValueChange` 中更新 `value`。示例显式指定强调色、深浅色和形状。需要保存到设置或发送给服务时，使用 `onValueChangeFinished`，见下文。
+在 `onValueChange` 中立即更新传给滑条的内存值。若设置来自 DataStore 等异步来源，用已保存的值初始化内存状态。拖动期间，较早的保存结果回传给 `value` 时，滑条会将其视为外部修改并结束当前手势。需要在调整结束后保存时，用 `onValueChangeFinished` 提交最新内存值。
 
 ## 分段选择
 
@@ -67,6 +67,48 @@ Slider(
 `onValueChangeFinished` 在一次调整结束时触发，适合保存或提交。拖动过程中通过 `onValueChange` 更新显示；键盘方向键、Home 和 End 也支持调整。
 
 禁用滑条时传入 `enabled = false` 即可关闭交互；省略 `colors` 时，组件会生成禁用配色。若要传入自定义 `colors`，可用相同的 `enabled` 值调用 `CouiSliderDefaults.colors`。
+
+## 在回弹页面中使用滑条
+
+按住滑条时，如果要让页面停在当前位置，在滑条的 Modifier 上观察按下和结束事件。用 `stopScroll` 停止页面正在进行的惯性滚动，并通过 `couiVerticalScroll` 的 `enabled` 暂停新的纵向手势。宿主传入滑条的当前内存值、同步更新该值的回调和其余页面内容。
+
+~~~kotlin
+@Composable
+fun ScrollableSliderPage(
+    modifier: Modifier = Modifier,
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val scroll = rememberScrollState()
+    var sliderPressed by remember { mutableStateOf(false) }
+    LaunchedEffect(sliderPressed) {
+        if (sliderPressed) scroll.stopScroll(MutatePriority.UserInput)
+    }
+    Column(modifier.fillMaxSize().couiVerticalScroll(scroll, enabled = !sliderPressed)) {
+        Slider(
+            modifier = Modifier.fillMaxWidth().pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                    sliderPressed = true
+                    try {
+                        do {
+                            val event = awaitPointerEvent(PointerEventPass.Final)
+                        } while (event.changes.any { it.pressed })
+                    } finally {
+                        sliderPressed = false
+                    }
+                }
+            },
+            value = value,
+            onValueChange = onValueChange,
+        )
+        content()
+    }
+}
+~~~
+
+观察代码不消费触摸事件，滑条照常处理点击和拖动。松手、手势取消或滑条移除时，通过 `finally` 恢复页面滚动。`onValueChangeFinished` 用于提交数值，按下后没有调整时也要由手势观察恢复滚动。滚动容器的其他参数见[边界回弹](../effects/overscroll.md#状态与拖动观察)。
 
 ## 轨道配色
 

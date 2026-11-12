@@ -162,30 +162,37 @@ val pageModifier = Modifier.fillMaxSize().then(imePadding)
 
 ## 使用背景材质
 
-默认弹窗使用不透明表面。API 33 及以上可以传入 `material`，采样页面背景。先按[快速开始](../guide/getting-started.md#浮动组件的背景源)创建 `backdrop`，再将弹窗放在背景源节点之外：
+要让背景模糊随弹窗一起移动，在 API 33 及以上提供窗口背景源，并把显隐状态传给 `visible`。下面的 `page` 是原有宿主页，可以包含 COUI `Scaffold`。把背景修饰符挂到页面容器上，弹窗留在该容器之外。
 
 ~~~kotlin
-if (visible) {
-    Dialog(
-        onDismissRequest = onDismiss,
-        dark = dark,
-        title = title,
-        message = message,
-        confirmAction = CouiDialogAction(confirmLabel, onConfirm),
-        dismissAction = CouiDialogAction(cancelLabel, onDismiss),
-        material = if (CouiDialogDefaults.isMaterialSupported()) {
-            CouiDialogDefaults.material(dark)
-        } else {
-            null
-        },
-        backdrop = backdrop,
-    )
+@Composable
+fun BlurredDialogPage(
+    modifier: Modifier = Modifier,
+    visible: Boolean,
+    title: String,
+    confirmLabel: String,
+    onDismiss: () -> Unit,
+    page: @Composable () -> Unit,
+) {
+    val supported = CouiDialogDefaults.isMaterialSupported()
+    ProvideCouiMenuBackdrop { windowSource ->
+        Box(modifier.fillMaxSize().then(if (supported) windowSource else Modifier)) {
+            page()
+        }
+        Dialog(
+            visible = visible,
+            title = title,
+            onDismissRequest = onDismiss,
+            confirmAction = CouiDialogAction(confirmLabel, onDismiss),
+            material = if (supported) CouiDialogDefaults.material(CouiTheme.isDark) else null,
+        )
+    }
 }
 ~~~
 
-`visible`、文案和回调沿用前面的确认弹窗示例。`material` 非空时要求 API 33 及以上，并须通过 `backdrop` 或 `ProvideCouiMenuBackdrop` 提供有效背景源；缺少系统支持或背景源时会报错。不支持材质时传入 `material = null`，使用不透明表面。
+宿主打开弹窗时将 `visible` 设为 `true`，在 `onDismiss` 中改为 `false`。保留弹窗调用与窗口背景源，让库在退场结束后释放窗口。使用 `InputDialog` 时传入相同的 `visible` 和 `material`，并提供输入状态。省略 `visible` 并用外层条件创建弹窗时，系统移动整个窗口，COUI 会采样弹窗到位时的位置。
 
-背景模糊采样自页面，窗口遮罩由系统独立渐变。传入 `visible` 时，入场等待窗口完成布局后开始；底部弹窗按卡片外框高度进入，按显示区域高度退出，位移与背景采样共用当前帧的位置。
+`material` 非空时须通过 `backdrop` 或 `ProvideCouiMenuBackdrop` 提供有效窗口源。COUI `Scaffold` 自动提供的是栏位使用的正文源。窗口源的作用域见[宿主页面接入](../guide/secondary-pages.md#正文源与窗口源)。Android 12 上传入 `material = null`，使用不透明表面。
 
 ## 位置和外观
 
