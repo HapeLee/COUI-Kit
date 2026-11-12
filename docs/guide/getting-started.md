@@ -43,7 +43,7 @@ dependencies {
 
 ## 显示第一个组件
 
-在 Compose 页面中加入下面的滑条，拖动时更新 `value`：
+在 Compose 页面中加入下面的滑条，拖动时更新 `value`。示例使用 `com.itos.coui.slider.Slider`：
 
 ~~~kotlin
 @Composable
