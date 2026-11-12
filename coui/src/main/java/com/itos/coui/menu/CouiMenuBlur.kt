@@ -64,18 +64,29 @@ class CouiMenuBlur internal constructor(
     fun draw(scope: DrawScope, coordinates: LayoutCoordinates) = draw(scope, coordinates, 1f, Offset.Zero)
 
     /** coordinates 为未动画的锚点；变换与消费者的实际绘制使用同一帧数据。 */
-    internal fun draw(scope: DrawScope, coordinates: LayoutCoordinates, sampleScale: Float, translation: Offset) {
+    internal fun draw(
+        scope: DrawScope,
+        coordinates: LayoutCoordinates,
+        sampleScale: Float,
+        translation: Offset,
+        dimAmount: Float = 0f,
+    ) {
         fun drawSource(target: DrawScope) {
             target.withTransform({
                 scale(1f / sampleScale, 1f / sampleScale, Offset.Zero)
                 translate(-translation.x, -translation.y)
             }) { backdrop.draw(this, coordinates) }
         }
+        fun drawInputDim(target: DrawScope) {
+            // 宿主录制缺少系统遮罩，在采样层补上它以对齐窗口合成顺序。
+            if (dimAmount > 0f) target.drawRect(Color.Black, alpha = dimAmount)
+        }
         val menuSize = scope.size
         if (!coordinates.isAttached || menuSize.width <= 0f || menuSize.height <= 0f) return
         if (radius == 0) {
             scope.drawRect(background)
             drawSource(scope)
+            drawInputDim(scope)
             return
         }
         val origin = coordinates.localToScreen(Offset.Zero)
@@ -85,6 +96,7 @@ class CouiMenuBlur internal constructor(
         val deviceHeight = (bottom - origin).getDistance() * sampleScale
         if (!deviceWidth.isFinite() || !deviceHeight.isFinite() || deviceWidth <= 0f || deviceHeight <= 0f) {
             scope.drawRect(background)
+            drawInputDim(scope)
             return
         }
 
@@ -103,6 +115,7 @@ class CouiMenuBlur internal constructor(
             }) {
                 drawSource(this)
             }
+            drawInputDim(this)
         }
         recordBlurPasses(scope, blurSize)
         scope.withTransform({
