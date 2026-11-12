@@ -2,7 +2,9 @@ package com.itos.coui.demo
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -19,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.itos.coui.effect.CouiFloatingRenderer
 import com.itos.coui.floatingtoolbar.CouiFloatingToolbarDefaults
@@ -84,7 +87,17 @@ private fun ToolbarPreview(
     val renderer = rendering.getOrNull()
     ChromePreview(
         modifier = Modifier.height(120.dp),
-        background = { ChromePreviewGradient(dark) },
+        background = {
+            ChromePreviewGradient(dark)
+            // 栏后保留一段正文，才能看出胶囊的背景模糊：栏内文字被模糊，栏外保持清晰。
+            Text(
+                stringResource(R.string.floating_toolbar_preview_text),
+                Modifier.align(Alignment.Center).fillMaxWidth().padding(horizontal = 12.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+            )
+        },
     ) { backdrop ->
         if (renderer != null) {
             FloatingToolbar(

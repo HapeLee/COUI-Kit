@@ -14,13 +14,13 @@ Status: implemented
 - 跟手光、`couiTouchMotion`、`couiPressMotion` 都挂在整条胶囊上，装配方式与底栏中间胶囊（`NavigationBar` 的 `FloatingNode`）一致：光画在内容之下、随触点在栏内移动；表面几何与内容层读同一组弹簧值，材质和图标不会错位。操作项不各自叠光或形变，否则相邻项会各自亮起、缩放也会与整条玻璃分叉。
 - 拖动由操作栏接管（`consumeDrag = true`），与底栏一致：拖动时胶囊位移、拉伸而不带动页面滚动；形成拖动后子项 `clickable` 因移动被消费而取消，只有静止点按才提交。
 - 材质与投影直接复用 `CouiTopAppBarButtonDefaults.systemMaterial(dark, capsule = true)` 与 `shadow(..., capsule = true, search = true)`，即 CAPSULE_1 系统胶囊。没有使用项目对顶栏按钮的加深特化 `material()`：那条特化以 OVERLAY/COLOR_DODGE 为主，在不透明深色页面上会接近透明，与参考图中可见的深灰胶囊不符。
-- 系统胶囊的 `blurRadius` 为 0，因为顶栏按钮所在背景本身已经模糊。操作栏浮在正文上时不为「更像玻璃」而自动加模糊，避免与库内图标玻璃分叉；宿主需要时在 `style.material` 上显式提高半径。
+- 系统胶囊在顶栏里的 `blurRadius` 为 0，因为顶栏按钮所在背景本身已经模糊；操作栏浮在正文上，默认在材质上补 20px 背景模糊（与库内搜索胶囊同一档），否则正文透过后仍可辨认，玻璃读不出层次。模糊仍由 `CouiFloatingMaterial.blurRadius` 的既有 RenderEffect 链执行，不新增模糊实现；宿主可改材质半径，`0f` 关闭。
 - `content` 是完整的 Row 插槽，`FloatingToolbarItem` 只是常用的可点击项；组件不为项目数预留槽位，也没有主次或强调变体，颜色不表达层级。
 - 操作项最小宽度 48dp、高度填满栏高，宿主可用 `Modifier.width` 加宽；默认样式 `contentColor` 取当前模式的 `onSurface` 压到 80% 作为兜底，图标显式 `tint` 优先，需要整栏着色时由宿主覆盖。
 - 兜底内容色是必须的：操作栏常浮在任意背景（含彩色卡片）之上，完全依赖环境内容色会把没有自带颜色的图标交给上游决定，出现与页面正文不一致的颜色。
 - 兜底色压到 80% 是因为正文色本身是 90% 白/黑，直接压在透明材质上偏重；多色图标与自带配色的图标仍由自身 `tint` 决定，不受该透明度影响。
 - 禁用态只对内容应用 0.38 透明度，不改写颜色；这样即使宿主没有指定内容色，禁用状态仍然可见。
-- 栏高 48dp 与单项最小宽相同，四项即 192dp 宽且无横向内边距，对应参考图约 4:1 的胶囊比例；真机反馈 56dp 偏大（52dp 仍偏大），收到 48dp 并同步把图标降到 20dp。
+- 栏高 48dp 与单项最小宽相同，四项即 192dp 宽且无横向内边距，对应参考图约 4:1 的胶囊比例；真机反馈 56dp 偏大（52dp 仍偏大），收到 48dp。图标取 24dp：系统胶囊的图标中心间距同为 48dp、图标约 24dp，操作项内两侧各 12dp；早先从 48dp 栏高降到 20dp 图标会让同一间距下显得空。
 - `themeTint` 跟随 `CouiTheme.materialTintFor(dark)`，与底栏、菜单、搜索栏的 M3 染色契约一致。
 
 ## Alternatives considered

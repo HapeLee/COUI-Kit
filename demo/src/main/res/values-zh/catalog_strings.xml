@@ -101,6 +101,7 @@
     <string name="floating_toolbar_hint">按住并拖动可查看整条栏的高光与形变。</string>
     <string name="floating_toolbar_last_action">上次操作</string>
     <string name="floating_toolbar_none">无</string>
+    <string name="floating_toolbar_preview_text">胶囊背后的正文会被模糊，栏外保持清晰。</string>
     <string name="catalog_appbar_behavior">折叠标题与悬浮搜索</string>
     <string name="catalog_appbar_behavior_summary">滚动组件目录可折叠大标题，搜索进入时分裂取消胶囊；取消后恢复进入前的滚动位置。</string>
     <string name="intro_wheel">切换数字、时间、倒计时和日期，比较不同的滚轮组合。</string>

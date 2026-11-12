@@ -31,7 +31,7 @@ fun PageFloatingToolbar(
 
 需要更多操作时按同样方式继续添加，或用 `forEach` 从一个列表生成，数量不受限制。
 
-栏高 48dp，每个操作项的最小宽度也是 48dp；栏宽由内容决定，四项为 192dp，两项为 96dp，左右没有额外内边距。位置、外边距与安全区由页面决定；父容器需要为投影留出空间。示例图标来自可选的 `coui-icons`，库本身不依赖该模块。
+栏高 48dp，每个操作项的最小宽度也是 48dp；栏宽由内容决定，四项为 192dp，两项为 96dp，左右没有额外内边距。默认图标 24dp，因此操作项内左右各留 12dp，与系统胶囊的间距一致。位置、外边距与安全区由页面决定；父容器需要为投影留出空间。示例图标来自可选的 `coui-icons`，库本身不依赖该模块。
 
 ## 数量、宽度与顺序
 
@@ -76,11 +76,13 @@ FloatingToolbar(backdrop = backdrop, style = style) { /* 操作项 */ }
 
 `themeTint` 默认读取匹配模式的主题策略：原生为透明，M3 适配为宿主 surface，仅进入已有页面色相层。显式透明关闭染色。`lightColor` 用于跟手光高光，轮廓光由 `LocalCouiContourGlowEnabled` 控制。
 
-系统胶囊材质的模糊半径为 0：顶栏按钮本身位于已模糊的顶栏背景上，胶囊不再重复模糊。操作栏单独浮在正文上时，需要背景模糊可以显式提高半径，`blurRadius` 使用设备像素：
+默认样式在系统胶囊材质上补了 20px 背景模糊：`CAPSULE_1` 在顶栏里不带模糊，因为顶栏背景本身已经渐进模糊；操作栏单独浮在正文上，零半径会让正文清晰透出、读不出玻璃层次。模糊半径使用设备像素，由已有的浮动表面材质链执行，组件没有另建模糊实现。
+
+需要不同的强度时直接改材质的 `blurRadius`；设为 `0f` 可关闭背景模糊：
 
 ~~~kotlin
 val base = CouiFloatingToolbarDefaults.style(dark)
-val style = base.copy(material = base.material.copy(blurRadius = 20f))
+val style = base.copy(material = base.material.copy(blurRadius = 30f))
 ~~~
 
 ## 版本和采样
