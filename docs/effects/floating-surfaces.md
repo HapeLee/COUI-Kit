@@ -40,6 +40,8 @@ val surfaceModifier = Modifier.couiFloatingSurface(
 
 `CouiFloatingSurface.bounds` 使用当前绘制节点中的未缩放像素坐标。缩放单独通过 `scaleX` / `scaleY` 传入，`alpha` 与 `visible` 表达主体状态。宿主负责窗口或布局坐标到节点坐标的转换，并让内容录制与几何对应同一帧。
 
+材质和 caustic 的 patch 按主体本地几何录制，最终可见范围由窗口裁剪。导航转场可能只移动祖先图层，不触发子节点重建绘制缓存；不能在缓存构建时按当时的窗口交集裁掉 patch，否则屏幕外入场的主体可能持续缺少材质。
+
 `cornerRadius` 使用未缩放像素，省略时为短边的一半；显式值须有限且非负，绘制时限制到短边的一半。圆角矩形使用 `cornerWeight >= 2`，并让内容 Shape 使用相同的半径和权重。显式半径小于短边一半时，普通投影使用 RoundRect caster，沿用不透明主体、不做 inverse clip 的绘制方式。
 
 `CouiFloatingShadow` 的长度使用像素；material 字段的单位以公开声明为准，带 Dp 后缀的参数使用 dp。固定预设从所属组件 Defaults 获取。

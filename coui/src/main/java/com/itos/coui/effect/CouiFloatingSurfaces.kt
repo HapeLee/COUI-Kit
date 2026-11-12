@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -237,15 +236,15 @@ private fun Modifier.floatingSurfaces(
         if (target?.isAttached == true && size.width > 0f && size.height > 0f &&
             nodes.all { it.bounds.width > 0f && it.bounds.height > 0f }
         ) {
-            val viewport = target.localBoundingBoxOf(target.findRootCoordinates(), false)
             val commands = mutableListOf<GraphicsLayer>()
             val patches = mutableListOf<FloatingPatch>()
             fun appendPatch(layer: GraphicsLayer, crop: Rect,
                 blendMode: ComposeBlendMode = ComposeBlendMode.Src,
                 includePrefix: Boolean = true, effect: (Rect) -> RenderEffect) {
-                val clipped = crop.intersect(viewport)
-                if (clipped.width <= 0f || clipped.height <= 0f) return
-                val bounds = Rect(floor(clipped.left), floor(clipped.top), ceil(clipped.right), ceil(clipped.bottom))
+                // 祖先可只更新转场图层的变换，不触发本节点重建缓存。
+                // 保留主体自身的 patch 范围，最终可见范围交给窗口裁剪，避免缓存屏幕外的空交集。
+                if (crop.width <= 0f || crop.height <= 0f) return
+                val bounds = Rect(floor(crop.left), floor(crop.top), ceil(crop.right), ceil(crop.bottom))
                 layer.topLeft = IntOffset(bounds.left.toInt(), bounds.top.toInt())
                 layer.clip = true
                 // 完整 patch 用 Src; 分离后的透明前景只使用 SrcOver。
