@@ -55,6 +55,7 @@ internal fun DemoSecondaryPage(page: String, dark: Boolean, preferences: DemoPre
                 "fab" -> FabSample(preset = fabPreset, onPresetChange = { fabPreset = it },
                     rounded = roundedFab, onRoundedChange = { roundedFab = it })
                 "floatingtoolbar" -> FloatingToolbarSample(dark)
+                "textfield" -> TextFieldSample(dark)
                 "about" -> {
                     DemoAboutHero()
                     Group {
