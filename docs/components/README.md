@@ -15,6 +15,7 @@
 | [Footer](footer.md) | 分组辅助说明 |
 | [底栏](navigation-bar.md) | 页面选择、左右附件和融合表面 |
 | [FAB](fab.md) | 独立浮动操作 |
+| [悬浮操作栏](floating-toolbar.md) | 胶囊玻璃上的多个同级操作 |
 | [菜单](menu.md) | 选择、勾选、分组与子菜单 |
 | [滑动选择条](slider.md) | 连续、分段与隐藏点位的步进选择 |
 | [分段选择器](segmented-control.md) | 胶囊内的单选滑块、不等宽标签与拖动回弹 |
