@@ -2,6 +2,16 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
+## [未发布]
+
+### 新增与改进
+
+- `Dialog` 的 `confirmAction` 改为可选；它与 `dismissAction`、`neutralAction` 一起省略时渲染无操作弹窗，只保留标题、正文和 `content`，关闭由返回键或点击外部触发。[弹窗](docs/components/dialog.md#最小调用)
+
+### 升级说明
+
+- 现有调用无需修改。省略 `confirmAction` 是新增能力，三个操作齐全时的布局、配色与回调时机不变。
+
 ## [0.0.1-alpha11] - 2026-11-12
 
 ### 新增与改进

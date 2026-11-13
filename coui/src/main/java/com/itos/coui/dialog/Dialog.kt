@@ -44,6 +44,8 @@ data class CouiDialogAction(val text: String, val onClick: () -> Unit, val enabl
 
 /**
  * 普通警告弹窗。两短按钮横排，单个、三个或放不下的按钮竖排。
+ * confirmAction 可省略；连同 dismissAction / neutralAction 一起为空时渲染无操作弹窗，
+ * 只保留标题、正文和 content，关闭由外部点击或返回键触发。
  * content 可装配列表、输入和选择器；不提供推荐/AI Payment 专用按钮及原厂高内容标题合并协议。
  * CouiShape 自动提供轮廓半径；其他 Shape 使用材质时须显式提供 cornerRadius。
  * visible 非空时由库保留退场窗口，调用须留在组合中；null 使用外层条件和系统窗口动画。
@@ -52,7 +54,7 @@ data class CouiDialogAction(val text: String, val onClick: () -> Unit, val enabl
 fun Dialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
-    confirmAction: CouiDialogAction,
+    confirmAction: CouiDialogAction? = null,
     dark: Boolean = CouiTheme.isDark,
     title: String? = null,
     message: String? = null,
@@ -91,18 +93,21 @@ fun Dialog(
                     onLineCount = { if (messageLines != it) messageLines = it })
                 content()
             }
-            DialogActions(confirmAction, dismissAction, neutralAction, colors, dark, material != null) {
-                val next = if (it) 1 else 0
-                if (stacked != next) stacked = next
+            if (confirmAction != null || dismissAction != null || neutralAction != null) {
+                DialogActions(confirmAction, dismissAction, neutralAction, colors, dark, material != null) {
+                    val next = if (it) 1 else 0
+                    if (stacked != next) stacked = next
+                }
             }
         }
     }
 }
 
 @Composable
-private fun DialogActions(confirm: CouiDialogAction, dismiss: CouiDialogAction?, neutral: CouiDialogAction?,
+private fun DialogActions(confirm: CouiDialogAction?, dismiss: CouiDialogAction?, neutral: CouiDialogAction?,
     colors: CouiDialogColors, dark: Boolean, material: Boolean, onStacked: (Boolean) -> Unit) {
     val horizontal = listOfNotNull(dismiss, neutral, confirm)
+    if (horizontal.isEmpty()) return
     val vertical = listOfNotNull(neutral, confirm, dismiss)
     val density = LocalDensity.current
     val textStyle = rememberDialogTextStyle(DialogTextKind.Button)
