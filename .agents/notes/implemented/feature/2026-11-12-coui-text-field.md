@@ -28,7 +28,7 @@ Status: implemented
 - 直接复用 `CouiPageColors` 当公开参数：省掉一次角色映射，但把输入组件族的公开 API 绑到 `layout` 的页面类型上，页面色板增删会牵动输入框签名。
 - 扩公开的 `CouiTextKind` 加输入角色：宿主对枚举的穷举 `when` 会因此编译失败，而弹窗已经证明族内私有排版够用。
 - 让 String 重载内部用 `rememberTextFieldState` + `LaunchedEffect` 回写外部值：外部值回流会与输入法组合区竞争，直接使用 Foundation 的 String 重载更稳。
-- 抽 `label` / 浮动标签槽：参考页面没有标签，标签由 Group 标题或 Footer 承担；增加未使用的槽位只会多一条测量分支。
+- 抽 `label` / 浮动标签槽：参考页面没有标签，标签由 Group 标题或 Footer 承担；增加未使用的槽位只会多一条测量分支。宿主随后提出了自带标题的输入场景，这条备选已在[输入框标签按内容浮动并补齐重载](2026-11-13-coui-text-field-label-and-overloads.md)翻转。
 
 ## Consequences
 
