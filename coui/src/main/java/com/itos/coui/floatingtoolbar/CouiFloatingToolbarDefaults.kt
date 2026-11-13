@@ -39,10 +39,22 @@ internal val LocalCouiFloatingToolbarStyle = staticCompositionLocalOf<CouiFloati
 object CouiFloatingToolbarDefaults {
     val height = 48.dp
     val itemSize = 48.dp
-    val iconSize = 20.dp
+
+    /**
+     * 系统胶囊的操作项间距为 48dp、图标为 24dp，两侧各留 12dp；图标按 24dp 取尺寸，
+     * 与系统同间距下才会得到同一处内外边距，缩到 20dp 会让操作项显得空。
+     */
+    val iconSize = 24.dp
 
     /** 玻璃上的图标相对正文色的透明度；正文色本身是 90%，直接使用偏重。 */
     private const val FloatingToolbarIconAlpha = 0.8f
+
+    /**
+     * 背景模糊半径，单位是设备像素，与 [CouiFloatingMaterial.blurRadius] 一致。
+     * CAPSULE_1 在顶栏里不带模糊，因为顶栏背景本身已渐进模糊；操作栏单独浮在正文上，
+     * 沿用库内搜索胶囊同一档 20px 模糊，避免正文透过玻璃后仍可辨认。
+     */
+    private const val FloatingToolbarBlurRadius = 20f
 
     /** 与底栏中间胶囊、搜索胶囊共用的胶囊轮廓。 */
     val capsuleShape: Shape = CouiCapsuleShape
@@ -59,9 +71,9 @@ object CouiFloatingToolbarDefaults {
         return CouiFloatingToolbarStyle(
             dark = dark,
             shape = capsuleShape,
-            // CAPSULE_1 系统胶囊材质与阴影；不叠加顶栏按钮的加深特化。
+            // CAPSULE_1 系统胶囊材质与阴影；不叠加顶栏按钮的加深特化，只补上浮在正文上所需的背景模糊。
             material = CouiTopAppBarButtonDefaults.systemMaterial(dark, capsule = true)
-                .copy(themeTint = themeTint),
+                .copy(themeTint = themeTint, blurRadius = FloatingToolbarBlurRadius),
             shadow = CouiTopAppBarButtonDefaults.shadow(
                 dark = dark, capsule = true, density = density, contour = contour, search = true,
             ),
