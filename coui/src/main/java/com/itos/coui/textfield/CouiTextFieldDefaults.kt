@@ -31,9 +31,11 @@ data class CouiTextFieldColors(
     val text: Color,
     /** 占位提示。 */
     val placeholder: Color,
+    /** 标签文字。 */
+    val label: Color,
     /** 光标。 */
     val cursor: Color,
-    /** 禁用时的正文与占位提示。 */
+    /** 禁用时的正文、占位提示与标签。 */
     val disabled: Color,
 )
 
@@ -54,12 +56,22 @@ object CouiTextFieldDefaults {
     /** 与 [CouiPageDefaults.shape] 同一条平滑圆角，字段和分组卡片使用一致的轮廓。 */
     val shape: Shape = CouiPageDefaults.shape
 
+    /** 标签常驻时的字号；只在 [textStyle] 未指定字号时回退使用。 */
+    val labelSize = 16.sp
+
+    /** 标签浮动到输入上方的字号。 */
+    val floatingLabelSize = 12.sp
+
+    /** 标签浮动时上移的距离。输入文字同步下移同一距离，卡片高度不变。 */
+    val labelShift = 8.dp
+
     @Composable
     fun colors(dark: Boolean = CouiTheme.isDark): CouiTextFieldColors {
         val theme = CouiTheme.colorSchemeFor(dark)
         // 禁用强度与页面禁用文字一致，避免同一页出现两种淡化程度。
-        return CouiTextFieldColors(theme.card, theme.onSurface, theme.onSurfaceVariant, theme.accent,
-            theme.onSurface.copy(alpha = .3f))
+        return CouiTextFieldColors(container = theme.card, text = theme.onSurface,
+            placeholder = theme.onSurfaceVariant, label = theme.onSurfaceVariant,
+            cursor = theme.accent, disabled = theme.onSurface.copy(alpha = .3f))
     }
 
     /**
