@@ -31,7 +31,10 @@ import com.itos.coui.text.rememberCouiTextStyle
 import com.itos.coui.theme.CouiTheme
 import com.itos.coui.shape.CouiCapsuleShape
 
-/** Menu 的设置行装配预设；展开期间锁住行蒙层，菜单选择和退场仍由同一个 Menu 持有。 */
+/**
+ * Menu 的设置行装配预设；展开期间锁住行蒙层，菜单选择和退场仍由同一个 Menu 持有。
+ * [closeOnItemClick] 置 false 时提交后保持展开，供多选列表连续勾选。
+ */
 @Composable
 internal fun <T> DemoPopupPreference(
     modifier: Modifier = Modifier,
@@ -44,6 +47,7 @@ internal fun <T> DemoPopupPreference(
     menuStyle: CouiMenuStyle,
     summary: String? = null,
     enabled: Boolean = true,
+    closeOnItemClick: Boolean = true,
     icon: (@Composable () -> Unit)? = null,
 ) {
     val dark = CouiTheme.isDark
@@ -60,8 +64,17 @@ internal fun <T> DemoPopupPreference(
             PopupArrow(Modifier.padding(start = 4.dp).size(14.dp, 24.dp),
                 Color(if (dark) 0x4DFFFFFF else 0x42000000))
         }
-        Menu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }, items = items,
-            onItemClick = { item -> onItemClick(item); onExpandedChange(false) }, style = menuStyle, anchor = anchor)
+        Menu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) },
+            items = items,
+            onItemClick = { item ->
+                onItemClick(item)
+                if (closeOnItemClick) onExpandedChange(false)
+            },
+            style = menuStyle,
+            anchor = anchor,
+        )
     }
 }
 
