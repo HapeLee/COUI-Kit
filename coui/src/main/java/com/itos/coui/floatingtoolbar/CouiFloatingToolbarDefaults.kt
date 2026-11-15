@@ -33,17 +33,34 @@ internal val LocalCouiFloatingToolbarStyle = staticCompositionLocalOf<CouiFloati
 }
 
 /**
- * 栏高与单个操作项的最小宽度一致，操作项按图标按钮处理：只承担点击与悬停，不各自绘制玻璃表面。
+ * 尺寸取自系统便签 17.0.30 的 `coui_floating_toolbar_*` 资源：
+ * 栏高 44dp、项宽 44dp、项高 40dp、项间距 4dp、图标 24dp、两项以上时两侧各留 6dp。
+ * 操作项按图标按钮处理：只承担点击与悬停，不各自绘制玻璃表面。
  * 组件不按位置或颜色区分操作项，多色图标与单色图标反馈完全一致。
  */
 object CouiFloatingToolbarDefaults {
-    val height = 48.dp
-    val itemSize = 48.dp
+    /** `coui_floating_toolbar_menu_view_height`。 */
+    val height = 44.dp
+
+    /** `coui_floating_toolbar_item_width`；宿主可用 `Modifier.width` 加宽。 */
+    val itemSize = 44.dp
+
+    /** `coui_floating_toolbar_item_height`：项比栏矮 4dp，上下各留 2dp。 */
+    val itemHeight = 40.dp
+
+    /** `coui_floating_toolbar_item_view_space`：删除时先扩到 1.75 倍，插入时先压到 0.25 倍再收拢。 */
+    val itemSpacing = 4.dp
 
     /**
-     * 系统胶囊的操作项间距为 48dp、图标为 24dp，两侧各留 12dp；图标按 24dp 取尺寸，
-     * 与系统同间距下才会得到同一处内外边距，缩到 20dp 会让操作项显得空。
+     * `coui_floating_toolbar_menu_view_item_bg_inset_horizontal`：胶囊边缘到首/末操作项的距离。
+     * 项只在相邻一侧带半个间距，两端直接补这个值；单项时原厂取 0。
      */
+    val edgeInset = 6.dp
+
+    /** `coui_floating_toolbar_item_single_mask_inset_horizontal`：单项时蒙版左右各内缩 2dp。 */
+    val singleItemFeedbackInset = 2.dp
+
+    /** `coui_floating_toolbar_item_icon_width`：项内左右各留 10dp。 */
     val iconSize = 24.dp
 
     /** 玻璃上的图标相对正文色的透明度；正文色本身是 90%，直接使用偏重。 */
