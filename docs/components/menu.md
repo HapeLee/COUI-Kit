@@ -72,6 +72,12 @@ fun MenuButton(
 
 `expanded` 控制菜单显隐。点击菜单项时调用 `onItemClick`；点击外部或按返回键时调用 `onDismissRequest`。需要在选中后关闭菜单时，在 `onItemClick` 中将 `expanded` 设为 `false`，如上例所示。
 
+### 菜单选择行的图标
+
+设置行显示当前值且点击后弹出菜单时，在行尾使用 COUI 上下双箭头。菜单关闭和打开时都使用同一个图标，避免把选择入口误读为展开或收起正文的控件。宿主绘制设置行时使用 `CouiIcons.Outlined.Popup` 或 `CouiIcons.Filled.Popup`，并按页面主题设置颜色。两个入口共用同一矢量，对应 ColorOS「音量键默认调节」使用的 `coui_pop_up_next_normal`。[图标用法](icons.md#指定颜色与特殊图标)
+
+弹出菜单里，带 `children` 的父项由 `Menu` 自动绘制同样的上下双箭头。普通选项只显示各自的内容和选择状态。
+
 ## 添加勾选和子菜单
 
 每个 `CouiMenuItem` 对应一个选项：

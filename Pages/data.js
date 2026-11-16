@@ -161,6 +161,118 @@ window.COUI_ICON_DATA = {
       }
     },
     {
+      "name": "Popup",
+      "style": "Filled",
+      "source": "Popup",
+      "day": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"24\" viewBox=\"0 0 14 24\" fill=\"none\"><path d=\"M4.199,10L8.328,5.413C8.526,5.192 8.872,5.192 9.071,5.413L13.199,10\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"miter\"/><path d=\"M13.199,14L9.071,18.587C8.872,18.808 8.526,18.808 8.328,18.587L4.199,14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"miter\"/></svg>",
+      "night": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"24\" viewBox=\"0 0 14 24\" fill=\"none\"><path d=\"M4.199,10L8.328,5.413C8.526,5.192 8.872,5.192 9.071,5.413L13.199,10\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"miter\"/><path d=\"M13.199,14L9.071,18.587C8.872,18.808 8.526,18.808 8.328,18.587L4.199,14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"miter\"/></svg>",
+      "mode": "original",
+      "vector": {
+        "day": {
+          "name": "Popup",
+          "width": 14,
+          "height": 24,
+          "viewportWidth": 14,
+          "viewportHeight": 24,
+          "autoMirror": false,
+          "tintColor": {
+            "type": "unspecified"
+          },
+          "commands": [
+            {
+              "type": "path",
+              "d": "M4.199,10L8.328,5.413C8.526,5.192 8.872,5.192 9.071,5.413L13.199,10",
+              "fill": null,
+              "fillAlpha": 1,
+              "stroke": {
+                "type": "solid",
+                "hex": "#000000",
+                "alpha": 1,
+                "rawAlpha": 255,
+                "isBackgroundParam": false
+              },
+              "strokeAlpha": 1,
+              "strokeLineWidth": 1.4,
+              "strokeLineCap": "round",
+              "strokeLineJoin": "miter",
+              "strokeLineMiter": 4,
+              "fillRule": "nonzero"
+            },
+            {
+              "type": "path",
+              "d": "M13.199,14L9.071,18.587C8.872,18.808 8.526,18.808 8.328,18.587L4.199,14",
+              "fill": null,
+              "fillAlpha": 1,
+              "stroke": {
+                "type": "solid",
+                "hex": "#000000",
+                "alpha": 1,
+                "rawAlpha": 255,
+                "isBackgroundParam": false
+              },
+              "strokeAlpha": 1,
+              "strokeLineWidth": 1.4,
+              "strokeLineCap": "round",
+              "strokeLineJoin": "miter",
+              "strokeLineMiter": 4,
+              "fillRule": "nonzero"
+            }
+          ]
+        },
+        "night": {
+          "name": "Popup",
+          "width": 14,
+          "height": 24,
+          "viewportWidth": 14,
+          "viewportHeight": 24,
+          "autoMirror": false,
+          "tintColor": {
+            "type": "unspecified"
+          },
+          "commands": [
+            {
+              "type": "path",
+              "d": "M4.199,10L8.328,5.413C8.526,5.192 8.872,5.192 9.071,5.413L13.199,10",
+              "fill": null,
+              "fillAlpha": 1,
+              "stroke": {
+                "type": "solid",
+                "hex": "#000000",
+                "alpha": 1,
+                "rawAlpha": 255,
+                "isBackgroundParam": false
+              },
+              "strokeAlpha": 1,
+              "strokeLineWidth": 1.4,
+              "strokeLineCap": "round",
+              "strokeLineJoin": "miter",
+              "strokeLineMiter": 4,
+              "fillRule": "nonzero"
+            },
+            {
+              "type": "path",
+              "d": "M13.199,14L9.071,18.587C8.872,18.808 8.526,18.808 8.328,18.587L4.199,14",
+              "fill": null,
+              "fillAlpha": 1,
+              "stroke": {
+                "type": "solid",
+                "hex": "#000000",
+                "alpha": 1,
+                "rawAlpha": 255,
+                "isBackgroundParam": false
+              },
+              "strokeAlpha": 1,
+              "strokeLineWidth": 1.4,
+              "strokeLineCap": "round",
+              "strokeLineJoin": "miter",
+              "strokeLineMiter": 4,
+              "fillRule": "nonzero"
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "Close",
       "style": "Filled",
       "source": "Close",
@@ -8354,6 +8466,118 @@ window.COUI_ICON_DATA = {
             {
               "type": "path",
               "d": "M5,6L10.646,11.646C10.842,11.842 10.842,12.158 10.646,12.354L5,18",
+              "fill": null,
+              "fillAlpha": 1,
+              "stroke": {
+                "type": "solid",
+                "hex": "#000000",
+                "alpha": 1,
+                "rawAlpha": 255,
+                "isBackgroundParam": false
+              },
+              "strokeAlpha": 1,
+              "strokeLineWidth": 1.4,
+              "strokeLineCap": "round",
+              "strokeLineJoin": "miter",
+              "strokeLineMiter": 4,
+              "fillRule": "nonzero"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Popup",
+      "style": "Outlined",
+      "source": "Popup",
+      "day": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"24\" viewBox=\"0 0 14 24\" fill=\"none\"><path d=\"M4.199,10L8.328,5.413C8.526,5.192 8.872,5.192 9.071,5.413L13.199,10\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"miter\"/><path d=\"M13.199,14L9.071,18.587C8.872,18.808 8.526,18.808 8.328,18.587L4.199,14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"miter\"/></svg>",
+      "night": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"24\" viewBox=\"0 0 14 24\" fill=\"none\"><path d=\"M4.199,10L8.328,5.413C8.526,5.192 8.872,5.192 9.071,5.413L13.199,10\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"miter\"/><path d=\"M13.199,14L9.071,18.587C8.872,18.808 8.526,18.808 8.328,18.587L4.199,14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"miter\"/></svg>",
+      "mode": "original",
+      "vector": {
+        "day": {
+          "name": "Popup",
+          "width": 14,
+          "height": 24,
+          "viewportWidth": 14,
+          "viewportHeight": 24,
+          "autoMirror": false,
+          "tintColor": {
+            "type": "unspecified"
+          },
+          "commands": [
+            {
+              "type": "path",
+              "d": "M4.199,10L8.328,5.413C8.526,5.192 8.872,5.192 9.071,5.413L13.199,10",
+              "fill": null,
+              "fillAlpha": 1,
+              "stroke": {
+                "type": "solid",
+                "hex": "#000000",
+                "alpha": 1,
+                "rawAlpha": 255,
+                "isBackgroundParam": false
+              },
+              "strokeAlpha": 1,
+              "strokeLineWidth": 1.4,
+              "strokeLineCap": "round",
+              "strokeLineJoin": "miter",
+              "strokeLineMiter": 4,
+              "fillRule": "nonzero"
+            },
+            {
+              "type": "path",
+              "d": "M13.199,14L9.071,18.587C8.872,18.808 8.526,18.808 8.328,18.587L4.199,14",
+              "fill": null,
+              "fillAlpha": 1,
+              "stroke": {
+                "type": "solid",
+                "hex": "#000000",
+                "alpha": 1,
+                "rawAlpha": 255,
+                "isBackgroundParam": false
+              },
+              "strokeAlpha": 1,
+              "strokeLineWidth": 1.4,
+              "strokeLineCap": "round",
+              "strokeLineJoin": "miter",
+              "strokeLineMiter": 4,
+              "fillRule": "nonzero"
+            }
+          ]
+        },
+        "night": {
+          "name": "Popup",
+          "width": 14,
+          "height": 24,
+          "viewportWidth": 14,
+          "viewportHeight": 24,
+          "autoMirror": false,
+          "tintColor": {
+            "type": "unspecified"
+          },
+          "commands": [
+            {
+              "type": "path",
+              "d": "M4.199,10L8.328,5.413C8.526,5.192 8.872,5.192 9.071,5.413L13.199,10",
+              "fill": null,
+              "fillAlpha": 1,
+              "stroke": {
+                "type": "solid",
+                "hex": "#000000",
+                "alpha": 1,
+                "rawAlpha": 255,
+                "isBackgroundParam": false
+              },
+              "strokeAlpha": 1,
+              "strokeLineWidth": 1.4,
+              "strokeLineCap": "round",
+              "strokeLineJoin": "miter",
+              "strokeLineMiter": 4,
+              "fillRule": "nonzero"
+            },
+            {
+              "type": "path",
+              "d": "M13.199,14L9.071,18.587C8.872,18.808 8.526,18.808 8.328,18.587L4.199,14",
               "fill": null,
               "fillAlpha": 1,
               "stroke": {
