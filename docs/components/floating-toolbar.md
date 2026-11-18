@@ -1,8 +1,11 @@
-# 🧰悬浮操作栏
+# FloatingToolbar 悬浮操作栏
 
-`FloatingToolbar` 把多个同级操作放进同一个胶囊玻璃表面，语义对齐 M3、Miuix 的 FloatingToolbar：容器承担材质、投影与轮廓，操作项只承担点击与反馈。
+`FloatingToolbar` 把多个同级操作放进同一个胶囊玻璃表面，语义对齐 M3、Miuix 的 FloatingToolbar：容器承担材质、投影与轮廓，操作项只承担点击与反馈。组件位于 `com.itos.coui.floatingtoolbar`，操作数量与业务提交由宿主决定。
 
-## 最小调用
+- **系统版本要求**：需要 **API 34+**，并需要所属页面的不透明 SDR 背景源（`backdrop`）。
+- **核心特性**：胶囊材质、投影与轮廓由容器统一承担、操作项数量不限并按列数收放、按压共用同一反馈蒙版；不内置横向滚动。
+
+## 基本用法
 
 操作栏需要 API 34 和页面背景源。`content` 是完整的 `Row` 插槽，操作项通过 `FloatingToolbarItem` 传入；下面在第三方容器中显式接收背景源：
 
@@ -129,5 +132,7 @@ val style = base.copy(material = base.material.copy(blurRadius = 30f))
 每个操作栏默认创建独立的单主体绘制器。宿主需要处理 Shader 初始化失败时，可以先用 `CouiFloatingRenderer.standalone()` 创建绘制器，成功后通过 `renderer` 传入。每个操作栏各用一个实例；同一页面出现两个操作栏时分别创建。
 
 放入 COUI Scaffold 的顶栏、底栏或 FAB 槽位时可省略 `backdrop`；正文中的操作栏需要显式传入覆盖页面内容的背景源，创建方式见[背景采样](../effects/backdrop.md)。
+
+## 源码与完整示例
 
 源码见 [FloatingToolbar](../../coui/src/main/java/com/itos/coui/floatingtoolbar/FloatingToolbar.kt) 与 [Defaults](../../coui/src/main/java/com/itos/coui/floatingtoolbar/CouiFloatingToolbarDefaults.kt)。Demo 装配见 [DemoFloatingToolbar](../../demo/src/main/java/com/itos/coui/demo/DemoFloatingToolbar.kt)。
