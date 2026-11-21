@@ -37,7 +37,7 @@ Demo 首页包含三个底栏页签（API 34+ 使用浮动 `NavigationBar`，左
 - **分段选择器**：依次展示多色背景上的透明模糊、默认 `Group` 内的普通填色和页面底色上的透明模糊；各组显示已提交选择，支持切换紧凑尺寸、禁用态和抬手提交（`commitOnRelease`），横向滑选期间页面保持静止。
 - **开关**：展示点击、拖动吸附、加载中（`loading`）、独立开关与禁用状态。
 - **单/复选框**：展示互斥单选、禁用单选，以及独立、整行和禁用复选框。
-- **菜单**：展示列表项入口、触点锚定、勾选、子菜单与限高滚动；勾选项与普通操作通过分隔线分组，菜单页与滚轮选择器的设置行遵循[菜单选择行的图标规范](../components/menu.md#菜单选择行的图标)。
+- **菜单**：分别打开按钮定位、触点定位、勾选与分隔线、二级菜单、带标题菜单、可滚动长菜单和自定义外观示例。页首的「菜单背景模糊」可切换页面示例的采样材质和纯色背景。设置行使用上下双箭头，见[菜单选择行的图标规范](../components/menu.md#菜单选择行的图标)。
 - **弹窗**：展示底部、居中、长文、三操作、禁用确认、主题色确认及打开时切换主题；输入型示例演示草稿、过滤、计数、清除与取消；加载示例在模拟任务结束后自动关闭。
 - **选择器**：滚轮选择器通过类型菜单切换数字、时间、倒计时和日期，共用示例区域与弹窗入口并各自保留值和设置；月历独立展示。弹窗确认后才提交草稿，搜索具体类型可直接直达对应示例。
 - **设置**：主题组提供 Material 配色开关，底栏组提供轮廓光与左右附件开关；点击“还原示例”弹窗确认后恢复四项默认值。“关于”页展示应用名称与参考系统版本。
@@ -65,7 +65,7 @@ Demo 首页包含三个底栏页签（API 34+ 使用浮动 `NavigationBar`，左
 | 详情分发与页面容器 | [DemoSecondaryPage](../../demo/src/main/java/com/itos/coui/demo/DemoSecondaryPage.kt)、[DemoSettingsPage](../../demo/src/main/java/com/itos/coui/demo/DemoSettingsPage.kt) |
 | 组件与设置样例 | [DemoSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt) |
 | 阴影、模糊与材质 | [DemoShadowSamples](../../demo/src/main/java/com/itos/coui/demo/DemoShadowSamples.kt)、[DemoBlurTutorial](../../demo/src/main/java/com/itos/coui/demo/DemoBlurTutorial.kt)、[DemoVisualEffects](../../demo/src/main/java/com/itos/coui/demo/DemoVisualEffects.kt) |
-| 弹窗、Sheet 与选择器 | [DemoDialogSamples](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)、[DemoSheetSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSheetSamples.kt)、[DemoPickerSamples](../../demo/src/main/java/com/itos/coui/demo/DemoPickerSamples.kt) |
+| 菜单、弹窗、Sheet 与选择器 | [DemoPopupSamples](../../demo/src/main/java/com/itos/coui/demo/DemoPopupSamples.kt)、[DemoDialogSamples](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)、[DemoSheetSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSheetSamples.kt)、[DemoPickerSamples](../../demo/src/main/java/com/itos/coui/demo/DemoPickerSamples.kt) |
 | 记录侧滑 | [DemoRecordSamples](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt) |
 
 Demo 仅展示宿主装配方式，其中的行包装与路由属于示例实现，并非库公开 API。实际接入请从[组件目录](../components/README.md)或[效果目录](../effects/README.md)开始。

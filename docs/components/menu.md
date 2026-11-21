@@ -170,6 +170,23 @@ fun HostPageWithMenuExample(
 - **菜单放在背景源之外**：`Menu` 自身运行在 `Popup` 中且触发容器位于 `windowSource` 之外，弹窗和页面遮罩也不要放入 `windowSource` 节点树内。
 - **页面色相叠加（`themeTint`）**：`CouiMenuStyle.themeTint` 会在采样材质上叠加页面色相（原生默认透明，M3 适配默认取 host surface）；将 `themeTint` 显式设为 `Color.Transparent` 可关闭色相叠加。
 
+### 切换采样与纯色背景
+
+窗口已经提供采样源时，可以读取它并只为一组菜单切换背景。将开关的状态传给这一组菜单的内容范围：
+
+~~~kotlin
+val windowBackdrop = rememberCouiWindowBackdrop()
+ProvideCouiMenuBackdrop(backdrop = if (blurEnabled) windowBackdrop else null) {
+    TouchAnchorMenuButton(
+        label = buttonLabel,
+        items = items,
+        onSelect = onSelect,
+    )
+}
+~~~
+
+窗口继续使用原有的背景录制节点。开关关闭时，范围内的菜单使用 `CouiMenuStyle.colors.container`。
+
 ### 空闲时按需离屏
 
 `ProvideCouiMenuBackdrop` 默认对背景内容保持离屏隔离（`isolateContent = true`）。对于已确认内容内部没有跨节点目标混合（如 `Clear`、`DstIn`）的**不透明静态页面根**，可传入 `isolateContent = false`，让窗口在空闲期间采用 `CompositingStrategy.Auto`：
@@ -247,4 +264,4 @@ fun rememberMenuStyle(
 ## 源码与完整示例
 
 - **公开入口与预设**：[Menu.kt](../../coui/src/main/java/com/itos/coui/menu/Menu.kt)、[CouiMenuStyle.kt](../../coui/src/main/java/com/itos/coui/menu/CouiMenuStyle.kt)、[CouiMenuAnchor.kt](../../coui/src/main/java/com/itos/coui/menu/CouiMenuAnchor.kt)、[CouiMenuBackdrop.kt](../../coui/src/main/java/com/itos/coui/menu/CouiMenuBackdrop.kt)
-- **Demo 完整示例**：[DemoSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)、[DemoPopupSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoPopupSamples.kt)
+- **Demo 完整示例**：[DemoPopupSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoPopupSamples.kt)
