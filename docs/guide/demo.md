@@ -20,7 +20,7 @@ Demo 首页包含三个底栏页签（API 34+ 使用浮动 `NavigationBar`，左
 
 | 页面 | 内容 |
 | --- | --- |
-| 组件 | 开关、滑条、单/复选框、菜单、弹窗、顶栏、搜索、底栏、FAB、选择器、分段选择器、消息输入栏与 `ChipTab` |
+| 组件 | 开关、滑条、单/复选框、Sheet 面板、菜单、弹窗、顶栏、搜索、底栏、FAB、选择器、分段选择器、消息输入栏与 `ChipTab` |
 | 效果 | 平滑胶囊阴影、记录侧滑融合、背景模糊和材质 |
 | 设置 | 主题设置、底栏设置，以及同一无标题组中的“关于此示例”和“还原示例”选项 |
 
@@ -33,6 +33,7 @@ Demo 首页包含三个底栏页签（API 34+ 使用浮动 `NavigationBar`，左
 
 所有二级页统一使用 `LargeTopAppBar` 大标题顶栏：展开标题位于返回按钮下方，上滑时沿弧线收起至按钮旁，返回按钮与操作区位于标题上层（见[二级页大标题与弧线收起](customizations.md#二级页大标题与弧线收起)）。
 
+- **Sheet 面板**：在**组件 → Sheet 面板**可分别试用「添加闹钟」与「半屏面板」；闹钟示例展示全高编辑、草稿取消/保存与内嵌 `ChipTabRow`，半屏示例展示拖动条与右上角「更多」菜单，页面顶部的模糊开关可对照下方三色色块预览采样效果（用法见 [Sheet 面板](../components/bottom-sheet.md)）。
 - **分段选择器**：依次展示多色背景上的透明模糊、默认 `Group` 内的普通填色和页面底色上的透明模糊；各组显示已提交选择，支持切换紧凑尺寸、禁用态和抬手提交（`commitOnRelease`），横向滑选期间页面保持静止。
 - **开关**：展示点击、拖动吸附、加载中（`loading`）、独立开关与禁用状态。
 - **单/复选框**：展示互斥单选、禁用单选，以及独立、整行和禁用复选框。
@@ -51,7 +52,7 @@ Demo 首页包含三个底栏页签（API 34+ 使用浮动 `NavigationBar`，左
 ## 主题与页面装配
 
 - **主题切换**：`DemoApplication` 初始化可选 `CouiMaterial3Style`。开启 Material 配色时组件读取宿主主题；关闭时局部 `CouiTheme` 切换为原生外观，Demo 的 M3 内容也映射到 COUI 表面与强调色；显式 `Fab` 配色预设优先于主题（见[外观与预设](appearance.md)）。
-- **页面容器与背景源**：首页和详情页使用公开的 [Scaffold](../components/scaffold.md) 测量栏位并处理横向安全区，Demo 在容器外处理 `IME` 避让，正文应用测量所得 `Padding`。容器自动向顶栏、底栏和 `FAB` 槽位提供正文背景源，正文内的 `ChipTab` 与模糊演示保留独立源；Activity 根部安装 `ProvideCouiMenuBackdrop` 窗口源供菜单与弹窗使用（见[宿主页面接入](secondary-pages.md)）。
+- **页面容器与背景源**：首页和详情页使用公开的 [Scaffold](../components/scaffold.md) 测量栏位并处理横向安全区，Demo 在容器外处理 `IME` 避让，正文应用测量所得 `Padding`。容器自动向顶栏、底栏和 `FAB` 槽位提供正文背景源，正文内的 `ChipTab` 与模糊演示保留独立源；Activity 根部安装 `ProvideCouiMenuBackdrop` 窗口源供菜单、弹窗与 Sheet 面板使用（见[宿主页面接入](secondary-pages.md)）。
 - **导航边界**：页面通过标准 `Intent` 启动、`finish()` 退出，沿用当前 ROM 向普通应用提供的 Activity 转场，不实现系统设置的特权窗口或双栏协议。
 
 ## 源码导航
@@ -64,7 +65,7 @@ Demo 首页包含三个底栏页签（API 34+ 使用浮动 `NavigationBar`，左
 | 详情分发与页面容器 | [DemoSecondaryPage](../../demo/src/main/java/com/itos/coui/demo/DemoSecondaryPage.kt)、[DemoSettingsPage](../../demo/src/main/java/com/itos/coui/demo/DemoSettingsPage.kt) |
 | 组件与设置样例 | [DemoSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt) |
 | 阴影、模糊与材质 | [DemoShadowSamples](../../demo/src/main/java/com/itos/coui/demo/DemoShadowSamples.kt)、[DemoBlurTutorial](../../demo/src/main/java/com/itos/coui/demo/DemoBlurTutorial.kt)、[DemoVisualEffects](../../demo/src/main/java/com/itos/coui/demo/DemoVisualEffects.kt) |
-| 弹窗与选择器 | [DemoDialogSamples](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)、[DemoPickerSamples](../../demo/src/main/java/com/itos/coui/demo/DemoPickerSamples.kt) |
+| 弹窗、Sheet 与选择器 | [DemoDialogSamples](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)、[DemoSheetSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSheetSamples.kt)、[DemoPickerSamples](../../demo/src/main/java/com/itos/coui/demo/DemoPickerSamples.kt) |
 | 记录侧滑 | [DemoRecordSamples](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSamples.kt) |
 
 Demo 仅展示宿主装配方式，其中的行包装与路由属于示例实现，并非库公开 API。实际接入请从[组件目录](../components/README.md)或[效果目录](../effects/README.md)开始。

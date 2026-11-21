@@ -1,0 +1,31 @@
+<resources>
+    <string name="sheet_title">Sheet</string>
+    <string name="intro_sheets">A reusable Sheet container for editors, settings pages and existing controls.</string>
+    <string name="sheet_alarm">Add alarm</string>
+    <string name="sheet_alarm_editor">New alarm</string>
+    <string name="sheet_done">Done</string>
+    <string name="sheet_alarm_until">Next alarm in %1$d hours %2$d minutes</string>
+    <string name="sheet_alarm_name">Alarm name</string>
+    <string name="sheet_ring_once">Once</string>
+    <string name="sheet_weekdays">Weekdays</string>
+    <string name="sheet_quick_alarm">Quick alarm</string>
+    <string name="sheet_custom">Custom</string>
+    <string name="sheet_default_vibration">Default vibration</string>
+    <string name="sheet_no_vibration">No vibration</string>
+    <string name="sheet_silent">Silent</string>
+    <string name="sheet_snooze">Snooze</string>
+    <string name="sheet_snooze_default">Every 5 minutes, 3 times</string>
+    <string name="sheet_snooze_off">Off</string>
+    <string name="sheet_usage">Tap Done to save the alarm draft in this demo.</string>
+    <string name="sheet_half">Half-height sheet</string>
+    <string name="sheet_half_usage">Drag down from the handle or an empty part of the sheet, or tap Close.</string>
+    <string name="sheet_close">Close</string>
+    <string name="sheet_more_actions">More options</string>
+    <string name="sheet_blur_title">Sheet background blur</string>
+    <string name="sheet_blur_summary">Samples the colors and content behind the sheet.</string>
+    <string name="sheet_blur_no_source">Background sampling is unavailable on this page.</string>
+    <string name="sheet_vibrate">Vibrate</string>
+    <string name="sheet_sound">Ringtone</string>
+    <string name="sheet_default_sound">Default</string>
+    <string name="sheet_saved">Saved in this demo</string>
+</resources>

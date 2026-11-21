@@ -72,14 +72,17 @@ fun LitSurface(
 
 | 配置 | 行为与角权重约束 | 适用场景 |
 | --- | --- | --- |
-| `floating = false`, `style = CouiContourStyle.Menu`（默认） | 菜单轮廓与内晕，`cornerWeight >= 2f` | 菜单或圆角卡片 |
-| `floating = false`, `style = CouiContourStyle.Dialog` / `Button` | 警告窗口 / 控件的轮廓预设，`cornerWeight >= 1f` | 自定义弹窗或按钮（支持胶囊权重 `1f`）；[弹窗](../components/dialog.md)已内置，无需单独配置 |
+| `floating = false`, `style = CouiContourStyle.Menu`（默认） | 菜单轮廓与内晕，`cornerWeight >= 2f`，要求上下等角且 `innerGlowScale == 1f` | 菜单或圆角卡片 |
+| `floating = false`, `style = CouiContourStyle.Dialog` | 警告窗口轮廓预设，`cornerWeight >= 1f` | 自定义弹窗（[弹窗](../components/dialog.md)已内置，无需单独配置） |
+| `floating = false`, `style = CouiContourStyle.Button` / `CircleButton` | 分别对应胶囊与圆形控件的 Drawable 轮廓预设，`cornerWeight >= 1f` | 自定义胶囊/圆形控件或顶栏按钮 |
 | `floating = false`, `style = CouiContourStyle.Panel` | 底部面板的独立内晕分布（使用同一 `Shader`），`cornerWeight >= 1f` | 底部面板轮廓 |
-| `floating = true`（`style` 须保持默认 `Menu`） | 使用 FAB 加亮算法并保持表面 `alpha`，禁止与其他 `style` 组合 | 浮动操作按钮类独立表面 |
+| `floating = true`（`style` 须保持默认 `Menu`） | 使用 FAB 加亮算法并保持表面 `alpha`，要求上下等角且禁止与其他 `style` 组合 | 浮动操作按钮类独立表面 |
 
 ### 单位、叠色与资源生命周期
 
-- **输入单位与取值范围**：`shader(size, density, radiusPx, cornerWeight, surfaceColor, innerGlowAlpha, lineAlpha, effectAlpha, lineWidthPx)` 中，`size`、`radiusPx`、`lineWidthPx`（默认 `2.5f * density`）均使用**节点本地 px**，`density` 须为正数；`innerGlowAlpha`、`lineAlpha` 与 `effectAlpha` 须在 `0f..1f` 范围内。
+- **输入单位与取值范围**：`size`、`radiusPx`、`bottomRadiusPx`、`lineWidthPx`（默认 `2.5f * density`）均使用**节点本地 px**，半径须为有限非负数，`density` 须为有限正数；`innerGlowAlpha`、`lineAlpha` 与 `effectAlpha` 须在 `0f..1f` 范围内。
+- **上下圆角独立控制（`bottomRadiusPx`）**：默认取 `radiusPx`。可在 `cornerWeight >= 2f` 的 `Dialog`、`Button`、`CircleButton`、`Panel` 预设中分别设置上下角（例如为底部面板传入 `0f` 得到直角下沿）；`Menu`、浮动轮廓（`floating = true`）与 `cornerWeight < 2f` 的胶囊轮廓要求上下等角。
+- **内晕缩放（`innerGlowScale`）**：缩放 Drawable 与浮动轮廓的内晕渐变距离，须为有限正数，默认 `1f`；普通 `Menu` 预设固定使用 `1f`。
 - **透明覆盖 vs 带底色输出**：仅需独立覆盖光效时，传入 `surfaceColor = Color.Transparent`，再覆盖到已有表面上；传入真实 `surfaceColor` 时，输出已包含该底色，**不得再重复叠加底色**。独立轮廓使用白光 `SrcOver`，需要后景颜色参与混合时应使用 `CouiEdge`。
 - **节点资源归属**：每个独立绘制节点持有自己的 `CouiContour` 或 `CouiEdge`；尺寸、几何、`density` 或颜色改变时应调用 `shader(...)` / `renderEffect(size, density)` 更新参数，不复用旧尺寸或旧参数的 uniform 快照。外部裁剪 `Shape` 须与传入距离场的圆角和 `cornerWeight` 匹配。
 
