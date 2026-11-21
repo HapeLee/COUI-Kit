@@ -7,10 +7,49 @@ COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和�
 ### 新增与改进
 
 - `Dialog` 的 `confirmAction` 改为可选；它与 `dismissAction`、`neutralAction` 一起省略时渲染无操作弹窗，只保留标题、正文和 `content`，关闭由返回键或点击外部触发。[弹窗](docs/components/dialog.md#最小调用)
+- 同步上游 `0.0.1-alpha14`：接入 Sheet 面板 `BottomSheet`、消息输入栏 `MessageInputBar`、菜单选择图标与 Popup 菜单默认宽度，并保留 fork 的 API 26 门槛、悬浮操作栏 `FloatingToolbar` 与输入框 `TextField`。
 
 ### 升级说明
 
 - 现有调用无需修改。省略 `confirmAction` 是新增能力，三个操作齐全时的布局、配色与回调时机不变。
+- 本 fork 的库模块仍以 API 26 为最低系统；上游新组件的平台门槛见[兼容要求](docs/guide/compatibility.md#效果门槛)。
+
+## [0.0.1-alpha14] - 2026-11-22
+
+### 新增与改进
+
+- 优化顶栏、底栏、FAB、搜索栏、菜单和弹窗的背景模糊与材质效果，修复部分场景下的马赛克和色阶分层。
+- 调整 Popup 菜单的默认宽度。普通菜单为 `168–256dp`，含子菜单项时最小宽度为 `196dp`。 [PR #33](https://github.com/ItosEO/COUI-Kit/pull/33)
+
+### 升级说明
+
+- `coui`、`coui-material3` 和 `coui-icons` 使用同一版本。升级后重新编译宿主模块。
+
+## [0.0.1-alpha13] - 2026-11-21
+
+### 新增与改进
+
+- 新增底部面板 `BottomSheet`，通过 `MutableState<Boolean>` 控制显隐，支持居中标题、两侧操作按钮、正文滚动回弹及下拉关闭。面板支持 API 31+，有宿主窗口背景源时可在 API 33+ 启用模糊材质，顶部按钮的浮动材质要求 API 34+。[底部面板](docs/components/bottom-sheet.md)
+- 对齐底部面板 Fast Kawase 的降采样网格与放大后的混色顺序，减轻底图的色阶块。面板内的菜单和子菜单按面板可见范围定位，顶部按钮可用 `CouiSheetButton.popupContent` 挂载固定位置的菜单。[菜单](docs/components/menu.md)
+- `ChipTabRow` 可继承容器提供的背景源，并支持分别设置选中底色与前景色。新增默认单行省略的 `CouiTextKind.SheetTitle`。[分类栏](docs/components/chip-tab.md)
+- `WheelPicker` 支持单独设置滚轮文字的可见宽度和对齐方式，整列仍可触摸拖动。[选择器](docs/components/pickers.md)
+
+### 升级说明
+
+- `coui`、`coui-material3` 和 `coui-icons` 使用同一版本。升级后重新编译宿主模块。
+
+## [0.0.1-alpha12] - 2026-11-18
+
+### 新增与改进
+
+- 新增消息输入栏 `MessageInputBar`（Android 14 / API 34+），自带随深浅主题切换的底部渐变遮罩和留白。宿主可按焦点切换提示文案，也可按草稿内容切换操作按钮。切换按钮时保留光标位置和选区。[消息输入栏](docs/components/message-input-bar.md)
+- 新增 `rememberCouiImeInsets()`，供宿主页随软键盘调整布局。编辑时切到小窗，键盘收起后输入栏随之回落。[底部放置与键盘抬升](docs/components/message-input-bar.md#底部放置与键盘抬升)
+- 新增 `CouiIcons.Outlined` 下的 `Camera`、`AddCircle`、`Send` 和 `Keyboard`，保留原厂日夜配色与透明度。新增菜单选择行的上下双箭头 `Filled.Popup` 和 `Outlined.Popup`，调整 `Outlined.Setting` 的描边。[图标](docs/components/icons.md)
+
+### 升级说明
+
+- `coui`、`coui-material3` 和 `coui-icons` 使用同一版本。alpha11 的公开调用可沿用，升级后重新编译宿主模块。
+- 接入消息输入栏时，将 `MessageInputBar` 放入页面底栏，由宿主页统一处理键盘避让。组件会补足底部导航栏留白。
 
 ## [0.0.1-alpha11] - 2026-11-12
 

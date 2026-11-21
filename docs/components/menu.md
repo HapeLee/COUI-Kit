@@ -1,10 +1,13 @@
-# 📋菜单
+# 菜单
 
-`Menu` 可以显示普通菜单项、勾选项和一级子菜单。菜单的展开状态和选择结果由页面保存。
+`Menu` 提供悬浮弹出的选择菜单，支持普通菜单项、独立勾选状态、分组分隔线、顶部提示文本和一级子菜单。组件位于 `com.itos.coui.menu`，菜单的展开状态、选中结果与勾选数据均由宿主持有。
 
-## 最小调用
+- **基础菜单与兼容模糊**：支持库的最低系统版本（API 31+）；在 API 33 以下提供背景源时使用普通 Gaussian 模糊分支（与 Fast Kawase 效果不等价）。
+- **Fast Kawase 模糊材质、轮廓光与跟手光**：要求 Android 13（API 33）及以上，并需要外层通过 `ProvideCouiMenuBackdrop` 提供宿主窗口背景源。
 
-页面提供展开状态、菜单项和回调：
+## 基本用法
+
+最小调用只需提供展开状态、关闭请求回调、菜单项列表和点击回调：
 
 ~~~kotlin
 Menu(
@@ -15,15 +18,20 @@ Menu(
 )
 ~~~
 
-需要采样页面背景时，把菜单调用放在[背景材质 Provider](#使用背景材质)的 `ProvideCouiMenuBackdrop` 内容中；默认样式不会创建背景源。样式默认使用 `CouiMenuDefaults.style()`，显式传入的样式仍优先。原生默认 `themeTint` 透明；M3 适配取 host surface，显式透明可关闭。通用主题规则见[外观与预设](../guide/appearance.md)。
+`style` 默认使用 `CouiMenuDefaults.style()`，从当前 `CouiTheme`（或 M3 适配策略）解析配色与文字样式，详见[外观与预设](../guide/appearance.md)。**点击菜单项不会自动收起菜单**，需要在 `onItemClick` 中由宿主决定是否将 `expanded` 设为 `false`；点击外部或按系统返回键会触发 `onDismissRequest`。
 
-## 显示一个菜单
+### 触点锚点与同 `Box` 定位
 
-下面的按钮会打开菜单。选择项目后调用 `onSelect`，然后关闭菜单：
+`Menu` 支持两种常见的锚点定位方式：
+
+- **方式一：按触点弹出（`rememberCouiMenuAnchor()`）**：适合列表项、设置行或大面积按钮，菜单会根据手指按下的位置与窗口可见范围自适应弹出。
+- **方式二：相对按钮固定弹出**：适合[顶栏按钮](#顶栏按钮菜单)，菜单位置以按钮的布局范围为基准。
+
+下面展示带触点锚点的菜单按钮，选择菜单项后回调 `onSelect` 并收起菜单：
 
 ~~~kotlin
 @Composable
-fun MenuButton(
+fun TouchAnchorMenuButton(
     modifier: Modifier = Modifier,
     style: CouiMenuStyle = CouiMenuDefaults.style(),
     label: String,
@@ -32,6 +40,7 @@ fun MenuButton(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val anchor = rememberCouiMenuAnchor()
+
     Box(modifier) {
         Button(
             modifier = Modifier.couiMenuAnchor(anchor),
@@ -54,79 +63,144 @@ fun MenuButton(
 }
 ~~~
 
-`anchor` 记录按钮上的触点，菜单根据触点和窗口可见范围定位。通过键盘或无障碍服务打开时，没有触点，菜单使用默认锚点。示例中的 Material3 `Button` 和 `Text` 需要由应用声明 Material3 依赖；最小调用不需要该依赖。自定义 `style` 的创建方式见[菜单样式](#菜单样式)。
+`Modifier.couiMenuAnchor(anchor)` 只记录按下的位置。键盘和无障碍操作会按触发按钮的容器定位。
 
-顶栏按钮与菜单放在同一个 Box 时，可省略 `anchor`，直接用按钮回调更新 `expanded`。菜单按 Popup 父布局的范围定位，因此 Box 应只包住对应按钮。需要按触点定位时再使用 `rememberCouiMenuAnchor()`；触点锚点只观察输入，点击仍由按钮或列表项处理。
+### 顶栏按钮菜单
 
-`expanded` 控制菜单显隐。点击菜单项时调用 `onItemClick`；点击外部或按返回键时调用 `onDismissRequest`。需要在选中后关闭菜单时，在 `onItemClick` 中将 `expanded` 设为 `false`，如上例所示。
+在 [TopAppBar](top-app-bar.md) 的 `actions` 中，为触发按钮单独放一个 `Box`，把按钮和 `Menu` 作为它的两个子项。省略 `anchor`，菜单就会按整个按钮所在容器定位。建议传 `DpOffset(0.dp, 4.dp)`，下方空间足够时在按钮底边留出 `4.dp`。
 
-## 添加勾选和子菜单
+下面的片段用于支持 `TopAppBarButton` 的 API 34+ 顶栏。`moreIcon`、`items` 和 `onSelect` 由页面提供。
 
-每个 `CouiMenuItem` 对应一个选项：
+~~~kotlin
+var expanded by remember { mutableStateOf(false) }
 
-| 字段 | 作用 |
-| --- | --- |
-| `value` | 提交给业务层的值 |
-| `text` | 显示文本 |
-| `icon` / `iconTint` | 图标和自定义颜色 |
-| `selected` | 当前选中样式，和勾选状态分开 |
-| `checked` | 独立复选框状态；`null` 表示普通菜单项 |
-| `enabled` | 是否接受点击 |
-| `dividerBefore` | 在该项前加分组线 |
-| `children` | 一级子菜单；父项只展开，不提交值 |
+Box {
+    TopAppBarButton(onClick = { expanded = true }) {
+        moreIcon()
+    }
+    Menu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        items = items,
+        onItemClick = { item ->
+            expanded = false
+            onSelect(item.value)
+        },
+        offset = DpOffset(0.dp, 4.dp),
+    )
+}
+~~~
+
+### 菜单选择行的图标
+
+设置行显示当前值且点击后弹出菜单时，在行尾使用 COUI 上下双箭头（菜单打开和关闭时保持同一个图标，避免误读为折叠正文入口）。宿主绘制设置行时使用 `CouiIcons.Outlined.Popup` 或 `CouiIcons.Filled.Popup` 并按页面主题设置颜色（详见[图标用法](icons.md#指定颜色与特殊图标)）；弹出菜单中带 `children` 的父项由 `Menu` 自动绘制同样的上下双箭头。
+
+## 菜单项：选中、勾选与子菜单
+
+每个菜单项由 `CouiMenuItem<T>` 描述：
+
+| 字段 | 默认值 | 说明 |
+| --- | --- | --- |
+| `value` | 必填 | 提交给业务层的数据值。 |
+| `text` | 必填 | 菜单项显示文本。 |
+| `icon` / `iconTint` | `null` | 左侧图标与可选图标染色；`iconTint = null` 时跟随当前项文字色。 |
+| `selected` | `false` | 单选高亮样式（高亮底色与 `primary` 文字色），**与 `checked` 互不冲突、相互独立**。 |
+| `checked` | `null` | 独立开关勾选态。非 `null` 时在左侧显示 `Checkbox`；`null` 表示普通菜单项。 |
+| `enabled` | `true` | 是否响应点击或滑动选择提交。 |
+| `dividerBefore` | `false` | 是否在该项上方插入一条分组分隔线。 |
+| `children` | `emptyList()` | 一级子菜单项列表。非空时点击父项只负责展开/切换子菜单，**不会触发 `onItemClick`**。 |
+
+下面的示例组合了单选高亮、独立勾选、分组线与一级子菜单：
 
 ~~~kotlin
 val items = listOf(
-    CouiMenuItem(0, "重命名", icon = Icons.Default.Edit, selected = selected == 0),
-    CouiMenuItem(1, "固定到桌面", icon = Icons.Default.Check, checked = pinned),
-    CouiMenuItem(2, "更多", dividerBefore = true, children = listOf(
-        CouiMenuItem(3, "分享"),
-        CouiMenuItem(4, "删除", enabled = false),
-    )),
+    CouiMenuItem(0, "按名称排序", icon = Icons.Default.SortByAlpha, selected = sortMode == 0),
+    CouiMenuItem(1, "显示隐藏文件", checked = showHidden),
+    CouiMenuItem(
+        value = 2,
+        text = "更多操作",
+        dividerBefore = true,
+        children = listOf(
+            CouiMenuItem(3, "分享"),
+            CouiMenuItem(4, "删除", enabled = false),
+        ),
+    ),
 )
 ~~~
 
-示例中的 `selected` 和 `pinned` 是页面状态。点击勾选项后，需要在 `onItemClick` 中更新 `pinned`。有 `children` 的父项只负责展开，子项才会提交值；子菜单只支持一级。
+- **两级菜单上限**：子菜单仅支持一级（即主菜单 + 一级子菜单，总计两级）。子项中的 `children` 必须为空，否则会抛出异常。
+- **勾选状态由宿主持有**：点击带 `checked` 的菜单项后，组件不会自动翻转勾选状态；如需连续勾选多个项目，可在 `onItemClick` 中更新状态而不关闭菜单。
 
 ## 使用背景材质
 
-不提供背景源时，菜单使用 `CouiMenuStyle.colors.container` 作为不透明底色。需要采样页面背景时，用 `ProvideCouiMenuBackdrop` 包住页面，并将返回的 Modifier 加到背景内容上：
+不提供背景源时，菜单使用 `CouiMenuStyle.colors.container` 作为不透明底色。需要采样页面背景实现毛玻璃材质时，在页面外层包一层 `ProvideCouiMenuBackdrop`，并将回调提供的 `Modifier` 挂到页面的背景内容容器上：
 
 ~~~kotlin
-ProvideCouiMenuBackdrop { source ->
-    Box(Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().then(source).background(background)) {
-            pageContent()
+@Composable
+fun HostPageWithMenuExample(
+    modifier: Modifier = Modifier,
+    background: Color,
+    style: CouiMenuStyle,
+    buttonLabel: String,
+    items: List<CouiMenuItem<Int>>,
+    onSelect: (Int) -> Unit,
+    pageContent: @Composable () -> Unit,
+) {
+    ProvideCouiMenuBackdrop { windowSource ->
+        Box(modifier.fillMaxSize()) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .then(windowSource)
+                    .background(background),
+            ) {
+                pageContent()
+            }
+            TouchAnchorMenuButton(
+                style = style,
+                label = buttonLabel,
+                items = items,
+                onSelect = onSelect,
+            )
         }
-        MenuButton(style = style, label = label, items = items, onSelect = onSelect)
     }
 }
 ~~~
 
-这里的 `background` 和 `pageContent` 由页面提供，`MenuButton` 沿用前面的示例。菜单放在背景源之外；弹窗和页面遮罩也不要录入背景源。`style.themeTint` 可以传页面表面色。
+- **菜单放在背景源之外**：`Menu` 自身运行在 `Popup` 中且触发容器位于 `windowSource` 之外，弹窗和页面遮罩也不要放入 `windowSource` 节点树内。
+- **页面色相叠加（`themeTint`）**：`CouiMenuStyle.themeTint` 会在采样材质上叠加页面色相（原生默认透明，M3 适配默认取 host surface）；将 `themeTint` 显式设为 `Color.Transparent` 可关闭色相叠加。
 
 ### 空闲时按需离屏
 
-背景内容默认使用离屏隔离。不透明的静态页面可设置 `isolateContent = false`，让没有菜单或材质弹窗消费背景时的源使用 `CompositingStrategy.Auto`。下面沿用前面的参数和 `MenuButton`：
+`ProvideCouiMenuBackdrop` 默认对背景内容保持离屏隔离（`isolateContent = true`）。对于已确认内容内部没有跨节点目标混合（如 `Clear`、`DstIn`）的**不透明静态页面根**，可传入 `isolateContent = false`，让窗口在空闲期间采用 `CompositingStrategy.Auto`：
 
 ~~~kotlin
-ProvideCouiMenuBackdrop(isolateContent = false) { source ->
+ProvideCouiMenuBackdrop(isolateContent = false) { windowSource ->
     Box(Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().then(source).background(background)) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .then(windowSource)
+                .background(background),
+        ) {
             pageContent()
         }
-        MenuButton(style = style, label = label, items = items, onSelect = onSelect)
+        TouchAnchorMenuButton(
+            style = style,
+            label = buttonLabel,
+            items = items,
+            onSelect = onSelect,
+        )
     }
 }
 ~~~
 
-库在菜单进入、显示和退出期间保持源及其父窗口源的离屏隔离。材质弹窗按实际存活期持有背景；最后一个消费者释放后，源恢复所选的空闲策略。普通菜单、子菜单和嵌套窗口共用这套管理，宿主不要按 `expanded` 手动切换背景策略。
-
-`Auto` 仍可能使用离屏缓冲，内容的目标混合需要自行隔离。透明窗口、移动的 BottomSheet、缩放或分数位移容器应使用默认隔离模式。完整要求见[背景源的离屏策略](../effects/backdrop.md#菜单窗口的离屏策略)，公开声明见 [ProvideCouiMenuBackdrop](../../coui/src/main/java/com/itos/coui/menu/CouiMenuBackdrop.kt)。
+- **自动管理消费生命周期**：菜单入场、展开、退场以及材质弹窗存活期间，库会自动恢复背景源及其父窗口源的离屏隔离；最后一个消费者释放后自动恢复空闲策略。**宿主不要按 `expanded` 手动切换策略**。
+- **适用边界**：透明窗口、缩放、移动中或分数位移容器仍须使用默认 `isolateContent = true`；内容中的特殊混合模式在 `Auto` 下需要自行隔离，详见[菜单窗口的离屏策略](../effects/backdrop.md#菜单窗口的离屏策略)。
 
 ## 菜单样式
 
-`CouiMenuStyle` 设置菜单的颜色、形状和文字。下面根据页面颜色创建一份样式：
+可以通过 `CouiMenuDefaults.style().copy(...)` 微调默认样式，或构造完整的 `CouiMenuStyle` 来统一控制配色、圆角、复选框外观与文字样式：
 
 ~~~kotlin
 @Composable
@@ -153,24 +227,24 @@ fun rememberMenuStyle(
         itemTextStyle = TextStyle(fontSize = 15.sp, color = contentColor),
         headerTextStyle = TextStyle(fontSize = 12.sp, color = contentColor.copy(alpha = 0.6f)),
         themeTint = surface,
+        dark = dark,
     )
 }
 ~~~
 
-`shape` 为 `CouiShape` 时，材质轮廓和普通投影从它读取半径，轮廓同时使用它的权重。`radius` 默认 `Dp.Unspecified`，表示由 Shape 解析；显式传入时必须与 Shape 的半径一致。可通过 `CouiMenuDefaults.style().copy(shape = newShape)` 修改形状。`itemShape` 和 Checkbox 的形状分别控制内部区域。
+- **显式传入 `dark`**：手写 `CouiMenuStyle` 时建议传入 `dark`，主菜单与子菜单的文字、材质、阴影与跟手反馈共用该模式；省略时按 `colors.surface` 亮度推断。
+- **圆角与轮廓（`shape` 与 `radius`）**：默认 `shape` 为 `CouiShape(28.dp)`，`radius` 为 `Dp.Unspecified`（自动从 `CouiShape` 读取半径与权重）。更换为非 `CouiShape` 的自定义 `Shape` 时，须显式提供有限非负的 `radius`，轮廓权重使用菜单预设；`itemShape`、`checkboxShape`、`checkboxBorderShape` 分别控制菜单项与内置复选框圆角。
+- **顶部提示文本（`headerText`）**：通过 `Menu(..., headerText = ...)` 显示顶部不可选提示文案（最多两行）。修改 `CouiTheme.typography.label` 或 `CouiMenuStyle.headerTextStyle` 可调整字体、字号、字重与行距，文字颜色由菜单按深浅色控制。
+- **菜单限高与滚动**：`Menu` 默认不设固定最大高度；长菜单可在 `Menu` 的 `modifier` 中传入 `Modifier.heightIn(max = 320.dp)`，使其在限定高度内纵向滚动（子菜单会自动受可用窗口高度约束）。
+- **Sheet 面板内定位**：在 [Sheet 面板](bottom-sheet.md)内弹出时，主菜单与子菜单均在面板当前可见区域内定位与滚动，主菜单的缩放与平移也受该区域约束；窄面板中的子菜单改为上下展开，而面板内另行打开的独立 `Dialog` 中的菜单仍按各自窗口定位。
 
-使用其他自定义 Shape 时，须显式提供有限非负的 `radius`，轮廓权重使用菜单预设。普通投影使用圆角矩形轮廓。
+## 装配注意事项
 
-菜单没有默认高度上限；长菜单可以在 `Menu` 的 `modifier` 中传入 `Modifier.heightIn(max = 320.dp)`，让它在限定高度内滚动。子菜单会按窗口高度限制。
+- API 33+ 使用 Fast Kawase。底图恢复到面板尺寸后，执行亮度混色、Overlay 和轻微抖动，再绘制轮廓光。API 31–32 使用普通 Gaussian 模糊。各版本的光效见[兼容要求](../guide/compatibility.md#效果门槛)。
+- **宽度范围**：普通菜单面板宽度限制在 `168.dp` 至 `256.dp` 之间，含子菜单项时最小宽度为 `196.dp`（子面板跟随主菜单实测宽度），内容按最大固有宽度测量。
+- **诊断回调**：`onSpotlightDiagnostic` 仅用于调试跟手光状态，常规业务接入无需传入。
 
-自定义样式应传入 `dark`，省略时按 surface 亮度判断。默认工厂使用当前主题模式，主菜单与子菜单的文字、材质、阴影和反馈共同使用它。M3 模糊补底取 surface，无 Backdrop 的容器取 surfaceBright；selected 取 primary，checkbox 深色取 inversePrimary。
+## 源码与完整示例
 
-## 兼容性和滚动
-
-API 26–30 使用不透明的普通菜单；API 31–32 的 Gaussian 模糊与 API 33+ 的 Fast Kawase 不同，见[兼容要求](../guide/compatibility.md)。
-
-`headerText` 用于显示提示文案，不参与选择。`themeTint` 透明时关闭采样材质上的页面色相叠加；显式样式可以提供非透明色。
-
-标题字体默认来自 `CouiTheme.typography.label`。修改主题的 `label` 或显式传入 `CouiMenuStyle.headerTextStyle` 可以调整字体、字号、字重和行距。标题颜色、对齐和最多两行由菜单控制。
-
-源码见 [Menu / CouiMenuItem](../../coui/src/main/java/com/itos/coui/menu/Menu.kt)、[样式](../../coui/src/main/java/com/itos/coui/menu/CouiMenuStyle.kt)、[触点锚点](../../coui/src/main/java/com/itos/coui/menu/CouiMenuAnchor.kt)，选中、勾选、子菜单和限高示例见 [DemoSamples](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)。
+- **公开入口与预设**：[Menu.kt](../../coui/src/main/java/com/itos/coui/menu/Menu.kt)、[CouiMenuStyle.kt](../../coui/src/main/java/com/itos/coui/menu/CouiMenuStyle.kt)、[CouiMenuAnchor.kt](../../coui/src/main/java/com/itos/coui/menu/CouiMenuAnchor.kt)、[CouiMenuBackdrop.kt](../../coui/src/main/java/com/itos/coui/menu/CouiMenuBackdrop.kt)
+- **Demo 完整示例**：[DemoSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)、[DemoPopupSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoPopupSamples.kt)

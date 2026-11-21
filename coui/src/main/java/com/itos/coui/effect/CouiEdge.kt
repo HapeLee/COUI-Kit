@@ -26,6 +26,7 @@ class CouiEdge(
     private val shader = RuntimeShader(CouiEdgeShader)
     private var lastSize = Size.Zero
     private var lastDensity = 0f
+    private var lastSlightDither = false
     private var cachedEffect: RenderEffect? = null
 
     init {
@@ -39,16 +40,20 @@ class CouiEdge(
         shader.setFloatUniform("uContourGlowEnabled", if (contourGlowEnabled) 1f else 0f)
     }
 
-    fun renderEffect(size: Size, density: Float): RenderEffect {
+    fun renderEffect(size: Size, density: Float): RenderEffect = renderEffect(size, density, slightDither = false)
+
+    internal fun renderEffect(size: Size, density: Float, slightDither: Boolean): RenderEffect {
         cachedEffect?.let { effect ->
-            if (size == lastSize && density == lastDensity) return effect
+            if (size == lastSize && density == lastDensity && slightDither == lastSlightDither) return effect
         }
+        shader.setFloatUniform("uSlightDither", if (slightDither) 1f else 0f)
         shader.setCouiContourUniforms(size, density, radiusPx, cornerWeight, innerGlowAlpha, lineAlpha)
         // 与现有模糊层一致, uniform 更新后重建 effect, 不复用旧尺寸的 native 快照。
         val effect = RenderEffect.createRuntimeShaderEffect(shader, "content")
         cachedEffect = effect
         lastSize = size
         lastDensity = density
+        lastSlightDither = slightDither
         return effect
     }
 }
@@ -302,7 +307,7 @@ internal const val CouiContourShaderFunctions = CouiEdgeColorFunctions + """
             return 1.0 - smoothstep(-aa, aa, d);
         }
 
-        float4 blendMenuInnerGlow(CommonDataRect rectData, float4 color, float d, float2 fragCoord) {
+        float4 blendMenuInnerGlow(CommonDataRect rectData, float4 color, float d, float2 fragCoord, float innerCorner) {
             float3 uFadeColor = float3(u_shadowArray[0], u_shadowArray[1], u_shadowArray[2]);
             float3 uFadeAlpha = float3(u_shadowArray[3], u_shadowArray[4], u_shadowArray[5]);
             float uFadeIn = u_shadowArray[6];
@@ -323,7 +328,7 @@ internal const val CouiContourShaderFunctions = CouiEdgeColorFunctions + """
                 float fadeLine = uFadeIn*-1.0;
                 float fadeSdf = fadeLine;
                 float2 halfSizeFade = rectData.halfSize*uFadeScale;
-                fadeConer.x = min(min(halfSizeFade.x, halfSizeFade.y),max(uFadeIn*1.2,rectData.coner));
+                fadeConer.x = min(min(halfSizeFade.x, halfSizeFade.y),max(uFadeIn*1.2,innerCorner));
                 if(rectData.weight<2.0 || any(greaterThan(abs(pos_new), halfSizeFade - float2(fadeConer.x)))) {
                     fadeSdf = smoothSDF_D(pos_new, halfSizeFade, fadeConer.x, rectData.weight);
                     float alpha = smoothstep(fadeLine,0.0,fadeSdf);
@@ -364,6 +369,10 @@ internal const val CouiContourShaderFunctions = CouiEdgeColorFunctions + """
             reColor.rgb = color.rgb*(1.0-fadeColor.a)+fadeColor.rgb;
             reColor.a = color.a*(1.0-fadeColor.a)+fadeColor.a;
             return reColor;
+        }
+
+        float4 blendMenuInnerGlow(CommonDataRect rectData, float4 color, float d, float2 fragCoord) {
+            return blendMenuInnerGlow(rectData, color, d, fragCoord, rectData.coner);
         }
 
         float getDis(float2 pos,float2 halfsize) {
@@ -425,15 +434,19 @@ internal const val CouiContourShaderFunctions = CouiEdgeColorFunctions + """
 
 """
 
-private const val CouiEdgeShader = CouiMaterialShaderFunctions + CouiContourShaderFunctions + """
+private const val CouiEdgeShader = CouiMaterialShaderFunctions + CouiContourShaderFunctions +
+    CouiSlightDitherShaderFunction + """
         uniform shader content;
         uniform float4 uMixColor;
         uniform float4 uBlendColor;
+        uniform float uSlightDither;
 
         half4 main(float2 fragCoord) {
             half4 sourceColor = content.eval(fragCoord);
             half4 displayColor = couiMaterial(sourceColor, uMixColor, uBlendColor);
-            if (uContourGlowEnabled < 0.5) return displayColor;
+            half4 materialColor = displayColor;
+            if (uSlightDither > 0.5) materialColor.rgb += slightDither(fragCoord) * materialColor.a;
+            if (uContourGlowEnabled < 0.5) return materialColor;
             half4 edgeReferenceColor = displayColor;
             if (uUseLightEdgeColor > 0.5) {
                 edgeReferenceColor = lightEdgeReferenceColor(sourceColor);
@@ -446,7 +459,7 @@ private const val CouiEdgeShader = CouiMaterialShaderFunctions + CouiContourShad
             rectData.coner = u_commonArray[6];
             rectData.weight = u_commonArray[7];
             float d = smoothSDF_D(rectData.pos, rectData.halfSize, rectData.coner, rectData.weight);
-            half4 color = blendMenuInnerGlow(rectData, displayColor, d, fragCoord);
+            half4 color = blendMenuInnerGlow(rectData, materialColor, d, fragCoord);
             color = blendEdge(rectData, color, edgeReferenceColor, d, 1.0);
             // shortcut: 整材质由调用方的公开 Shape Path 裁剪, 未移植厂商 GPU 抗锯齿覆盖率。
             return color;

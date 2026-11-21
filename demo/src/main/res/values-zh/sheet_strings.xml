@@ -1,0 +1,31 @@
+<resources>
+    <string name="sheet_title">Sheet 面板</string>
+    <string name="intro_sheets">通用 Sheet 容器，可承载编辑内容、二级设置页和现有控件。</string>
+    <string name="sheet_alarm">添加闹钟</string>
+    <string name="sheet_alarm_editor">新建闹钟</string>
+    <string name="sheet_done">完成</string>
+    <string name="sheet_alarm_until">距离下次响铃还有 %1$d 小时 %2$d 分钟</string>
+    <string name="sheet_alarm_name">闹钟名称</string>
+    <string name="sheet_ring_once">响一次</string>
+    <string name="sheet_weekdays">工作日</string>
+    <string name="sheet_quick_alarm">秒抢闹钟</string>
+    <string name="sheet_custom">自定义</string>
+    <string name="sheet_default_vibration">默认振动</string>
+    <string name="sheet_no_vibration">无振动</string>
+    <string name="sheet_silent">无铃声</string>
+    <string name="sheet_snooze">稍后提醒</string>
+    <string name="sheet_snooze_default">响铃间隔 5 分钟，响铃次数 3 次</string>
+    <string name="sheet_snooze_off">已关闭</string>
+    <string name="sheet_usage">点「完成」会在本 Demo 保存闹钟草稿。</string>
+    <string name="sheet_half">半屏面板</string>
+    <string name="sheet_half_usage">向下拖动顶部手柄或面板空白处，也可点「关闭」。</string>
+    <string name="sheet_close">关闭</string>
+    <string name="sheet_more_actions">更多选项</string>
+    <string name="sheet_blur_title">面板背景模糊</string>
+    <string name="sheet_blur_summary">实时采样面板后方的色块与页面内容。</string>
+    <string name="sheet_blur_no_source">当前页面没有可用的背景采样源。</string>
+    <string name="sheet_vibrate">振动</string>
+    <string name="sheet_sound">铃声</string>
+    <string name="sheet_default_sound">默认铃声</string>
+    <string name="sheet_saved">本 Demo 已保存</string>
+</resources>

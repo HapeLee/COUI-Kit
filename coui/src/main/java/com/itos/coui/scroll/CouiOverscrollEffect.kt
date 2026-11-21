@@ -22,9 +22,12 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -50,6 +53,8 @@ import kotlin.math.ceil
 import kotlin.math.sign
 import kotlin.math.sqrt
 
+internal val LocalCouiClipUpwardOverscroll = staticCompositionLocalOf { false }
+
 /**
  * 单轴越界阻尼和回弹；纵向沿用 Settings 列表，横向复用 Chip 分类栏的物理配置。
  * 每个滚动容器持有独立实例，传给容器的 overscrollEffect，不能多节点共用。
@@ -72,6 +77,7 @@ class CouiOverscrollEffect internal constructor(private val scope: CoroutineScop
     private var disposed = false
     private var overflowFling = false
     override val isInProgress: Boolean get() = translation != 0f || axisPhysics?.running == true
+    internal val drawsAboveViewport: Boolean get() = translation.toInt() < 0
     override val node: DelegatableNode = EdgeNode()
 
     private fun createPhysics(axis: Orientation) = CouiScrollPhysics(1,
@@ -353,7 +359,26 @@ fun Modifier.couiVerticalScroll(
 ): Modifier {
     require(overscrollEffect?.selectedOrientation != Orientation.Horizontal) { "couiVerticalScroll 不能使用横向回弹实例" }
     // 禁用纵向输入时保留回弹节点，避免移除祖先触摸节点而取消子内容的当前手势。
-    val visual = if (overscrollEffect != null) Modifier.overscroll(overscrollEffect) else Modifier
+    val visual = if (overscrollEffect != null) {
+        val viewport = if (LocalCouiClipUpwardOverscroll.current) Modifier.drawWithContent {
+            if (overscrollEffect.drawsAboveViewport) {
+                clipRect { this@drawWithContent.drawContent() }
+            } else drawContent()
+        } else Modifier
+        // verticalScroll 的内部裁剪会随回弹一起位移，裁剪须放在回弹节点外。
+        viewport.overscroll(overscrollEffect)
+    } else Modifier
+    return then(visual).couiVerticalScrollInput(state, enabled, overscrollEffect, interactionSource)
+}
+
+/** 只装配滚动输入，回弹可由更外层的视口绘制。 */
+@Composable
+internal fun Modifier.couiVerticalScrollInput(
+    state: ScrollState,
+    enabled: Boolean,
+    overscrollEffect: CouiOverscrollEffect?,
+    interactionSource: MutableInteractionSource? = null,
+): Modifier {
     val flingBehavior = rememberCouiScrollFlingBehavior(overscrollEffect)
     // Foundation 的 canScroll=true 允许分发但不保证消费；边界运动在零内容范围时仍可消费。
     // 只开放输入门控，其余操作直接委托真实 state，共用同一互斥，不另建滚动状态。
@@ -363,7 +388,7 @@ fun Modifier.couiVerticalScroll(
             override val canScrollBackward = true
         }
     }
-    return then(visual).scrollable(inputState, Orientation.Vertical,
+    return scrollable(inputState, Orientation.Vertical,
         overscrollEffect = overscrollEffect, enabled = enabled, reverseDirection = true,
         flingBehavior = flingBehavior, interactionSource = interactionSource,
         bringIntoViewSpec = InputOnlyBringIntoViewSpec)

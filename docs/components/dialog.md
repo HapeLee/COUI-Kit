@@ -1,45 +1,22 @@
-# 💬弹窗
+# 弹窗
 
-`Dialog` 用于显示确认、提示等弹窗，可以放在屏幕底部或居中显示。需要单行输入时，可以使用 `InputDialog`。
+`Dialog` 提供底部或居中显示的确认与警告弹窗，`InputDialog` 提供内置单行输入区的输入型弹窗，`LoadingDialog` 在任务执行期间显示居中的加载圆弧与提示文案。这些组件位于 `com.itos.coui.dialog`，显隐状态、文案、输入校验与业务提交均由宿主持有。
 
-## 最小调用
+- **基础不透明弹窗（`Dialog`、`InputDialog`、`LoadingDialog`）**：支持库的最低系统版本（API 31+）。
+- **半透明模糊材质与轮廓光**：要求 Android 13（API 33）及以上，并需要宿主提供不包含本弹窗的窗口背景源（`backdrop`）。
 
-页面提供显隐状态、操作文案和回调；`confirmAction` 是宿主用文案和业务回调构造的 `CouiDialogAction`：
+## 基本用法
 
-~~~kotlin
-Dialog(
-    visible = visible,
-    onDismissRequest = onDismiss,
-    confirmAction = confirmAction,
-)
-~~~
+`Dialog` 支持两种显隐控制方式，接入时按是否需要**移动过程中实时采样背景**与**自定义退场动画**二选一：
 
-`confirmAction` 可以省略。三个操作参数都为空时渲染无操作弹窗，只保留标题、正文和 `content`，关闭由返回键或点击外部触发：
+1. **常驻组合传入 `visible`（推荐用于材质弹窗）**：将 `Dialog` 持续保留在组合中，通过 `visible` 切换展开与关闭。`visible = true` 开始入场，`false` 开始退场并在动画结束后释放窗口；背景模糊采样与卡片位移、缩放共用同一帧变换，支持动画中途反向。**不要在外层再用 `if (visible)` 包裹**，否则关闭时会直接销毁窗口、跳过退场动画。
+2. **外层 `if (visible)` 控制（省略 `visible`）**：`visible` 默认为 `null`。由外层条件决定是否进入组合，使用系统窗口动画；此方式不提供卡片移动过程中的实时背景采样。
 
-~~~kotlin
-Dialog(
-    visible = visible,
-    onDismissRequest = onDismiss,
-    title = title,
-    message = message,
-) {
-    Text("这里放页面自己的内容")
-}
-~~~
-
-需要移动过程中实时采样背景时，传入 `visible`，并将调用持续保留在组合中。`true` 开始入场，`false` 开始退场；库在退场结束后释放窗口。移动和背景采样使用同一帧的位移、缩放，动画中途可以反向。
-
-`Dialog` 和两个 `InputDialog` 重载均支持此参数。不要再用 `if (visible)` 包裹这类调用，否则退场内容会立即移除。省略参数（默认 `null`）时，由外层条件控制窗口，使用系统窗口动画；此方式不提供移动过程中的实时采样。下文外层条件示例展示该调用方式。
-
-`dark` 和 `colors` 默认读取局部 `CouiTheme` 或初始化策略；未初始化时使用原生预设，模式来自 Local 或系统。M3 模式使用对应文字角色的字体族，字号、字重、行距和 fontScale 由组件控制。自定义正文使用宿主样式。通用规则见[外观与预设](../guide/appearance.md)。
-
-## 显示一个简单确认弹窗
-
-下面的弹窗包含标题、正文、确认和取消按钮：
+下面展示常驻组合的确认弹窗用法，文案、深浅色模式与回调均由宿主传入：
 
 ~~~kotlin
 @Composable
-fun ConfirmDialog(
+fun ConfirmDialogExample(
     modifier: Modifier = Modifier,
     visible: Boolean,
     dark: Boolean,
@@ -48,121 +25,141 @@ fun ConfirmDialog(
     confirmLabel: String,
     cancelLabel: String,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
-    if (visible) {
-        Dialog(
-            modifier = modifier,
-            onDismissRequest = onDismiss,
-            dark = dark,
-            title = title,
-            message = message,
-            confirmAction = CouiDialogAction(confirmLabel, onConfirm),
-            dismissAction = CouiDialogAction(cancelLabel, onDismiss),
-        )
-    }
+    Dialog(
+        modifier = modifier,
+        visible = visible,
+        onDismissRequest = onDismissRequest,
+        dark = dark,
+        title = title,
+        message = message,
+        confirmAction = CouiDialogAction(confirmLabel, onConfirm),
+        dismissAction = CouiDialogAction(cancelLabel, onDismissRequest),
+    )
 }
 ~~~
 
-`visible` 为 `true` 时显示弹窗。点击按钮会调用对应的回调；需要关闭弹窗时，在回调中将页面的 `visible` 设为 `false`。返回键和点击外部通过 `onDismissRequest` 请求关闭。此例显式提供 `dark`；省略时使用默认值。
-
-标题和正文可以传 `null`，对应区域不会显示。两个短按钮横排；单个按钮、三个按钮或文案放不下时自动竖排。省略全部操作时不渲染按钮区，正文保留自身底部间距，`content` 的底部留白由调用方决定。
-
-## 添加第三个操作
-
-通过 `neutralAction` 添加第三个操作。例如，在确认和取消之外增加重置按钮：
+若不需要实时背景采样，也可省略 `visible`，改由外层控制组合：
 
 ~~~kotlin
-Dialog(
-    onDismissRequest = onDismiss,
-    dark = dark,
-    title = title,
-    message = message,
-    confirmAction = CouiDialogAction(
-        text = confirmLabel,
-        onClick = onConfirm,
-        enabled = canConfirm,
-        style = CouiDialogActionStyle.Primary,
-        colors = CouiDialogDefaults.primaryActionColors(accent),
-    ),
-    dismissAction = CouiDialogAction(cancelLabel, onDismiss),
-    neutralAction = CouiDialogAction("重置选择", onReset),
-)
-~~~
-
-三个按钮竖排时，`neutralAction` 在最上方，默认使用破坏性文字色。设置 `CouiDialogActionStyle.Primary` 时，需要像示例一样提供 `colors`。`enabled = false` 只禁用对应按钮。
-
-## 使用自定义正文
-
-需要在正文中放列表或选择器时，可以使用 `content` 槽位：
-
-~~~kotlin
-Dialog(
-    onDismissRequest = onDismiss,
-    dark = dark,
-    title = title,
-    confirmAction = CouiDialogAction(confirmLabel, onConfirm),
-    dismissAction = CouiDialogAction(cancelLabel, onDismiss),
-) {
-    Text("这里放页面自己的内容")
+if (visible) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        title = title,
+        message = message,
+        confirmAction = CouiDialogAction(confirmLabel, onConfirm),
+        dismissAction = CouiDialogAction(cancelLabel, onDismissRequest),
+    )
 }
 ~~~
 
-`content` 位于正文滚动区。操作区独立排列；正文较长时，按钮仍保留在窗口内。示例中的 `Text` 来自 Material3，项目需要声明该依赖。
+接入时注意以下要点：
 
-## 输入型弹窗
+- **显式关闭由宿主控制**：点击按钮会触发 `CouiDialogAction.onClick`，**组件不会自动关闭弹窗**；需要在回调中由宿主将 `visible` 设为 `false`。系统返回键与点击遮罩区域会触发 `onDismissRequest`。
+- **可选标题与正文**：`title` 和 `message` 可传 `null` 或空字符串，对应区域会自动隐藏。
+- **主题默认解析**：省略 `dark` 与 `colors` 时自动读取局部 `CouiTheme` 或全局初始化策略，详见[外观与预设](../guide/appearance.md)。
 
-需要单行输入时，可以使用 `InputDialog`。下面用 `TextFieldState` 保存草稿，仅在输入非空时启用保存按钮：
+## 多操作、主操作配色与自定义正文
+
+通过 `neutralAction` 可添加第三个操作，通过 `CouiDialogActionStyle.Primary` 可突出主操作按钮；需要在正文中放置列表或[选择器](pickers.md)时，可使用尾随 `content` 槽位：
 
 ~~~kotlin
 @Composable
-fun RenameDialog(
+fun MultiActionDialogExample(
     modifier: Modifier = Modifier,
     visible: Boolean,
     dark: Boolean,
     accent: Color,
     title: String,
-    message: String,
+    confirmLabel: String,
+    cancelLabel: String,
+    resetLabel: String,
+    canConfirm: Boolean,
+    onConfirm: () -> Unit,
+    onReset: () -> Unit,
+    onDismissRequest: () -> Unit,
+    bodyContent: @Composable ColumnScope.() -> Unit,
+) {
+    Dialog(
+        modifier = modifier,
+        visible = visible,
+        onDismissRequest = onDismissRequest,
+        dark = dark,
+        title = title,
+        confirmAction = CouiDialogAction(
+            text = confirmLabel,
+            onClick = onConfirm,
+            enabled = canConfirm,
+            style = CouiDialogActionStyle.Primary,
+            colors = CouiDialogDefaults.primaryActionColors(accent),
+        ),
+        dismissAction = CouiDialogAction(cancelLabel, onDismissRequest),
+        neutralAction = CouiDialogAction(resetLabel, onReset),
+        content = bodyContent,
+    )
+}
+~~~
+
+- **按钮排布规则**：两个短按钮自动横排（`dismissAction` 在左、`confirmAction` 在右）；单个按钮、三个按钮，或任意按钮文案在均分宽度下放不下时，自动转为竖排（自上而下依次为 `neutralAction`、`confirmAction`、`dismissAction`）。
+- **主操作与破坏性配色**：设置 `CouiDialogActionStyle.Primary` 时**必须**传入 `colors`（可通过 `CouiDialogDefaults.primaryActionColors(accent)` 创建），否则会抛出异常。`neutralAction` 默认使用破坏性文字色（`colors.destructive`），`enabled = false` 仅禁用对应按钮。
+- **正文滚动隔离**：`content` 位于正文可滚动区域内，操作按钮区独立固定在底部；正文较长时按钮仍保留在窗口内，不会滚出视口。若正文使用 Material 3 的 `Text` 等组件，宿主需自行声明 Material 3 依赖。
+
+## 输入型弹窗
+
+需要单行输入时使用 `InputDialog`。组件提供两种状态重载：`TextFieldState` 重载（支持通过 `inputTransformation` 过滤粘贴和输入法组合编辑范围）与 `TextFieldValue` 回调重载。
+
+下面以 `TextFieldState` 重载为例，仅在输入非空时启用保存按钮：
+
+~~~kotlin
+@Composable
+fun RenameDialogExample(
+    modifier: Modifier = Modifier,
+    visible: Boolean,
+    dark: Boolean,
+    accent: Color,
+    title: String,
+    message: String?,
+    placeholder: String?,
     saveLabel: String,
     cancelLabel: String,
     clearLabel: String,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     onSave: (String) -> Unit,
 ) {
-    if (!visible) return
     val editor = rememberTextFieldState()
     InputDialog(
         modifier = modifier,
+        visible = visible,
         state = editor,
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismissRequest,
         dark = dark,
         accent = accent,
         title = title,
         message = message,
+        placeholder = placeholder,
         clearContentDescription = clearLabel,
         confirmAction = CouiDialogAction(
             text = saveLabel,
             onClick = { onSave(editor.text.toString()) },
             enabled = editor.text.isNotBlank(),
         ),
-        dismissAction = CouiDialogAction(cancelLabel, onDismiss),
+        dismissAction = CouiDialogAction(cancelLabel, onDismissRequest),
     )
 }
 ~~~
 
-编辑不会自动提交或关闭弹窗。示例在 `onSave` 中传出输入值，由页面保存并关闭弹窗；关闭后重新打开会创建新的输入状态。需要保留草稿时，可以将 `TextFieldState` 提到弹窗外层。
+接入 `InputDialog` 时注意以下规则：
 
-页面负责设置长度、内容校验和确认条件。`InputDialog` 支持 `TextFieldState` 和 `TextFieldValue`。需要按替换范围过滤粘贴或输入法组合输入时，使用 `state` 版本的 `inputTransformation`；程序性的 `state.edit` 和清除不会经过该转换。
-
-默认会在窗口获焦后请求输入焦点和键盘。需要手动点击输入区时，设置 `autoFocus = false`。
-
-传入 `visible` 时，卡片随键盘展开、收起而移动，背景模糊采样同步跟随卡片位置。关闭弹窗会立即释放输入焦点并收起键盘，卡片从当前位置退场。省略 `visible` 时，使用系统窗口的 `ADJUST_RESIZE` 避让键盘。两种方式均不需要额外添加 `imePadding`；自定义 `properties` 时，保留 `decorFitsSystemWindows = true` 和 `usePlatformDefaultWidth = false`。
+- **草稿生命周期与提交**：编辑不会自动保存或关闭弹窗。若将 `rememberTextFieldState()` 放在常驻组合的弹窗外层或内部，关闭后再次打开会保留上次输入；需要每次打开清空草稿时，可在打开时重置 `state`，或改用外层 `if (visible)` 包裹。
+- **校验、计数与清除按钮**：长度限制、错误态（`counterIsError`）与 `counter` 文案均由宿主持有并传入。`clearContentDescription` 为必填无障碍描述；清除按钮仅在获焦且内容非空时出现，点击仅清空文本并保持焦点，不触发提交。使用 `TextFieldState` 重载时，程序性调用 `state.edit` 与清除操作不经过 `inputTransformation`。
+- **焦点与键盘策略**：默认 `autoFocus = true`，窗口获焦后自动请求输入焦点并弹出软键盘；设为 `false` 时需用户手动点击输入区。传入 `visible` 时，卡片会随键盘展开和收起平滑移动并同步背景采样，关闭（`visible = false`）时立即释放焦点并收起键盘；省略 `visible` 时使用系统 `ADJUST_RESIZE` 避让键盘。两种方式均**不要**在弹窗内部叠加 `imePadding()`。
 
 ### 宿主页的键盘避让
 
-宿主页如果使用 `imePadding()`，只在自己的窗口拥有焦点时启用。输入弹窗打开后，宿主页仍可能收到键盘尺寸；继续应用间距会提前空出整块区域，在键盘升起前露出窗口底色。
+宿主页如果使用 `imePadding()`，必须只在宿主自身窗口拥有焦点时启用。输入弹窗打开后，宿主页仍可能收到键盘尺寸变化；继续无条件应用 `imePadding()` 会导致页面在键盘升起前提前空出整块区域，露出窗口底色。
 
-在宿主 Activity 的 Composable 中创建以下 Modifier，替换页面原来的无条件 `imePadding()`，并传给现有的 Scaffold 或页面容器。焦点判断放在宿主页，不放在 `InputDialog` 内部：
+请在宿主页的根容器（如传给 `Scaffold` 或页面容器的 `modifier`）中使用 `LocalWindowInfo.current.isWindowFocused` 替换无条件的 `imePadding()`，该判断应放在宿主页而非 `InputDialog` 内部：
 
 ~~~kotlin
 val imePadding = if (LocalWindowInfo.current.isWindowFocused) {
@@ -173,62 +170,107 @@ val imePadding = if (LocalWindowInfo.current.isWindowFocused) {
 val pageModifier = Modifier.fillMaxSize().then(imePadding)
 ~~~
 
-## 使用背景材质
+## 显示加载弹窗
 
-默认弹窗使用不透明表面；窗口背景模糊归零只在 API 31+ 设置，API 26–30 保持普通窗口遮罩。API 33 及以上可以传入 `material`，采样页面背景。先按[快速开始](../guide/getting-started.md#浮动组件的背景源)创建 `backdrop`，再将弹窗放在背景源节点之外：
+`LoadingDialog` 在屏幕中央显示循环转动的弧线和一行提示。把调用常驻留在组合中，由宿主在任务开始和结束时更新 `visible`：
 
 ~~~kotlin
-if (visible) {
-    Dialog(
-        onDismissRequest = onDismiss,
-        dark = dark,
-        title = title,
-        message = message,
-        confirmAction = CouiDialogAction(confirmLabel, onConfirm),
-        dismissAction = CouiDialogAction(cancelLabel, onDismiss),
-        material = if (CouiDialogDefaults.isMaterialSupported()) {
-            CouiDialogDefaults.material(dark)
-        } else {
-            null
-        },
-        backdrop = backdrop,
+@Composable
+fun TaskLoadingDialogExample(
+    modifier: Modifier = Modifier,
+    isWorking: Boolean,
+    loadingMessage: String,
+    onDismissRequest: (() -> Unit)? = null,
+) {
+    LoadingDialog(
+        modifier = modifier,
+        visible = isWorking,
+        message = loadingMessage,
+        onDismissRequest = onDismissRequest,
     )
 }
 ~~~
 
-`visible`、文案和回调沿用前面的确认弹窗示例。`material` 非空时要求 API 33 及以上，并须通过 `backdrop` 或 `ProvideCouiMenuBackdrop` 提供有效背景源；缺少系统支持或背景源时会报错。不支持材质时传入 `material = null`，使用不透明表面。
+- **文案与交互**：提示过长时以省略号收尾。默认屏蔽点击遮罩关闭；传入 `onDismissRequest` 后，系统返回键可请求宿主关闭，若需点击外部也请求关闭请同时设置 `dismissOnClickOutside = true`。
+- **状态归属**：宿主负责实际任务生命周期与关闭请求，通过 `visible` 控制窗口显隐。
 
-背景模糊采样自页面，窗口遮罩由系统独立渐变。传入 `visible` 时，入场等待窗口完成布局后开始；底部弹窗按卡片外框高度进入，按显示区域高度退出，位移与背景采样共用当前帧的位置。
+## 使用背景材质
 
-## 位置和外观
-
-默认从底部显示。需要居中时，设置 `placement = CouiDialogPlacement.Center`：
+弹窗默认使用不透明表面。在 Android 13（API 33）及以上，可在宿主页外层使用 `ProvideCouiMenuBackdrop` 录制窗口背景，并向 `Dialog` 或 `InputDialog` 传入 `material` 与 `backdrop`：
 
 ~~~kotlin
-Dialog(
-    onDismissRequest = onDismiss,
-    confirmAction = CouiDialogAction(confirmLabel, onConfirm),
-    dark = dark,
-    placement = CouiDialogPlacement.Center,
-)
+@Composable
+fun HostPageWithDialogExample(
+    modifier: Modifier = Modifier,
+    dialogVisible: Boolean,
+    dark: Boolean,
+    title: String,
+    message: String,
+    confirmLabel: String,
+    cancelLabel: String,
+    onConfirm: () -> Unit,
+    onDismissRequest: () -> Unit,
+    pageContent: @Composable () -> Unit,
+) {
+    ProvideCouiMenuBackdrop { windowSource ->
+        Box(Modifier.fillMaxSize().then(windowSource)) {
+            pageContent()
+        }
+
+        val backdrop = rememberCouiWindowBackdrop()
+        val material = if (CouiDialogDefaults.isMaterialSupported() && backdrop != null) {
+            CouiDialogDefaults.material(dark)
+        } else {
+            null
+        }
+
+        Dialog(
+            modifier = modifier,
+            visible = dialogVisible,
+            onDismissRequest = onDismissRequest,
+            dark = dark,
+            title = title,
+            message = message,
+            confirmAction = CouiDialogAction(confirmLabel, onConfirm),
+            dismissAction = CouiDialogAction(cancelLabel, onDismissRequest),
+            material = material,
+            backdrop = backdrop,
+        )
+    }
+}
 ~~~
 
-默认 `colors` 使用 `CouiDialogDefaults.themeColors(dark)`。显式自定义时可从该入口复制调整；主操作配色可以使用 `CouiDialogDefaults.primaryActionColors(accent)`。
+- **版本与背景源校验**：当 `material != null` 时，系统低于 API 33 或未通过 `backdrop` / `ProvideCouiMenuBackdrop` 提供有效背景源会直接抛出异常。不支持材质时传入 `material = null`，使用不透明表面。`InputDialog` 与 `LoadingDialog` 使用相同的材质接入方式。
+- **背景源节点边界**：`Dialog` 必须放在 `windowSource` 修饰的页面内容节点之外，不能让弹窗自身进入背景源，也不要只在弹窗内部新建背景源来代替宿主背景。
+- 启用材质时，`colors.dimAmount` 同时控制窗口遮罩与面板采样的压暗强度。面板先压暗采样，再做模糊。底图恢复到面板尺寸后，先按 `mix` 的 alpha 逐通道混合 RGB，再执行 `blendMode`。模糊等级为 `0` 时直接混色。窗口外遮罩由系统独立淡入淡出。传入 `visible` 时，入场在窗口完成布局后开始，背景模糊采样与卡片当前帧位置、缩放实时同步。
 
-修改圆角时，传入 `shape = CouiShape(radius, cornerWeight)`。裁剪与材质轮廓从 Shape 读取半径和权重。`cornerRadius` 默认 `Dp.Unspecified`，表示从 Shape 解析；显式传入时必须与 CouiShape 的半径一致。
+## 位置、圆角与外观
 
-使用其他自定义 `Shape` 并开启材质轮廓时，须显式提供有限非负的 `cornerRadius`；轮廓权重使用 Dialog 预设。无材质轮廓时只使用 Shape 裁剪。
+- **显示位置（`placement`）**：默认 `CouiDialogPlacement.Bottom`（底部显示）；需要居中显示时设为 `CouiDialogPlacement.Center`。
+- **配色（`colors`）**：默认使用 `CouiDialogDefaults.themeColors(dark)`，自定义时可基于 `themeColors(dark)` 或 `CouiDialogDefaults.colors(dark)` 复制调整；`dimAmount` 必须在 `0f..1f` 范围内。
+- **圆角与轮廓（`shape`、`cornerRadius`）**：默认 `shape = CouiDialogDefaults.shape`（`CouiShape(45.dp, 3f)`），`cornerRadius = Dp.Unspecified` 表示自动从 `CouiShape` 解析圆角半径与权重。更换为其他 `CouiShape` 时保持 `cornerRadius = Dp.Unspecified`（或传入一致的半径）；若改用非 `CouiShape` 的自定义 `Shape` 且开启材质轮廓，必须显式传入有限非负的 `cornerRadius`（轮廓权重使用 `Dialog` 预设），未开启材质时仅用于裁剪。
 
-## 窗口和限制
+## 参数与行为速查
 
-默认 `DialogProperties` 关闭平台默认宽度，使用 COUI 自己的外框策略。自定义 `properties` 时如果还要保留 COUI 宽度，显式设置 `usePlatformDefaultWidth = false`。
+| 参数 | 默认值 | 行为说明 |
+| --- | --- | --- |
+| `visible` | `null` | `Boolean?` 可选参数。传 `Boolean` 时常驻组合执行入退场动画并实时同步背景采样；省略（`null`）时由外层 `if (visible)` 控制，使用系统窗口动画。 |
+| `onDismissRequest` | 必填 | 系统返回键或点击弹窗外遮罩时触发；不会自动关闭弹窗，需由宿主更新状态。 |
+| `confirmAction` | 必填 | 确认按钮配置；`text` 不能为空白，使用 `Primary` 样式时必须提供 `colors`。 |
+| `dismissAction` / `neutralAction` | `null` | 可选取消与第三操作；`neutralAction` 默认使用破坏性文字色。 |
+| `placement` | `CouiDialogPlacement.Bottom` | 弹窗位置：底部（`Bottom`）或居中（`Center`）。 |
+| `material` / `backdrop` | `null` | API 33+ 背景材质配置与窗口背景源；`material` 非空时必须同时具备 API 33+ 与有效背景源。 |
+| `properties` | `usePlatformDefaultWidth = false` | `DialogProperties` 配置；`InputDialog` 额外要求保留 `decorFitsSystemWindows = true`。 |
+| `autoFocus` | `true` | 仅 `InputDialog` 可用；窗口获焦后自动请求输入焦点并弹出键盘。 |
 
-尺寸极小的弹窗和推荐/AI 支付按钮暂不支持。
+## 装配注意事项
 
-## Demo 中的样式与示例
+- **自定义 `properties` 的保留项**：自定义 `DialogProperties` 时如需维持 COUI 弹窗宽度与外边距策略，请保留 `usePlatformDefaultWidth = false`；`InputDialog` 还**必须**保留 `decorFitsSystemWindows = true`，否则会抛出异常。
+- **模糊半径语义**：`CouiDialogMaterial.blurRadius` 为 Fast Kawase 引擎等级（`0` 或不小于 `10`），并非高斯像素或 `sigma` 值。
+- **无障碍触摸浏览**：开启系统 TalkBack 触摸浏览时，弹窗会自动禁用点击遮罩关闭（`dismissOnClickOutside`），用户可通过系统返回或无障碍操作关闭。
+- **能力边界**：极小尺寸弹窗及推荐/AI 支付专用按钮暂不支持。
 
-Demo 的“组件 → 弹窗”分组包含底部、居中、长内容、多个操作和输入弹窗示例。
+## 源码与完整示例
 
-支持的设备可以通过“弹窗背景材质”开关比较模糊材质和不透明表面。
-
-Demo 源码见 [DemoDialogSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt) 与[输入型示例](../../demo/src/main/java/com/itos/coui/demo/DemoDialogInputSample.kt)。公开参数见 [Dialog / CouiDialogAction](../../coui/src/main/java/com/itos/coui/dialog/Dialog.kt)、[CouiDialogActionStyle / CouiDialogActionColors](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogButton.kt)、[InputDialog](../../coui/src/main/java/com/itos/coui/dialog/InputDialog.kt) 与 [CouiDialogDefaults](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogDefaults.kt)。
+- **公开入口与预设**：[Dialog.kt](../../coui/src/main/java/com/itos/coui/dialog/Dialog.kt)、[InputDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/InputDialog.kt)、[LoadingDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/LoadingDialog.kt)、[CouiDialogButton.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogButton.kt)、[CouiDialogDefaults.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogDefaults.kt)
+- **Demo 完整示例**：[DemoDialogSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)、[DemoDialogInputSample.kt](../../demo/src/main/java/com/itos/coui/demo/DemoDialogInputSample.kt)
