@@ -105,9 +105,9 @@ internal data class CouiMenuMotionFrame(
     val alpha: Float,
 )
 
-/** 保留 Material 的横向与普通锚点定位; 触点菜单纵向只按可见窗口避让。 */
+/** 普通菜单按布局锚点定位，触点菜单按触点与窗口可见范围定位。 */
 internal class CouiMenuMotionPositionProvider(
-    private val delegate: PopupPositionProvider,
+    private val delegate: CouiMenuPositionProvider,
     private val motion: CouiMenuMotion,
     private val anchorPosition: () -> Offset?,
     private val visibleWindowBounds: () -> IntRect?,
@@ -135,13 +135,13 @@ internal class CouiMenuMotionPositionProvider(
         val contentSize = menuSize ?: return IntOffset.Zero
         val popupOrigin = popupOriginInHostWindow ?: return IntOffset.Zero
         val touchPosition = anchorPosition()
-        val positioningAnchor = touchPosition?.let { IntRect(it.round(), IntSize.Zero) } ?: anchorBounds
-        val defaultPosition = delegate.calculatePosition(
-            positioningAnchor, windowSize, layoutDirection, contentSize,
-        )
         val candidate = if (touchPosition != null) {
+            val touch = touchPosition.round()
             val visibleBounds = visibleWindowBounds() ?: IntRect(IntOffset.Zero, windowSize)
-            val below = positioningAnchor.top + touchOffsetY
+            val x = delegate.calculateTouchX(
+                touch.x, windowSize.width, visibleBounds, layoutDirection, contentSize.width,
+            )
+            val below = touch.y + touchOffsetY
             val above = below - contentSize.height
             val maxTop = (visibleBounds.bottom - contentSize.height).coerceAtLeast(visibleBounds.top)
             // Material 的额外纵向留白会让靠近底部的触点失去吸附, 这里直接尝试触点两侧。
@@ -150,9 +150,9 @@ internal class CouiMenuMotionPositionProvider(
                 above >= visibleBounds.top && above + contentSize.height <= visibleBounds.bottom -> above
                 else -> below.coerceIn(visibleBounds.top, maxTop)
             }
-            defaultPosition.copy(y = y)
+            IntOffset(x, y)
         } else {
-            defaultPosition
+            delegate.calculatePosition(anchorBounds, windowSize, layoutDirection, contentSize)
         }
         val position = contentBounds?.invoke()?.let { frame ->
             IntOffset(candidate.x.coerceIn(frame.left, (frame.right - contentSize.width).coerceAtLeast(frame.left)),
