@@ -28,4 +28,8 @@
     <string name="sheet_sound">Ringtone</string>
     <string name="sheet_default_sound">Default</string>
     <string name="sheet_saved">Saved in this demo</string>
+    <string name="sheet_custom_slots">Host header slots</string>
+    <string name="sheet_custom_slots_usage">The leading and trailing slots take any composable; pressing them never starts a sheet drag.</string>
+    <string name="sheet_custom_slot_action">Counter</string>
+    <string name="sheet_custom_slot_menu_item">Slot menu item</string>
 </resources>

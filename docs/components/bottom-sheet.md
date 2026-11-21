@@ -63,7 +63,8 @@ fun BasicBottomSheetExample(
 
 - **两侧按钮（`CouiSheetButton`）**：`leadingButton` 与 `trailingButton` 随布局方向（LTR / RTL）自动镜像。`label`（文字按钮，最多两行省略）与 `icon`（圆形图标按钮）必须**二选一**；使用 `icon` 时请在内部图标上设置无障碍 `contentDescription`。可通过 `enabled` 控制按钮是否可点击。
 - **居中标题（`titleContent`）**：可放置任意 Composable；使用 `Text(..., kind = CouiTextKind.SheetTitle)` 时默认居中、单行省略，并自动具备无障碍标题语义。两侧按钮按较宽一侧等量避让，使标题保持视觉居中。三个顶部槽位均可省略；全部省略时不占用顶部栏高度。
-- **确认与菜单**：若取消按钮也需要关闭确认，可将同一个确认回调传给 `onDismissRequest` 和取消按钮的 `onClick`。把 [Menu](menu.md) 放入 `CouiSheetButton.popupContent`，菜单会以整个按钮为锚点固定弹出。
+- **自定义操作槽（`leadingContent` / `trailingContent`）**：宿主已有自己的按钮、开关或图标组合时，直接放入任意 Composable，不必封装成 `CouiSheetButton`。内容槽与按钮槽共用按下防误触（按在槽位上不会开始面板拖拽）和工具栏背景采样，标题仍按两侧实际宽度居中避让。同一侧只能选按钮或内容之一，同时传入会抛异常；两侧内容槽本身不提供点击手势和无障碍语义，需要宿主自己保证。
+- **确认与菜单**：若取消按钮也需要关闭确认，可将同一个确认回调传给 `onDismissRequest` 和取消按钮的 `onClick`。把 [Menu](menu.md) 放入 `CouiSheetButton.popupContent`，菜单会以整个按钮为锚点固定弹出；使用 `trailingContent` 时菜单挂在自己的锚点节点上即可。
 
 ## 使用背景材质
 
@@ -137,6 +138,7 @@ fun HostPageWithSheetExample(
 | `fullPageOverscroll` | `false` | 设为 `true` 后，留白也可发起回弹，顶部操作区在越界时与正文一起回弹。 |
 | `scrollableContent` | `true` | 由面板负责正文滚动与回弹；使用自带纵向滚动容器的正文时设为 `false`。 |
 | `leadingButton`、`trailingButton` | `null` | 顶部两侧各一个 `CouiSheetButton`，随布局方向自动镜像。 |
+| `leadingContent`、`trailingContent` | `null` | 顶部两侧的任意 Composable，替代同侧按钮；与按钮槽共用防误触与采样，同一侧两者互斥。 |
 | `titleContent` | `null` | 顶部居中的 Compose 内容。 |
 | `dismissOnClickOutside` | `true` | 控制点击遮罩能否请求关闭。 |
 | `colors` | `CouiDialogDefaults.themeColors(dark)` | 控制面板不透明底色与遮罩最大透明度（`dimAmount`）。需要固定原生面板配色时传入 `CouiSheetDefaults.colors(dark)`。 |

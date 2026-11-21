@@ -6,8 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -72,6 +74,7 @@ internal fun SheetSamples(dark: Boolean) {
         onToggleBlur = { blurEnabled = !blurEnabled },
         blurControl = blurControl,
     )
+    CustomSlotsSample(dark, material)
 
     // 色块由宿主页面录制，供面板对照模糊效果。
     Group {
@@ -214,6 +217,71 @@ private fun HalfSheetSample(
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
+    }
+}
+
+/**
+ * 宿主自己的操作组合：两侧槽位放任意 Composable，不进 `CouiSheetButton`。
+ * 菜单挂在槽位自己的 Box 上，验证按下按钮不会被面板拖拽接管、菜单采样仍在工具栏内。
+ */
+@Composable
+private fun CustomSlotsSample(dark: Boolean, material: CouiDialogMaterial?) {
+    val visible = rememberSaveable { mutableStateOf(false) }
+    var menuExpanded by remember { mutableStateOf(false) }
+    var actions by rememberSaveable { mutableIntStateOf(0) }
+    val actionColor = CouiDialogDefaults.themeColors(dark).action
+
+    Group(footer = stringResource(R.string.sheet_custom_slots_usage)) {
+        SheetEntry(
+            title = stringResource(R.string.sheet_custom_slots),
+            dark = dark,
+            icon = null,
+            isOpen = { visible.value },
+            onClick = { visible.value = true },
+        )
+    }
+
+    BottomSheet(
+        visible = visible,
+        material = material,
+        leadingContent = {
+            TextButton(onClick = { actions++ }, enabled = visible.value) {
+                Text(stringResource(R.string.sheet_custom_slot_action), color = actionColor)
+            }
+        },
+        titleContent = {
+            CouiText(text = stringResource(R.string.sheet_custom_slots), kind = CouiTextKind.SheetTitle)
+        },
+        trailingContent = {
+            Box {
+                IconButton(onClick = { menuExpanded = true }, enabled = visible.value) {
+                    Icon(CouiIcons.Outlined.More, stringResource(R.string.sheet_more_actions),
+                        Modifier.size(24.dp), tint = actionColor)
+                }
+                Menu(
+                    expanded = menuExpanded && visible.value,
+                    onDismissRequest = { menuExpanded = false },
+                    offset = DpOffset(0.dp, 4.dp),
+                    style = demoMenuStyle(dark),
+                    items = listOf(
+                        CouiMenuItem({ actions++ }, stringResource(R.string.sheet_custom_slot_menu_item)),
+                    ),
+                    onItemClick = {
+                        menuExpanded = false
+                        it.value()
+                    },
+                )
+            }
+        },
+    ) {
+        Group {
+            DemoPreference(
+                title = stringResource(R.string.sheet_custom_slot_action),
+                value = actions.toString(),
+                showChevron = false,
+            )
+        }
+        Spacer(Modifier.height(16.dp))
     }
 }
 

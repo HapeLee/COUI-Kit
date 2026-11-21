@@ -131,8 +131,9 @@ object CouiSheetDefaults {
  * COUI 底部面板。修改 visible.value 控制显隐，持续调用本组件以完成退场。
  * sheetHeight 为包含 handle、内容及底部安全区的可见目标高度；null 按内容测量。
  * 普通手机窗口顶部使用状态栏高度，无状态栏时保留 40dp；屏外绘制余量不占内容高度。
- * leadingButton、titleContent、trailingButton 位于正文上方。正文默认由面板负责滚动、回弹和上沿裁剪；
- * 正文自带纵向滚动容器时传 scrollableContent = false。
+ * leadingButton、titleContent、trailingButton 位于正文上方；leadingContent/trailingContent
+ * 用宿主的任意 Composable 顶替同侧按钮，与按钮共用防误触守卫和工具栏采样。
+ * 正文默认由面板负责滚动、回弹和上沿裁剪；正文自带纵向滚动容器时传 scrollableContent = false。
  * draggable 允许从留白处下拉关闭，nestedScrollEnabled 也允许正文到顶后的下拉关闭。
  * fullPageOverscroll 开启时，顶部与正文共享回弹，留白也可发起回弹。内置拖动条保持在回弹区域之外。
  * 关闭请求默认将 visible.value 设为 false，可通过 onDismissRequest 接管。
@@ -160,8 +161,10 @@ fun BottomSheet(
     fullPageOverscroll: Boolean = false,
     scrollableContent: Boolean = true,
     leadingButton: CouiSheetButton? = null,
+    leadingContent: (@Composable () -> Unit)? = null,
     titleContent: @Composable (() -> Unit)? = null,
     trailingButton: CouiSheetButton? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val isVisible = visible.value
@@ -402,8 +405,11 @@ fun BottomSheet(
                                                 fullPageOverscroll = fullPageOverscroll,
                                                 scrollableContent = scrollableContent,
                                                 toolbar = {
-                                                    if (leadingButton != null || titleContent != null || trailingButton != null) {
-                                                        SheetToolbar(leadingButton, titleContent, trailingButton)
+                                                    if (leadingButton != null || leadingContent != null ||
+                                                        titleContent != null ||
+                                                        trailingButton != null || trailingContent != null) {
+                                                        SheetToolbar(leadingButton, titleContent, trailingButton,
+                                                            leadingContent, trailingContent)
                                                     }
                                                 },
                                                 content = content,
