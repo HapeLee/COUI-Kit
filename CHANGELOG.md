@@ -7,13 +7,11 @@ COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和�
 ### 新增与改进
 
 - `Dialog` 的 `confirmAction` 改为可选；它与 `dismissAction`、`neutralAction` 一起省略时渲染无操作弹窗，只保留标题、正文和 `content`，关闭由返回键或点击外部触发。[弹窗](docs/components/dialog.md#最小调用)
-- `BottomSheet` 顶部两侧新增 `leadingContent` / `trailingContent` 内容槽，宿主可直接放自己的按钮、开关或图标组合，与按钮槽共用按下防误触和工具栏背景采样，标题仍按两侧实际宽度居中避让。[Sheet 面板](docs/components/bottom-sheet.md#顶部操作按钮与标题)
 - 同步上游 `0.0.1-alpha14`：接入 Sheet 面板 `BottomSheet`、消息输入栏 `MessageInputBar`、菜单选择图标与 Popup 菜单默认宽度，并保留 fork 的 API 26 门槛、悬浮操作栏 `FloatingToolbar` 与输入框 `TextField`。
 
 ### 升级说明
 
 - 现有调用无需修改。省略 `confirmAction` 是新增能力，三个操作齐全时的布局、配色与回调时机不变。
-- 内容槽与同侧 `leadingButton` / `trailingButton` 互斥，同时传入会抛异常；`CouiSheetButton` 的行为不变。
 - 本 fork 的库模块仍以 API 26 为最低系统；上游新组件的平台门槛见[兼容要求](docs/guide/compatibility.md#效果门槛)。
 
 ## [0.0.1-alpha14] - 2026-11-22

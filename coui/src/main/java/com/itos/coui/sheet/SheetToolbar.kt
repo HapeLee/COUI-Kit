@@ -66,22 +66,13 @@ data class CouiSheetButton(
     }
 }
 
-/**
- * 顶部按钮只采样面板底图，避免采入按钮自身。
- * leadingContent/trailingContent 放宿主自己的操作组合（任意 Composable）：与按钮槽共用
- * 防误触守卫（按下后不交给面板拖拽）和工具栏采样，标题仍按两侧实际宽度居中避让。
- * 同一侧只能给按钮或内容之一。
- */
+/** 顶部按钮只采样面板底图，避免采入按钮自身。 */
 @Composable
 internal fun SheetToolbar(
     leadingButton: CouiSheetButton?,
     titleContent: @Composable (() -> Unit)?,
     trailingButton: CouiSheetButton?,
-    leadingContent: (@Composable () -> Unit)? = null,
-    trailingContent: (@Composable () -> Unit)? = null,
 ) {
-    require(leadingButton == null || leadingContent == null) { "leadingButton 与 leadingContent 只能选一个" }
-    require(trailingButton == null || trailingContent == null) { "trailingButton 与 trailingContent 只能选一个" }
     val backdrop = rememberCouiSheetSurfaceBackdrop()
     val dark = CouiTheme.isDark
     val density = LocalDensity.current.density
@@ -109,18 +100,8 @@ internal fun SheetToolbar(
     CompositionLocalProvider(LocalCouiToolbarBackdrop provides backdrop) {
         Layout(modifier = Modifier.fillMaxWidth().padding(top = CouiSheetDefaults.toolbarTopSpacing)
             .padding(horizontal = CouiSheetDefaults.toolbarHorizontalPadding), content = {
-            Box(actionInput) {
-                when {
-                    leadingContent != null -> leadingContent()
-                    leadingButton != null -> SheetToolbarButton(leadingButton, style)
-                }
-            }
-            Box(actionInput) {
-                when {
-                    trailingContent != null -> trailingContent()
-                    trailingButton != null -> SheetToolbarButton(trailingButton, style)
-                }
-            }
+            Box(actionInput) { if (leadingButton != null) SheetToolbarButton(leadingButton, style) }
+            Box(actionInput) { if (trailingButton != null) SheetToolbarButton(trailingButton, style) }
             Box(Modifier.padding(vertical = CouiSheetDefaults.toolbarTitleVerticalPadding)
                 .heightIn(min = CouiSheetDefaults.toolbarTitleMinHeight)
                 .semantics { if (titleContent != null) heading() }, contentAlignment = Alignment.Center) {

@@ -28,8 +28,4 @@
     <string name="sheet_sound">铃声</string>
     <string name="sheet_default_sound">默认铃声</string>
     <string name="sheet_saved">本 Demo 已保存</string>
-    <string name="sheet_custom_slots">自定义操作槽</string>
-    <string name="sheet_custom_slots_usage">两侧槽位可放任意 Composable；按在槽位上不会触发面板下拉关闭。</string>
-    <string name="sheet_custom_slot_action">计数</string>
-    <string name="sheet_custom_slot_menu_item">槽位菜单项</string>
 </resources>
