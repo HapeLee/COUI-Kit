@@ -89,6 +89,10 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 - **COUI 文本组件（`com.itos.coui.text.Text`）**：提供固定 COUI 排版角色（`kind` 必填），文字颜色依次取「显式 `color` → 已提供的 `LocalCouiContentColor` → 当前 `CouiTheme.colorScheme.onSurface`」，在独立布局中省略颜色即可跟随主题（详见 [Item](../components/item.md#配色与文字)）。菜单项则读取 `CouiTheme.typography.menuItem` 的字号、字重与字体族。
 - **`LocalCouiContentColor` 约定**：缺省值为 `Color.Unspecified`（表示未提供内容色）。直接读取该 Local 的宿主应在未指定时自行取当前主题色；COUI 的文字和图标已在消费处完成解析。显式颜色（包含 `Color.Transparent`）始终优先；图标显式传入 `tint = Color.Unspecified` 时保留不染色语义。
 
+## 增强单个颜色
+
+使用 `coui-material3` 中的 `enhanceHctColor(seed, tone)` 生成控件专用颜色。例如，`enhanceHctColor(themeColor, tone = 55.0)` 可用于有色 FAB。宿主选择种子色和结果用途，函数返回不透明 sRGB 颜色。参数与色域说明见 [KDoc](../../coui-material3/src/main/java/com/itos/coui/material3/HctColor.kt)。
+
 ## 背景材质染色
 
 | 组件 | 原生默认 | M3 适配默认 | 关闭染色 / 自定义方式 |

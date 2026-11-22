@@ -86,4 +86,5 @@ tasks.withType<Jar>().configureEach {
 dependencies {
     api(project(":coui"))
     api(libs.androidx.compose.material3)
+    implementation(libs.material.color.utilities)
 }

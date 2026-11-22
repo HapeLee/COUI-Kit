@@ -17,6 +17,7 @@ import com.itos.coui.dialog.CouiDialogActionStyle
 import com.itos.coui.dialog.LoadingDialog
 import com.itos.coui.menu.rememberCouiWindowBackdrop
 import com.itos.coui.layout.*
+import com.itos.coui.theme.CouiTheme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -30,7 +31,8 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
     val windowBackdrop = rememberCouiWindowBackdrop()
     val supported = Build.VERSION.SDK_INT >= 33 && windowBackdrop != null
     val variants = listOf("primary" to R.string.dialog_primary, "bottom" to R.string.dialog_bottom, "center" to R.string.dialog_center,
-        "long" to R.string.dialog_long, "three" to R.string.dialog_three, "disabled" to R.string.dialog_disabled,
+        "long" to R.string.dialog_long, "three" to R.string.dialog_three, "actionRows" to R.string.dialog_action_rows,
+        "disabled" to R.string.dialog_disabled,
         "input" to R.string.dialog_input, "loading" to R.string.dialog_loading) +
         if (onToggleTheme != null) listOf("theme" to R.string.dialog_theme_live) else emptyList()
     if (supported) Group {
@@ -47,6 +49,7 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
         val dismiss = { visible = false }
         val regularMessage = stringResource(R.string.dialog_sample_message)
         val title = stringResource(R.string.dialog_sample_title)
+        val dialogMaterial = if (material && supported) CouiDialogDefaults.material(dark) else null
         if (variant == "loading") {
             LaunchedEffect(visible, session) {
                 if (visible) {
@@ -59,19 +62,42 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
                 message = stringResource(R.string.dialog_loading_message),
                 onDismissRequest = dismiss,
                 dark = dark,
-                material = if (material && supported) CouiDialogDefaults.material(dark) else null,
+                material = dialogMaterial,
                 backdrop = windowBackdrop,
             )
         } else if (variant == "input") androidx.compose.runtime.key(session) {
             RenameDeviceDialogSample(dark = dark, initialName = deviceName, visible = visible,
-            material = material && supported, backdrop = windowBackdrop, onDismissRequest = dismiss,
+                material = dialogMaterial != null, backdrop = windowBackdrop, onDismissRequest = dismiss,
             onSave = { deviceName = it; visible = false })
+        } else if (variant == "actionRows") {
+            Dialog(
+                onDismissRequest = dismiss,
+                actionRows = listOf(
+                    listOf(CouiDialogAction(
+                        text = stringResource(R.string.dialog_confirm),
+                        onClick = dismiss,
+                        style = CouiDialogActionStyle.Primary,
+                        colors = CouiDialogDefaults.primaryActionColors(CouiTheme.colorScheme.accent),
+                    )),
+                    listOf(
+                        CouiDialogAction(stringResource(R.string.dialog_cancel), dismiss),
+                        CouiDialogAction(stringResource(R.string.dialog_later), dismiss),
+                    ),
+                ),
+                dark = dark,
+                title = title,
+                message = regularMessage,
+                properties = DialogProperties(usePlatformDefaultWidth = false, windowTitle = title),
+                visible = visible,
+                material = dialogMaterial,
+                backdrop = windowBackdrop,
+            )
         } else Dialog(onDismissRequest = dismiss, dark = dark, visible = visible,
             title = title,
             message = if (variant == "long") List(12) { regularMessage }.joinToString("\n\n") else regularMessage,
             confirmAction = CouiDialogAction(stringResource(R.string.dialog_confirm), dismiss, variant != "disabled",
                 style = if (variant == "primary") CouiDialogActionStyle.Primary else CouiDialogActionStyle.Secondary,
-                colors = if (variant == "primary") CouiDialogDefaults.primaryActionColors(com.itos.coui.theme.CouiTheme.colorScheme.accent) else null),
+                colors = if (variant == "primary") CouiDialogDefaults.primaryActionColors(CouiTheme.colorScheme.accent) else null),
             dismissAction = CouiDialogAction(stringResource(R.string.dialog_cancel), dismiss),
             neutralAction = when {
                 variant == "theme" && onToggleTheme != null -> CouiDialogAction(stringResource(R.string.toggle_theme), onToggleTheme)
@@ -80,7 +106,7 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
             },
             placement = if (variant == "center") CouiDialogPlacement.Center else CouiDialogPlacement.Bottom,
             properties = DialogProperties(usePlatformDefaultWidth = false, windowTitle = title),
-            material = if (material && supported) CouiDialogDefaults.material(dark) else null,
+            material = dialogMaterial,
             backdrop = windowBackdrop)
     }
 }

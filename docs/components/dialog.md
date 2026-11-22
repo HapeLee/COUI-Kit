@@ -105,6 +105,33 @@ fun MultiActionDialogExample(
 - **主操作与破坏性配色**：设置 `CouiDialogActionStyle.Primary` 时**必须**传入 `colors`（可通过 `CouiDialogDefaults.primaryActionColors(accent)` 创建），否则会抛出异常。`neutralAction` 默认使用破坏性文字色（`colors.destructive`），`enabled = false` 仅禁用对应按钮。
 - **正文滚动隔离**：`content` 位于正文可滚动区域内，操作按钮区独立固定在底部；正文较长时按钮仍保留在窗口内，不会滚出视口。若正文使用 Material 3 的 `Text` 等组件，宿主需自行声明 Material 3 依赖。
 
+### 自定义底部操作行
+
+需要一颗通栏按钮加两颗并排按钮时，使用 `actionRows` 重载。每行从布局起始侧开始排列，按钮均分该行可用宽度。受窗口宽度或字体大小影响时，放不下的行按声明顺序拆成竖排，操作区仍与正文滚动分开。
+
+~~~kotlin
+Dialog(
+    visible = visible,
+    onDismissRequest = onDismiss,
+    title = title,
+    message = message,
+    actionRows = listOf(
+        listOf(CouiDialogAction(
+            text = confirmLabel,
+            onClick = onConfirm,
+            style = CouiDialogActionStyle.Primary,
+            colors = CouiDialogDefaults.primaryActionColors(accent),
+        )),
+        listOf(
+            CouiDialogAction(cancelLabel, onDismiss),
+            CouiDialogAction(laterLabel, onLater),
+        ),
+    ),
+)
+~~~
+
+可声明 1 至 4 行，每行至少提供一个操作。宽度不足拆行后，实际显示的行数可能更多。按钮样式和配色由各自的 `CouiDialogAction` 指定，关闭弹窗由操作回调负责。`confirmAction`、`dismissAction` 与 `neutralAction` 属于自动排布重载。
+
 ## 输入型弹窗
 
 需要单行输入时使用 `InputDialog`。组件提供两种状态重载：`TextFieldState` 重载（支持通过 `inputTransformation` 过滤粘贴和输入法组合编辑范围）与 `TextFieldValue` 回调重载。
