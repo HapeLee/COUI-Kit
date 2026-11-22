@@ -8,6 +8,7 @@ import android.graphics.Shader
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
@@ -123,7 +124,7 @@ fun TopAppBarSurface(
                 backdrop, fadeHeight.value * density, referenceBlurRadius.value * density, gradientSpeed, tint,
             )
         }
-    } else {
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val blurEffects = remember(density) {
             BlurLayers.map { (radius, _) -> CouiCoverageBlurEffect(radius.value * density) }
         }
