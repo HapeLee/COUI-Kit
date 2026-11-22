@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import com.itos.coui.backdrop.CouiBackdrop
 import com.itos.coui.backdrop.CouiBackdropEffectScope
 import com.itos.coui.backdrop.DrawCouiBackdropNode
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.random.Random
 
@@ -33,6 +34,22 @@ private const val BlurOffsetPx = 2f
 private const val SigmaScale = 0.57735f
 
 internal data class CouiGradientTint(val color: Color, val opacity: Float, val dark: Boolean)
+
+internal object CouiLightTintCurve {
+    const val BendPosition = 0.6f
+    const val TransitionRadius = 0.12f
+    // 原厂中点的 70% 截断为 178/255。只圆滑接点附近，两端仍沿用原斜率。
+    private const val BendAlpha = 178f / 255f
+    const val UpperSlope = (1f - BendAlpha) / BendPosition
+    const val LowerSlope = BendAlpha / (1f - BendPosition)
+    const val BendCorrection = (LowerSlope - UpperSlope) / (4f * TransitionRadius)
+
+    fun alphaAt(position: Float): Float {
+        val linear = minOf(1f - UpperSlope * position, LowerSlope * (1f - position))
+        val blend = (TransitionRadius - abs(position - BendPosition)).coerceAtLeast(0f)
+        return linear - BendCorrection * blend * blend
+    }
+}
 
 /** 仅模糊背景；长度为 px，各节点独立持有横纵图层，Shader 在首次绘制创建。 */
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -288,10 +305,12 @@ private const val TintOutputShader = """
         if (tintColor.a == 0.0) return half4(result);
 
         float y = clamp((coord.y - tintBounds.x) / tintBounds.y, 0.0, 1.0);
-        const float middleAlpha = 178.0 / 255.0;
-        float mask = darkTint == 1 ? 0.4 * (1.0 - y) : (y <= 0.6
-            ? mix(1.0, middleAlpha, y / 0.6)
-            : middleAlpha * (1.0 - y) / 0.4);
+        float mask = 0.4 * (1.0 - y);
+        if (darkTint == 0) {
+            float linear = min(1.0 - ${CouiLightTintCurve.UpperSlope} * y, ${CouiLightTintCurve.LowerSlope} * (1.0 - y));
+            float blend = max(${CouiLightTintCurve.TransitionRadius} - abs(y - ${CouiLightTintCurve.BendPosition}), 0.0);
+            mask = linear - ${CouiLightTintCurve.BendCorrection} * blend * blend;
+        }
         float alpha = mask * tintColor.a * backgroundOpacity;
         result = float4(float3(tintColor.rgb) * alpha, alpha) + result * (1.0 - alpha);
 

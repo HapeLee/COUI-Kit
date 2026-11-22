@@ -37,6 +37,7 @@ import com.itos.coui.backdrop.rememberCouiBackdrop
 import com.itos.coui.backdrop.LocalCouiBackdrop
 import com.itos.coui.effect.CouiCoverageBlurEffect
 import com.itos.coui.effect.CouiGradientTint
+import com.itos.coui.effect.CouiLightTintCurve
 import com.itos.coui.effect.drawCouiGradientBackdrop
 import com.itos.coui.theme.CouiTheme
 
@@ -44,6 +45,7 @@ internal val LocalCouiToolbarBackdrop = staticCompositionLocalOf<CouiBackdrop?> 
 internal val LocalCouiToolbarOverlay = staticCompositionLocalOf<SharedTransitionScope?> { null }
 
 private const val FadeStopCount = 65
+private const val LightTintTransitionSegments = 8
 private val BlurLayers = listOf(
     Triple(2.7.dp, 0.68f, 1f),
     Triple(6.3.dp, 0.44f, 0.82f),
@@ -119,15 +121,15 @@ fun TopAppBarSurface(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || resolvedGradientColor.alpha == 0f) return@remember null
         val color = resolvedGradientColor.copy(alpha = 1f)
         val transparent = color.copy(alpha = 0f)
-        // GradientBackgroundDrawable 从下往上填节点。浅色 70% 节点在原厂截断为 178/255。
         if (dark) {
             Brush.verticalGradient(0f to color.copy(alpha = .4f), 1f to transparent)
         } else {
-            Brush.verticalGradient(
-                0f to color,
-                .6f to color.copy(alpha = 178f / 255f),
-                1f to transparent,
-            )
+            val transition = Array(LightTintTransitionSegments + 1) { index ->
+                val offset = 2f * index / LightTintTransitionSegments - 1f
+                val position = CouiLightTintCurve.BendPosition + CouiLightTintCurve.TransitionRadius * offset
+                position to color.copy(alpha = CouiLightTintCurve.alphaAt(position))
+            }
+            Brush.verticalGradient(0f to color, *transition, 1f to transparent)
         }
     }
     SharedTransitionScope { overlayModifier ->
