@@ -50,6 +50,7 @@ internal fun CouiSheetSurface(
     backdrop: CouiBackdrop?,
     colors: CouiDialogColors,
     dark: Boolean,
+    themeTint: Color,
     surfaceBackdrop: CouiBackdrop,
     windowCoordinates: () -> LayoutCoordinates?,
     panelCoordinates: () -> LayoutCoordinates?,
@@ -61,6 +62,7 @@ internal fun CouiSheetSurface(
         rememberCouiMaterialEffect(
             material.mix, material.blend, material.blendMode,
             rgbMix = true, slightDither = material.blurRadius > 0,
+            themeTint = themeTint,
         )
     } else null
     val blur = if (material != null) {
