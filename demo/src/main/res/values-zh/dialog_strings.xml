@@ -4,6 +4,7 @@
     <string name="dialog_center">居中确认弹窗</string>
     <string name="dialog_long">长内容滚动</string>
     <string name="dialog_three">三个操作</string>
+    <string name="dialog_action_rows">上方通栏，下方两个按钮</string>
     <string name="dialog_disabled">禁用确认操作</string>
     <string name="dialog_primary">主题色确认弹窗</string>
     <string name="dialog_input">输入型弹窗：重命名设备</string>

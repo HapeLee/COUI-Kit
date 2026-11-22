@@ -45,7 +45,8 @@ fun MaterialPanelExample(
 | 目标 | 公开入口 | 平台门槛 | 输入单位与坐标 | 算法与平台说明 |
 | --- | --- | --- | --- | --- |
 | 均匀背景模糊 | `Modifier.drawCouiBackdrop` + `CouiBackdropEffectScope.blur` | **API 31+** | `radius` 使用**本地 px**（可用 `dp.toPx()`） | 基于 Compose `BlurEffect`；调用 `blur` 会自动累加 `padding` |
-| 顶栏渐进模糊 | 完整顶栏用 `TopAppBarSurface`；底层用 `Modifier.drawCouiGradientBackdrop` | **API 33+** | `fadeHeightPx`、`referenceBlurRadiusPx` 使用 **px**，位置与源坐标对齐 | 原厂渐进 Gaussian（先横后纵两遍原尺寸卷积）；不提供旧平台替代模糊 |
+| 顶栏渐进模糊 | [顶栏组件](../components/top-app-bar.md#背景参数) | 渐进模糊 **API 33+**；分层模糊 **API 31–32** | `TopAppBarSurface` 的参考半径与渐隐高度使用 **dp** | API 33+ 默认使用 Compose，传入 `useCouiBlur = true` 可选择 COUI |
+| 直接绘制 COUI 渐进模糊 | `Modifier.drawCouiGradientBackdrop` | **API 33+** | `fadeHeightPx`、`referenceBlurRadiusPx` 使用 **px**，位置与源坐标对齐 | 先横后纵两遍原尺寸 Gaussian 卷积 |
 | 菜单快速模糊 | `rememberCouiMenuBlur(backdrop, background)` + `CouiMenuBlur.draw(...)` | **API 33+**（低于 33 返回 `null`） | `background` 为补底 `Color`。内部按设备像素的 16px 网格分块 | 使用 Fast Kawase，只输出模糊底图。菜单在底图恢复到面板尺寸后合成材质 |
 | 已有覆盖率模糊链 | `CouiCoverageBlurEffect(radiusPx)` | **API 31+**（API 33+ 启用覆盖率恢复） | `radiusPx` 使用 **px**；提供 `padding` 与 `effect` | 平台模糊后在 API 33+ 恢复边缘样本颜色与覆盖度，避免屏幕边缘混入透明外沿导致顶边透出正文 |
 | 两层材质混色 | `rememberCouiMaterialEffect(mix, blend, blendMode)` | **API 33+** | `mix`、`blend` 为 `Color`；`blendMode` 为 `CouiMaterialBlendMode` | 先执行 `luminosity(mix)`，再按 `Overlay`（默认）或 `ColorDodge` 混合 `blend`；弹窗 `Defaults` 按主题选模式 |

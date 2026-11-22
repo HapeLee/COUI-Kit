@@ -37,7 +37,10 @@ import com.itos.coui.theme.ProvideCouiContent
 import com.itos.coui.theme.LocalCouiDarkTheme
 import kotlin.math.roundToInt
 
-/** 完整紧凑顶栏；内部处理安全区和槽位布局，点击行为由宿主提供。 */
+/**
+ * 完整紧凑顶栏；内部处理安全区和槽位布局，点击行为由宿主提供。
+ * useCouiBlur 在 Android 13 及以上选择 COUI 渐进模糊；默认使用 Compose，可由作用域覆盖。
+ */
 @Composable
 fun TopAppBar(
     modifier: Modifier = Modifier,
@@ -50,11 +53,13 @@ fun TopAppBar(
     backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) {
         "顶栏需要显式 backdrop 或 ProvideCouiBackdrop 作用域"
     },
+    useCouiBlur: Boolean = LocalUseCouiTopAppBarBlur.current,
 ) {
     val density = LocalDensity.current
     TopAppBarSurface(modifier.fillMaxWidth(), backdrop,
         referenceBlurRadius = with(density) { CouiTopAppBarDefaults.systemBlurRadiusPx.toDp() },
-        gradientSpeed = CouiTopAppBarDefaults.systemGradientSpeed, gradientColor = colors.backgroundColor, dark = dark) {
+        gradientSpeed = CouiTopAppBarDefaults.systemGradientSpeed, gradientColor = colors.backgroundColor, dark = dark,
+        useCouiBlur = useCouiBlur) {
         CompositionLocalProvider(LocalCouiDarkTheme provides dark) {
             AppBarLayout(title, navigationIcon, actions, colors, windowInsets,
                 CouiTopAppBarDefaults.height, CouiTopAppBarDefaults.height, null)
@@ -69,6 +74,7 @@ fun TopAppBar(
  * expandedTitleStyle 配置展开标题，collapsedTitleStyle 在完全收起时覆盖展开样式。
  * 收起默认按起始侧导航槽是否占用空间选择字号。
  * 显式字号必须是有限正数 sp；title 槽位须继承组件提供的样式。
+ * useCouiBlur 在 Android 13 及以上选择 COUI 渐进模糊；默认使用 Compose，可由作用域覆盖。
  */
 @Composable
 fun LargeTopAppBar(
@@ -87,6 +93,7 @@ fun LargeTopAppBar(
     },
     expandedTitleStyle: TextStyle = TextStyle.Default,
     collapsedTitleStyle: TextStyle = TextStyle.Default,
+    useCouiBlur: Boolean = LocalUseCouiTopAppBarBlur.current,
 ) {
     require(expandedHeight.value.isFinite() && collapsedHeight.value.isFinite() &&
         collapsedHeight > 0.dp && expandedHeight > collapsedHeight) {
@@ -117,7 +124,7 @@ fun LargeTopAppBar(
                 val range = (expandedHeight.roundToPx() - collapsedHeight.roundToPx()).coerceAtLeast(0)
                 (state?.offsetPx ?: 0f).coerceIn(0f, range.toFloat()).toDp()
             }
-        }) {
+        }, useCouiBlur = useCouiBlur) {
         CompositionLocalProvider(LocalCouiDarkTheme provides dark) {
             AppBarLayout(title, navigationIcon, actions, colors, windowInsets, expandedHeight, collapsedHeight, state,
                 expandedTitleStyle, collapsedTitleStyle)

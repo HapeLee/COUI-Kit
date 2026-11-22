@@ -226,7 +226,8 @@ fun TopAppBarSearchButton(
         val overlay = LocalCouiToolbarOverlay.current
         TopAppBarSearchAction(
             modifier = modifier.onPlaced {
-                if ((!state.motion.present || (!state.motion.expanded && state.sourceCenter == null))) {
+                // 操作区可能在搜索期间换组，收起端点须跟随入口恢复后的布局位置。
+                if (!state.motion.expanded && it.size.width > 0) {
                     state.sourceCenter = checkNotNull(overlay).lookaheadScopeCoordinates(it)
                         .localPositionOf(it, Offset(it.size.width * 0.5f, it.size.height * 0.5f))
                 }
@@ -295,12 +296,13 @@ fun TopAppBarSearchAction(
                 var offset = Offset.Zero
                 if (!isLookingAhead) coordinates?.let { target ->
                     val root = lookaheadScopeCoordinates
-                    if (!state.motion.present || (restingOrigin == null && !state.motion.expanded)) {
+                    if (!state.motion.expanded) {
                         restingOrigin = root.localPositionOf(target, Offset.Zero)
+                    } else {
+                        restingOrigin?.let { offset = target.localPositionOf(root, it) }
                     }
-                    restingOrigin?.let { offset = target.localPositionOf(root, it) }
                 }
-                // 在同一次实际放置中抵消操作区移位, 不等全局回调修正首帧。
+                // 展开时在原位淡出，收起时按恢复后的操作区位置淡入。
                 if (state.motion.toolbarAlpha > 0f) child.placeWithLayer(0, 0) {
                     translationX = offset.x
                     translationY = offset.y

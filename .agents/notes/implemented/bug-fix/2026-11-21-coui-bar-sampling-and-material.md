@@ -8,7 +8,7 @@ Status: implemented
 
 ## Decision
 
-完整顶栏使用 AppBarBlurHelper 的固定像素半径和全高曲线。背景遮罩沿用[独立的平滑渐变](2026-10-18-coui-topbar-gradient-blur.md#decision)。低层 TopAppBarSurface 继续通过公开参数配置固定长度或全高模糊。浮动顶栏按钮和顶栏搜索的默认 Style 使用 ToolbarMaterialEffectResolver 的 TOP_BAR 材质，采样已完成渐进处理的背景。宿主显式使用的旧混色预设仍由 CouiTopAppBarButtonDefaults.material 提供。
+完整顶栏使用 AppBarBlurHelper 的固定像素半径和全高曲线。背景遮罩使用[独立的透明度曲线](2026-10-18-coui-topbar-gradient-blur.md#decision)。低层 TopAppBarSurface 继续通过公开参数配置固定长度或全高模糊。浮动顶栏按钮和顶栏搜索的默认 Style 使用 ToolbarMaterialEffectResolver 的 TOP_BAR 材质，采样已完成渐进处理的背景。宿主显式使用的旧混色预设仍由 CouiTopAppBarButtonDefaults.material 提供。
 
 底栏主体与无色附件使用 FRAMEWORK_BOTTOM_BAR。深浅色各用自己的两层滤镜。独立 FAB 和项目的右侧有色附件使用 FRAMEWORK_FAB。COUIFloatingButton 将默认主题色的 alpha 与显式 ColorStateList 分开处理，库同样只在默认主题色入口应用主题 alpha。项目右侧保留有色附件的装配及白色图标。
 
@@ -24,4 +24,4 @@ PJZ110 的 Contacts APK 中，AppBarBlurParamsExtKt 提供 30px 到 0 的渐进�
 
 ## Consequences
 
-浮动表面仍以所属页面的公开背景源承载系统 Canvas 采样，双主体的采样前缀仅覆盖同一绘制节点中的既有录制图层。顶栏渐进核继续保留透明边缘覆盖率及固定抖动。原厂动态噪声、跨独立兄弟节点的整个 Canvas 和设备 GPU 输出需要在各自条件下对照。
+浮动表面以所属页面的公开背景源承载采样，双主体的采样前缀覆盖同一绘制节点中的既有录制图层。顶栏保留透明边缘覆盖率，抖动更新时机见[渐进模糊](2026-10-18-coui-topbar-gradient-blur.md)。

@@ -13,11 +13,15 @@ plugins {
 
 android {
     namespace = "com.itos.coui.material3"
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 2 }
+    }
     defaultConfig {
         minSdk = 26
         aarMetadata {
-            minCompileSdk = 37
+            minCompileSdk {
+                version = release(37) { minorApiLevel = 1 }
+            }
             minAgpVersion = "9.1.0"
         }
     }
@@ -81,6 +85,6 @@ tasks.withType<Jar>().configureEach {
 
 dependencies {
     api(project(":coui"))
-    api(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.material3)
+    implementation(libs.material.color.utilities)
 }

@@ -7,7 +7,7 @@
   <link rel="icon" href="data:,">
   <meta name="description" content="浏览 COUI 图标，选择样式和颜色，复制 SVG 或 Compose ImageVector。">
   <script src="../theme.js?v=1"></script>
-  <link rel="stylesheet" href="../style.css?v=18">
+  <link rel="stylesheet" href="../style.css?v=21">
 </head>
 <body class="icons-page">
   <div class="top-blur" aria-hidden="true">
@@ -24,10 +24,26 @@
       </nav>
     </header>
 
-    <section class="hero-header" aria-labelledby="page-title">
-      <div>
-        <h1 id="page-title" class="page-title">图标</h1>
-        <p class="page-subtitle">浏览并复制 COUI 图标</p>
+    <header class="hero-header">
+      <h1 class="page-title">图标</h1>
+    </header>
+
+    <section class="icon-guide" aria-labelledby="icon-guide-title">
+      <h2 id="icon-guide-title">图标选用建议</h2>
+      <div class="icon-guide-card">
+        <div class="icon-guide-copy">
+          <p>由于 ColorOS 各应用的图标风格不完全一致</p>
+          <h3>仅以下场景推荐使用 COUI 图标</h3>
+          <ul>
+            <li>底栏的 Filled / Outlined 配对</li>
+            <li>ColorOS 特有图标</li>
+            <li>FAB 加号、搜索按钮等组件图标</li>
+          </ul>
+        </div>
+        <a class="icon-guide-link" href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer">
+          <span>其他通用图标建议优先考虑 <strong>Lucide Icons</strong><span class="sr-only">（在新标签页打开）</span></span>
+          <span aria-hidden="true">↗</span>
+        </a>
       </div>
     </section>
 
@@ -142,7 +158,7 @@
     </main>
   </div>
 
-  <script src="../data.js?v=19"></script>
+  <script src="../data.js?v=23"></script>
   <script src="../app.js?v=10"></script>
 </body>
 </html>

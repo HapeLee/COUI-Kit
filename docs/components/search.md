@@ -125,7 +125,7 @@ fun SearchToolbarActionsExample(
 }
 ~~~
 
-- `visibleWhileSearching = false`（默认）：搜索展开时该动作在原位淡出并移除无障碍语义。
+- `visibleWhileSearching = false`（默认）时，搜索展开会让该动作在原位淡出并移除无障碍语义。收起时，搜索框回到入口在当前操作组中的位置，恢复显示的动作在当前布局中淡入。
 - `visibleWhileSearching = true`：搜索展开时该动作平滑移动至新布局位置并保持可点击。
 
 ## 从搜索胶囊分离自定义按钮

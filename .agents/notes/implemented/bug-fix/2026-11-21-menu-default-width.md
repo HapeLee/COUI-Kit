@@ -8,7 +8,7 @@ Status: implemented
 
 ## Decision
 
-[Menu](../../../../coui/src/main/java/com/itos/coui/menu/Menu.kt) 将默认最小宽度设为 `CouiMenuMinWidth = 168.dp`，含子菜单项时的最小宽度设为 `CouiMenuMinWidthWithSubMenu = 196.dp`，最大宽度设为 `CouiMenuMaxWidth = 256.dp`。
+[Menu](../../../../coui/src/main/java/com/itos/coui/menu/Menu.kt) 为短内容的普通菜单采用略窄的项目预设。含子菜单项时的最小宽度和菜单最大宽度沿用原厂尺寸。
 
 普通单级菜单（`items.none { it.children.isNotEmpty() }`）使用 `widthIn(min = CouiMenuMinWidth, max = CouiMenuMaxWidth)`。存在子菜单项时，[CouiMenuWithSubMenu](../../../../coui/src/main/java/com/itos/coui/menu/CouiMenuSubMenu.kt) 的主菜单使用 `widthIn(min = CouiMenuMinWidthWithSubMenu, max = CouiMenuMaxWidth)`；子面板在取得主菜单实测宽度后继续沿用主菜单宽度，未取得实测宽度时的回退约束同步使用 `CouiMenuMinWidthWithSubMenu` 至 `CouiMenuMaxWidth`。
 
@@ -37,6 +37,6 @@ Status: implemented
 
 ## Consequences
 
-菜单默认宽度范围与 ColorOS 17 `COUIPopupListWindow` 对齐：普通菜单在 `168.dp`–`256.dp` 之间按内容测量，含子菜单项时从 `196.dp` 起步。由于 `168.dp` / `196.dp` 高于原先的 `128.dp`、`256.dp` 低于原先的 `280.dp`，极短菜单会略变宽，超宽长文本菜单会更早换行。
+短内容的普通菜单可使用更窄的面板。宽度较大的项目继续由内容固有宽度和最大宽度决定。
 
 当前已核对原厂字节码、资源与静态校验，但尚未在真机或模拟器上目视对比不同长度文本、带图标与带子菜单场景的视觉效果及换行表现。

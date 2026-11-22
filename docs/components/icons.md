@@ -1,12 +1,24 @@
 # 图标
 
+## 怎么选图标
+
+由于 ColorOS 各应用的图标风格不完全一致，仅以下场景推荐使用 COUI 图标。
+
+- **底栏导航**采用同名的 `Outlined` 和 `Filled` 图标，分别用于未选中和选中状态。装配方式见[底栏](navigation-bar.md)。
+- **ColorOS 特有图形**可选用对应的 COUI 图标，例如设置选择行的上下双箭头 `Popup`。
+- **组件操作图标**可选用 `CouiIcons.Filled.Add` 作为 FAB 的加号，`CouiIcons.Outlined.Search` 作为自定义搜索按钮的图标。`SearchBar` 和 `TopAppBarSearch` 已内置搜索图标。
+
+**其他通用图标**建议优先考虑 [Lucide Icons](https://lucide.dev/icons/)。
+
+## 接入 COUI 图标
+
 `CouiIcons` 在 Composable 中提供矢量 `ImageVector` 与位图 `Painter`，并根据当前 `CouiTheme` 自动加载日间或夜间资源；颜色、点击热区与交互状态由宿主或外层组件承担。
 
 - **系统版本要求**：支持库最低系统版本（**API 31+**）。
 - **可选依赖**：图标位于独立的 `coui-icons` 模块，使用时需在调用模块添加依赖并与核心库保持相同版本（仅使用核心组件时无需引入）：
 
 ~~~kotlin
-val couiVersion = "0.0.1-alpha14"
+val couiVersion = "0.0.1-alpha16"
 
 dependencies {
     implementation("io.github.itoseo:coui-icons:$couiVersion")
@@ -26,7 +38,7 @@ fun VectorIconExample(
     contentDescription: String?,
 ) {
     Image(
-        imageVector = CouiIcons.Filled.Wifi,
+        imageVector = CouiIcons.Filled.Album,
         contentDescription = contentDescription,
         modifier = modifier,
     )
@@ -37,7 +49,7 @@ fun VectorIconExample(
 
 ~~~kotlin
 Icon(
-    imageVector = CouiIcons.Filled.Wifi,
+    imageVector = CouiIcons.Filled.Album,
     contentDescription = contentDescription,
     tint = Color.Unspecified,
 )
@@ -80,7 +92,7 @@ fun BitmapIconExample(
   ~~~kotlin
   val iconTint = if (CouiTheme.isDark) CouiColor.Night.BLUE else CouiColor.Day.BLUE
   Icon(
-      imageVector = CouiIcons.Filled.Wifi,
+      imageVector = CouiIcons.Filled.Album,
       contentDescription = contentDescription,
       tint = iconTint,
   )
@@ -88,7 +100,7 @@ fun BitmapIconExample(
 
 - **多色图标**：`AI`、`Google`、`SettingDetail`、`Phone` 内置多色或渐变路径，应使用 `Image` 或 `Icon(..., tint = Color.Unspecified)`，避免整体 `tint` 覆盖原有配色。
 - **菜单选择箭头（`Popup`）**：`CouiIcons.Outlined.Popup` 与 `CouiIcons.Filled.Popup` 共用同一份上下双箭头矢量。在弹出菜单的设置行尾部使用时按页面主题传入 `tint`，详见[菜单选择行的图标](menu.md#菜单选择行的图标)。
-- **消息输入栏图标**：`CouiIcons.Outlined` 下的 `Camera`、`AddCircle` 和 `Send` 用于[消息输入栏](message-input-bar.md)，`Keyboard` 用于 Demo 目录入口。四个图标都保留原厂约 90% 不透明度的日间黑色和夜间白色。使用 `Icon` 显示原色时传入 `tint = Color.Unspecified`。`AddCircle` 是圆圈加号，`Add` 是普通加号。
+- **消息输入栏图标**：Demo 的[消息输入栏](message-input-bar.md)使用 `Outlined.Camera`、`Outlined.AddCircle` 和 `Filled.Send`。`Outlined.Send` 使用圆环和箭头，`Filled.AddCircle` 使用带镂空加号的实心圆。`Outlined.Keyboard` 用于 Demo 目录入口。这些图标使用约 90% 不透明度的日间黑色和夜间白色。使用 `Icon` 显示原色时传入 `tint = Color.Unspecified`。
 - **应用更新图标（`AppUpdate`）**：自定义圆形背景色时调用 `CouiIcons.Filled.AppUpdate(color = ...)`，并在 `Icon` 中传 `tint = Color.Unspecified` 以保留白色前景：
 
   ~~~kotlin

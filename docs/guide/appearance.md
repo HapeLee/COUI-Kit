@@ -89,13 +89,18 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 - **COUI 文本组件（`com.itos.coui.text.Text`）**：提供固定 COUI 排版角色（`kind` 必填），文字颜色依次取「显式 `color` → 已提供的 `LocalCouiContentColor` → 当前 `CouiTheme.colorScheme.onSurface`」，在独立布局中省略颜色即可跟随主题（详见 [Item](../components/item.md#配色与文字)）。菜单项则读取 `CouiTheme.typography.menuItem` 的字号、字重与字体族。
 - **`LocalCouiContentColor` 约定**：缺省值为 `Color.Unspecified`（表示未提供内容色）。直接读取该 Local 的宿主应在未指定时自行取当前主题色；COUI 的文字和图标已在消费处完成解析。显式颜色（包含 `Color.Transparent`）始终优先；图标显式传入 `tint = Color.Unspecified` 时保留不染色语义。
 
-## 菜单、底栏、搜索栏与 FAB 的染色
+## 增强单个颜色
+
+使用 `coui-material3` 中的 `enhanceHctColor(seed, tone)` 生成控件专用颜色。例如，`enhanceHctColor(themeColor, tone = 55.0)` 可用于有色 FAB。宿主选择种子色和结果用途，函数返回不透明 sRGB 颜色。参数与色域说明见 [KDoc](../../coui-material3/src/main/java/com/itos/coui/material3/HctColor.kt)。
+
+## 背景材质染色
 
 | 组件 | 原生默认 | M3 适配默认 | 关闭染色 / 自定义方式 |
 | --- | --- | --- | --- |
 | `Menu` | 透明（不染色） | 使用宿主 `surface` 染色（保留材质亮度） | 传入 `CouiMenuDefaults.style().copy(themeTint = Color.Transparent)` |
 | `NavigationBar` | 透明（不染色） | 使用宿主 `surface` 染色（保留材质亮度） | 显式传入 `themeTint = Color.Transparent`；右附件图标固定为白色 |
 | `SearchBar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 染色（保留材质亮度） | 通过局部 `CouiTheme` 的 `materialTint` 调整或关闭染色 |
+| `BottomSheet`（API 33+ 模糊材质） | 透明（不染色） | 使用宿主 `surface` 染色（保留材质亮度） | 传入 `themeTint = Color.Transparent` 关闭染色，或传入自定义颜色 |
 | `Fab` | 取主题强调色，不叠加页面 `themeTint` | 取 M3 `primary`，不叠加页面 `themeTint` | 日夜默认内容色均为不透明白色（显式 `material` 同样适用）；可通过 `contentColor` 覆盖（传 `Color.Unspecified` 继承外部内容色），子图标显式 `tint` 优先 |
 
 - 局部 `CouiTheme(materialTint = ...)` 同样可提供自定义染色，`Color.Transparent` 表示关闭。

@@ -61,7 +61,7 @@ private class DemoAboutHeroView(context: Context) : FrameLayout(context),
             marginStart = dp(4)
         })
         addView(TextView(context).apply {
-            setText(R.string.about_hero_version)
+            setText(R.string.style_reference_version)
             setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16f)
             setTextColor(0xD9FFFFFF.toInt())
             typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)

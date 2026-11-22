@@ -3,8 +3,8 @@
 在已有的 Jetpack Compose Android 项目中添加 COUI 依赖，即可使用滑条、开关、弹窗、顶栏等组件。本页使用 Gradle Kotlin DSL 说明接入步骤。
 
 - **最低运行系统**：本 fork 的库模块为 Android 8.0（API 26），上游发行版仍为 Android 12（API 31），部分高级效果与浮动组件需要 API 33 或 API 34+。
-- **编译环境基线**：`compileSdk` 37、AGP `9.1.0` 及以上，并启用 Jetpack Compose。完整环境要求见[兼容要求](compatibility.md)。
-- **发行版差异**：下方 Maven 示例指向上游 `0.0.1-alpha14`，其最低系统为 API 31。需要 API 26 支持时使用本 fork 的源码模块或自行发行的 fork 产物，不能用上游同名版本代替。
+- **编译环境基线**：`compileSdk` 37.1、AGP `9.1.0` 及以上，并启用 Jetpack Compose。完整环境要求见[兼容要求](compatibility.md)。
+- **发行版差异**：下方 Maven 示例指向上游 `0.0.1-alpha16`，其最低系统为 API 31。需要 API 26 支持时使用本 fork 的源码模块或自行发行的 fork 产物，不能用上游同名版本代替。
 - **预览阶段说明**：当前版本处于早期预览期，API 可能发生不兼容调整。
 
 ## 引入 COUI
@@ -32,11 +32,11 @@
    }
 
    dependencies {
-       implementation("io.github.itoseo:coui:0.0.1-alpha14")
+       implementation("io.github.itoseo:coui:0.0.1-alpha16")
    }
    ~~~
 
-   需要自动跟随宿主 `MaterialTheme` 时，可改为引入同版本的 `io.github.itoseo:coui-material3:0.0.1-alpha14`，详见[接入 Material 3](../../README.md#接入-material-3)；需要 `CouiIcons` 时可额外添加同版本的 `io.github.itoseo:coui-icons:0.0.1-alpha14`，见[图标用法](../components/icons.md)。
+   需要自动跟随宿主 `MaterialTheme` 时，可改为引入同版本的 `io.github.itoseo:coui-material3:0.0.1-alpha16`，详见[接入 Material 3](../../README.md#接入-material-3)；需要 `CouiIcons` 时可额外添加同版本的 `io.github.itoseo:coui-icons:0.0.1-alpha16`，见[图标用法](../components/icons.md)。
 
 ### GitHub Packages 预览版
 

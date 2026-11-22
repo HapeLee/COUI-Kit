@@ -25,7 +25,6 @@
     <string name="menu_row_title">Preferred network</string>
     <string name="menu_row_option_one">Wi-Fi</string>
     <string name="menu_row_option_two">Mobile data</string>
-    <string name="menu_row_group">List item menu preset</string>
     <string name="sample_enabled">Available</string>
     <string name="sample_disabled">Unavailable</string>
     <string name="illustration_original">Original</string>
@@ -45,9 +44,7 @@
     <string name="progress_pause">Pause</string>
     <string name="progress_resume">Resume</string>
     <string name="intro_chip">Scroll and select categories, with an optional icon button.</string>
-    <string name="menu_actions">Menu options</string>
-    <string name="menu_selection_label">Current option</string>
-    <string name="menu_open_summary">Choose a mode, toggle a pinned option or open the submenu.</string>
+    <string name="menu_actions">Menu items</string>
     <string name="settings_title">Settings page</string>
     <string name="settings_back">Back</string>
     <string name="settings_appearance">Appearance</string>
@@ -69,7 +66,8 @@
     <string name="settings_privacy">Privacy</string>
     <string name="settings_about">About this example</string>
     <string name="about_hero_brand" translatable="false">ColorOS</string>
-    <string name="about_hero_version" translatable="false">17.0</string>
+    <string name="settings_coui_version">COUI version</string>
+    <string name="style_reference_version" translatable="false">17.0.1</string>
     <string name="settings_local">Local example</string>
     <string name="settings_demo_only">Choices apply only to this demo and do not change system settings.</string>
     <string name="settings_switch_drag">Tap or drag the switch</string>
@@ -79,6 +77,7 @@
     <string name="settings_disabled">Unavailable option</string>
     <string name="settings_disabled_summary">An example of the disabled appearance</string>
     <string name="settings_baseline">Style reference</string>
+    <string name="settings_baseline_value" translatable="false">ColorOS %1$s</string>
     <string name="settings_reset">Reset example choices</string>
     <string name="settings_reset_message">Restore the default choices in this example?</string>
     <string name="home_app_settings">App settings</string>

@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 
 /** 材质的第二层混合模式。 */
 enum class CouiMaterialBlendMode { Overlay, ColorDodge }
@@ -25,14 +26,18 @@ internal fun rememberCouiMaterialEffect(
     blendMode: CouiMaterialBlendMode,
     rgbMix: Boolean,
     slightDither: Boolean = false,
+    themeTint: Color = Color.Transparent,
 ): RenderEffect =
-    remember(mix, blend, blendMode, rgbMix, slightDither) {
+    remember(mix, blend, blendMode, rgbMix, slightDither, themeTint) {
+        val tintEnabled = themeTint.alpha > 0f
         val shader = RuntimeShader(
-            "const bool RGB_MIX = $rgbMix;\nconst bool SLIGHT_DITHER = $slightDither;\n" + CouiMaterialShader,
+            "const bool RGB_MIX = $rgbMix;\nconst bool SLIGHT_DITHER = $slightDither;\n" +
+                "const bool THEME_TINT = $tintEnabled;\n" + CouiMaterialShader,
         )
         shader.setFloatUniform("uMixColor", mix.red, mix.green, mix.blue, mix.alpha)
         shader.setFloatUniform("uBlendColor", blend.red, blend.green, blend.blue, blend.alpha)
         shader.setFloatUniform("uColorDodge", if (blendMode == CouiMaterialBlendMode.ColorDodge) 1f else 0f)
+        if (tintEnabled) shader.setColorUniform("uThemeTint", themeTint.toArgb())
         RenderEffect.createRuntimeShaderEffect(shader, "content")
     }
 
@@ -106,11 +111,12 @@ private const val CouiMaterialShader = CouiMaterialShaderFunctions + CouiSlightD
     uniform float4 uMixColor;
     uniform float4 uBlendColor;
     uniform float uColorDodge;
+    layout(color) uniform half4 uThemeTint;
 
     half4 main(float2 coordinate) {
         half4 color = content.eval(coordinate);
-        if (SLIGHT_DITHER) {
-            // 面板绘制包含屏外余量；材质处理后仍须保留放大采样的覆盖度。
+        if (SLIGHT_DITHER || THEME_TINT) {
+            // 染色和抖动使用非预乘颜色，随后恢复放大采样的覆盖度。
             if (color.a == 0.0) return half4(0.0);
             color.rgb /= color.a;
         }
@@ -131,8 +137,15 @@ private const val CouiMaterialShader = CouiMaterialShaderFunctions + CouiSlightD
                 : color.rgb / (1.0 - uBlendColor.rgb);
             color.rgb = mix(color.rgb, blend, uBlendColor.a);
         }
+        if (THEME_TINT) {
+            // ColorDodge 可超过 SDR 白点，染色以可见的材质亮度为准。
+            float3 rgb = clamp(color.rgb, 0.0, 1.0);
+            color.rgb = mix(rgb, luminosity(rgb, uThemeTint.rgb), uThemeTint.a);
+        }
         if (SLIGHT_DITHER) {
             color.rgb = (color.rgb + slightDither(coordinate)) * color.a;
+        } else if (THEME_TINT) {
+            color.rgb *= color.a;
         }
         return color;
     }

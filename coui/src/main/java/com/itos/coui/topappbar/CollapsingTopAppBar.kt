@@ -33,6 +33,7 @@ import kotlin.math.roundToInt
  * 大标题与可选常驻搜索槽；省略搜索槽时，标题缩小后固定在顶栏，不淡出。
  * state 的连接须挂在实际内容滚动容器的祖先。
  * dark 只控制本顶栏，搜索槽由宿主传入相同模式或使用共同的局部主题；标题色 alpha 与动画相乘。
+ * useCouiBlur 在 Android 13 及以上选择 COUI 渐进模糊；默认使用 Compose，可由作用域覆盖。
  */
 @Composable
 fun CollapsingTopAppBar(
@@ -46,6 +47,7 @@ fun CollapsingTopAppBar(
     },
     backgroundColor: Color = Color.Unspecified,
     dark: Boolean = CouiTheme.isDark,
+    useCouiBlur: Boolean = LocalUseCouiTopAppBarBlur.current,
     searchBar: (@Composable () -> Unit)? = null,
 ) {
     val density = LocalDensity.current
@@ -91,7 +93,7 @@ fun CollapsingTopAppBar(
         // 正文直接跟随已接受的滚动，标题保留弹簧跟随；模糊不能等标题追上后才补亮。
         backgroundAlpha = if (!hasSearchBar || searchActive) 1f else
             (state.contentOffsetPx / (30 * density.density)).coerceIn(0f, 1f),
-        topExtension = { with(density) { offset.toDp() } }) {
+        topExtension = { with(density) { offset.toDp() } }, useCouiBlur = useCouiBlur) {
         Layout(modifier = Modifier.statusBarsPadding(), content = {
             BasicText(title, Modifier.semantics { heading() }.graphicsLayer {
                 alpha = if (hasSearchBar) (1f - f) * searchState.contentAlpha else 1f

@@ -9,10 +9,48 @@ COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和�
 - `Dialog` 的 `confirmAction` 改为可选；它与 `dismissAction`、`neutralAction` 一起省略时渲染无操作弹窗，只保留标题、正文和 `content`，关闭由返回键或点击外部触发。[弹窗](docs/components/dialog.md#最小调用)
 - 同步上游 `0.0.1-alpha14`：接入 Sheet 面板 `BottomSheet`、消息输入栏 `MessageInputBar`、菜单选择图标与 Popup 菜单默认宽度，并保留 fork 的 API 26 门槛、悬浮操作栏 `FloatingToolbar` 与输入框 `TextField`。
 
+- 新增 `CouiSheetActionButton`，正文内操作按钮与工具栏按钮共用材质、圆角与按压预选；`rememberCouiSheetToolbarStyle()` 同步开放给正文使用。
+- 同步上游 `0.0.1-alpha16`：接入 `Dialog` 自定义操作行、顶栏渐进模糊默认改用 Compose 实现、HCT 颜色增强与新增图标。
+
 ### 升级说明
 
 - 现有调用无需修改。省略 `confirmAction` 是新增能力，三个操作齐全时的布局、配色与回调时机不变。
 - 本 fork 的库模块仍以 API 26 为最低系统；上游新组件的平台门槛见[兼容要求](docs/guide/compatibility.md#效果门槛)。
+
+## [0.0.1-alpha16] - 2026-11-23
+
+### 新增与改进
+
+- 新增 `Dialog` 的 `actionRows` 重载，支持自定义 1 至 4 行底部按钮，例如上方一个通栏按钮、下方两个并排按钮。宽度不足时自动拆成竖排，操作区独立于正文滚动。[弹窗](docs/components/dialog.md#自定义底部操作行)
+- 优化顶栏渐进模糊，带来更好的效果，传入 `useCouiBlur = true` 可切回旧实现。[顶栏](docs/components/top-app-bar.md)
+- 新增 HCT 颜色增强函数 `enhanceHctColor(seed, tone)`，可从种子色生成指定色调的增强色，适合用于 FAB 等需要强调的控件。中性灰保持中性。[外观与预设](docs/guide/appearance.md)
+- 新增删除、收藏、信息、编辑和分享图标，均提供 Filled 与 Outlined 两种样式。补充实心 AddCircle、实心 Send、文档扫描和翻译图标，调整描边 Send 的圆环与箭头样式。[图标](docs/components/icons.md)
+
+### 升级说明
+
+- 现有 `Dialog` 调用可直接沿用。需要自定义按钮排布时，改用 `actionRows` 重载。
+- 如果在调用括号内按位置传入 `TopAppBarSurface` 的 `content` 或 `CollapsingTopAppBar` 的 `searchBar`，请改用命名参数或尾随 lambda。
+- 如果希望保留 Alpha 15 的实心发送图标，请把 `CouiIcons.Outlined.Send` 改为 `CouiIcons.Filled.Send`。
+
+## [0.0.1-alpha15] - 2026-11-22
+
+### 新增与改进
+
+- 优化顶栏渐变模糊，减轻浅色模式下的中段亮带和色阶分层。遮罩默认跟随页面底色。
+- 修复顶栏搜索收起时的锚点错位。操作区布局变化后，搜索框会回到入口的当前位置。
+- 优化触点菜单定位。菜单横向居中对准按下位置，靠近窗口边缘时向内移动。普通菜单最小宽度从 `168dp` 调整为 `160dp`。
+- 新增局部菜单背景采样控制，可让指定范围内的菜单在模糊材质与纯色背景之间切换。
+- 为 `BottomSheet` 新增 `themeTint` 参数。启用 Material 3 适配后，面板的模糊底图默认采用宿主的 `surface` 色染色。
+
+### 升级说明
+
+- 如果在 `BottomSheet(...)` 括号内按位置传入内容 lambda，改用 `content = { … }` 或移到括号外。原本用这两种方式的调用可直接升级。
+- 如果启用了 Material 3 适配，且希望底部面板保持原来的未染色外观，传入 `themeTint = Color.Transparent`。
+- 如果顶栏依赖原先的浅色白、深色黑遮罩，请在 `CouiTopAppBarDefaults.colors(backgroundColor = …)` 中显式指定颜色。直接使用 `TopAppBarSurface` 时，设置 `gradientColor`。
+
+### 编译要求
+
+宿主最低 `compileSdk` 提升至 `37.1`，运行最低版本仍为 API 31。
 
 ## [0.0.1-alpha14] - 2026-11-22
 

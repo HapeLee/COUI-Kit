@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.itos.coui.layout.Divider
 import com.itos.coui.layout.Group
 import com.itos.coui.scroll.couiVerticalScroll
+import com.itos.coui.search.CouiSearchBarDefaults
 import com.itos.coui.search.SearchBar
 import com.itos.coui.search.rememberCouiSearchBarState
 import com.itos.coui.topappbar.*
@@ -65,8 +66,7 @@ internal fun ToolbarSample() {
                 modifier = Modifier.align(Alignment.TopCenter),
                 backdrop = backdrop,
                 windowInsets = WindowInsets(0, 0, 0, 0),
-                colors = CouiTopAppBarDefaults.colors(backgroundColor = LocalDemoTopBarGradient.current,
-                    titleColor = MaterialTheme.colorScheme.onSurface),
+                colors = CouiTopAppBarDefaults.colors(titleColor = MaterialTheme.colorScheme.onSurface),
                 title = {
                     if (Build.VERSION.SDK_INT >= 34 && state != null) {
                         TopAppBarSearch(state = state, style = style,
@@ -100,6 +100,9 @@ internal fun ToolbarSample() {
 @Composable
 internal fun SearchSamples(dark: Boolean) {
     val titleStyle = CouiTopAppBarDefaults.titleTextStyle()
+    val toolbarHeight = 64.dp
+    val searchVerticalPadding = 6.dp
+    val headerHeight = toolbarHeight + CouiSearchBarDefaults.height + searchVerticalPadding * 2
     var enabled by remember { mutableStateOf(true) }
     var active by remember { mutableStateOf<SearchSampleMode?>(null) }
     var query by remember { mutableStateOf("") }
@@ -127,30 +130,23 @@ internal fun SearchSamples(dark: Boolean) {
     Group {
         ChromePreview(Modifier.height(480.dp), background = {
             Column(Modifier.fillMaxSize().couiVerticalScroll(scroll)
-                .padding(top = 128.dp, bottom = 16.dp)) {
+                .padding(top = headerHeight, bottom = 16.dp)) {
                 ToolbarPreviewList(query)
             }
         }) { backdrop ->
             // 搜索控件自行处理跟手变形，纵向拖动留在预览区，避免带动详情页滚动。
             val dragBoundary = rememberDraggableState { }
-            Column(Modifier.align(Alignment.TopCenter).fillMaxWidth()
-                .draggable(dragBoundary, Orientation.Vertical)) {
-                SearchBar(Modifier.padding(vertical = 6.dp),
-                    state = persistent, query = query, onQueryChange = { query = it },
-                    onExpandedChange = {
-                        if (!it) closeSearch()
-                        else if (active == null) active = SearchSampleMode.Persistent
-                    },
-                    onSearch = { keyboard?.hide() },
-                    placeholder = stringResource(R.string.toolbar_search_hint),
-                    cancelText = stringResource(R.string.catalog_search_cancel),
-                    clearDescription = stringResource(R.string.catalog_search_clear),
-                    dark = dark, backdrop = backdrop, enabled = persistentEnabled)
-                if (Build.VERSION.SDK_INT >= 34) {
-                    val state = rememberCouiTopAppBarSearchState(toolbarExpanded)
-                    TopAppBarSurface(Modifier.fillMaxWidth(), backdrop, gradientColor = LocalDemoTopBarGradient.current) {
+            TopAppBarSurface(
+                modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth()
+                    .draggable(dragBoundary, Orientation.Vertical),
+                backdrop = backdrop,
+                fadeHeight = headerHeight + CouiTopAppBarDefaults.bottomExtension,
+            ) {
+                Column {
+                    if (Build.VERSION.SDK_INT >= 34) {
+                        val state = rememberCouiTopAppBarSearchState(toolbarExpanded)
                         val style = CouiTopAppBarButtonDefaults.style(search = true).withDemoThemeTint()
-                        Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 16.dp),
+                        Row(Modifier.fillMaxWidth().height(toolbarHeight).padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically) {
                             TopAppBarSearch(modifier = Modifier.weight(1f), state = state, style = style,
                                 query = query, onQueryChange = { query = it },
@@ -176,9 +172,20 @@ internal fun SearchSamples(dark: Boolean) {
                                     enabled = toolbarEnabled)
                             }
                         }
+                    } else {
+                        DemoPreference(Modifier.height(toolbarHeight), title = stringResource(R.string.requires_api_34), enabled = false)
                     }
-                } else {
-                    DemoPreference(Modifier.height(64.dp), title = stringResource(R.string.requires_api_34), enabled = false)
+                    SearchBar(Modifier.padding(vertical = searchVerticalPadding),
+                        state = persistent, query = query, onQueryChange = { query = it },
+                        onExpandedChange = {
+                            if (!it) closeSearch()
+                            else if (active == null) active = SearchSampleMode.Persistent
+                        },
+                        onSearch = { keyboard?.hide() },
+                        placeholder = stringResource(R.string.toolbar_search_hint),
+                        cancelText = stringResource(R.string.catalog_search_cancel),
+                        clearDescription = stringResource(R.string.catalog_search_clear),
+                        dark = dark, enabled = persistentEnabled)
                 }
             }
         }
