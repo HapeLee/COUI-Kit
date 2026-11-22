@@ -39,7 +39,10 @@ android {
         versionCode = gitCommitCount.get()
         versionName = "0.0.1-alpha14"
     }
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
     val demoSigning = if (signingValues.isNotEmpty()) {
         signingConfigs.create("demo") {
             storeFile = rootProject.file(signingValues.getValue("KEYSTORE_FILE")).also {

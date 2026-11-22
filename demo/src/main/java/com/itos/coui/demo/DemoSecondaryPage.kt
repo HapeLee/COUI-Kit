@@ -64,9 +64,12 @@ internal fun DemoSecondaryPage(page: String, dark: Boolean, preferences: DemoPre
                 "about" -> {
                     DemoAboutHero()
                     Group {
-                        DemoPreference(title = stringResource(R.string.app_name), value = "1.0")
+                        DemoPreference(title = stringResource(R.string.settings_coui_version), value = BuildConfig.VERSION_NAME)
                         Divider()
-                        DemoPreference(title = stringResource(R.string.settings_baseline), value = "ColorOS 17")
+                        DemoPreference(
+                            title = stringResource(R.string.settings_baseline),
+                            value = stringResource(R.string.settings_baseline_value, stringResource(R.string.style_reference_version)),
+                        )
                     }
                 }
             }

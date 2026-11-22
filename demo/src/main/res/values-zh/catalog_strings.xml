@@ -65,6 +65,7 @@
     <string name="settings_dependency">关闭通知后，下方铃声和提醒选项不可操作。</string>
     <string name="settings_privacy">隐私</string>
     <string name="settings_about">关于此示例</string>
+    <string name="settings_coui_version">COUI 版本</string>
     <string name="settings_local">本地示例</string>
     <string name="settings_demo_only">这些选项仅在演示中保存，不会修改系统设置。</string>
     <string name="settings_switch_drag">点击或拖动开关</string>
