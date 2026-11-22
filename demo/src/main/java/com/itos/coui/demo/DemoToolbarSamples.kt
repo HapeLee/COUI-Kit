@@ -65,8 +65,7 @@ internal fun ToolbarSample() {
                 modifier = Modifier.align(Alignment.TopCenter),
                 backdrop = backdrop,
                 windowInsets = WindowInsets(0, 0, 0, 0),
-                colors = CouiTopAppBarDefaults.colors(backgroundColor = LocalDemoTopBarGradient.current,
-                    titleColor = MaterialTheme.colorScheme.onSurface),
+                colors = CouiTopAppBarDefaults.colors(titleColor = MaterialTheme.colorScheme.onSurface),
                 title = {
                     if (Build.VERSION.SDK_INT >= 34 && state != null) {
                         TopAppBarSearch(state = state, style = style,
@@ -148,7 +147,7 @@ internal fun SearchSamples(dark: Boolean) {
                     dark = dark, backdrop = backdrop, enabled = persistentEnabled)
                 if (Build.VERSION.SDK_INT >= 34) {
                     val state = rememberCouiTopAppBarSearchState(toolbarExpanded)
-                    TopAppBarSurface(Modifier.fillMaxWidth(), backdrop, gradientColor = LocalDemoTopBarGradient.current) {
+                    TopAppBarSurface(Modifier.fillMaxWidth(), backdrop) {
                         val style = CouiTopAppBarButtonDefaults.style(search = true).withDemoThemeTint()
                         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically) {

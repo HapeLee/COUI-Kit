@@ -9,18 +9,19 @@ import android.os.Build
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -64,7 +65,8 @@ private val FadeColors = LongArray(FadeStopCount) { index ->
 /**
  * 背景从标题栏顶部开始并向下延伸，不改变布局或触摸高度。
  * gradientSpeed 为 null 时保留项目固定渐隐；正值选择全高原厂幂曲线。
- * gradientColor 未指定时使用浅色白色、深色黑色渐变；Transparent 关闭遮罩，显式 alpha 与预设透明度相乘。
+ * gradientColor 未指定时优先取 Scaffold 的不透明页面底色，其次取当前主题的页面底色。
+ * 显式颜色覆盖默认值，其 alpha 与渐变透明度相乘。Color.Transparent 关闭遮罩。
  * topExtension 在测量时读取，背景向上延伸并平移，不改变内容占位或触摸范围。
  */
 @Composable
@@ -85,6 +87,8 @@ fun TopAppBarSurface(
 ) {
     val density = LocalDensity.current.density
     val destination = rememberCouiBackdrop(parent = backdrop)
+    // 模糊和遮罩在各自的目标 Canvas 上依次合成，按钮采样沿用同一组绘制指令。
+    SideEffect { destination.setIsolateWhenIdle(false) }
     val backgroundModifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         Modifier.drawCouiGradientBackdrop(
             backdrop = backdrop,
@@ -102,14 +106,25 @@ fun TopAppBarSurface(
             effects = { progressiveBlur(blurEffects, fadeHeight) },
         )
     }
-    val resolvedGradientColor = gradientColor.takeOrElse { if (dark) Color.Black else Color.White }
-    val gradient = remember(resolvedGradientColor, dark) {
-        // 扩展色彩编码保留渐变透明度精度，避免每个节点先量化为 8 位。
-        val color = resolvedGradientColor.convert(ColorSpaces.ExtendedSrgb)
-        Brush.verticalGradient(List(FadeStopCount) { index ->
-            color.copy(alpha = color.alpha * topBarGradientAlpha(index / (FadeStopCount - 1f), dark))
-        })
+    val resolvedGradientColor = gradientColor.takeOrElse {
+        CouiTopAppBarDefaults.defaultBackgroundColor(CouiTheme.colorSchemeFor(dark).background)
     }
+    val gradient = remember(resolvedGradientColor, dark) {
+        if (resolvedGradientColor.alpha == 0f) return@remember null
+        val color = resolvedGradientColor.copy(alpha = 1f)
+        val transparent = color.copy(alpha = 0f)
+        // GradientBackgroundDrawable 从下往上填节点。浅色 70% 节点在原厂截断为 178/255。
+        if (dark) {
+            Brush.verticalGradient(0f to color.copy(alpha = .4f), 1f to transparent)
+        } else {
+            Brush.verticalGradient(
+                0f to color,
+                .6f to color.copy(alpha = 178f / 255f),
+                1f to transparent,
+            )
+        }
+    }
+    val opacity = backgroundAlpha.coerceIn(0f, 1f)
     SharedTransitionScope { overlayModifier ->
         Layout(
             modifier = modifier.then(overlayModifier)
@@ -117,9 +132,14 @@ fun TopAppBarSurface(
                 .pointerInput(Unit) {},
             content = {
                 Box(Modifier.couiBackdrop(destination)) {
-                    Box(Modifier.matchParentSize().graphicsLayer { alpha = backgroundAlpha.coerceIn(0f, 1f) }) {
-                        Spacer(Modifier.matchParentSize().then(backgroundModifier))
-                        if (resolvedGradientColor.alpha > 0f) Spacer(Modifier.matchParentSize().background(gradient))
+                    Spacer(Modifier.matchParentSize().graphicsLayer {
+                        compositingStrategy = CompositingStrategy.ModulateAlpha
+                        alpha = opacity
+                    }.then(backgroundModifier))
+                    if (gradient != null) {
+                        Spacer(Modifier.matchParentSize().drawBehind {
+                            drawRect(gradient, alpha = opacity * resolvedGradientColor.alpha)
+                        })
                     }
                 }
                 Box {
@@ -146,21 +166,6 @@ fun TopAppBarSurface(
             }
         }
     }
-}
-
-private fun topBarGradientAlpha(position: Float, dark: Boolean): Float {
-    if (dark) return .4f * (1f - position * position * (3f - 2f * position))
-    // 保留浅色 .6/.7 节点；两段 Hermite 共用连接斜率，底端以零斜率淡出。
-    val first = position <= .6f
-    val span = if (first) .6f else .4f
-    val t = if (first) position / span else (position - .6f) / span
-    val start = if (first) 1f else .7f
-    val end = if (first) .7f else 0f
-    val startSlope = if (first) -.5f else -.8f
-    val endSlope = if (first) -.8f else 0f
-    val smooth = t * t * (3f - 2f * t)
-    return (start * (1f - smooth) + end * smooth +
-        span * t * (1f - t) * (startSlope * (1f - t) - endSlope * t)).coerceIn(0f, 1f)
 }
 
 private fun CouiBackdropEffectScope.progressiveBlur(blurEffects: List<CouiCoverageBlurEffect>, fadeHeight: androidx.compose.ui.unit.Dp) {

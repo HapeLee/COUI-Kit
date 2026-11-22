@@ -25,6 +25,7 @@ import com.itos.coui.backdrop.CouiBackdrop
 import com.itos.coui.backdrop.CouiBackdropEffectScope
 import com.itos.coui.backdrop.DrawCouiBackdropNode
 import kotlin.math.ceil
+import kotlin.random.Random
 
 private const val BlurOffsetPx = 2f
 private const val SigmaScale = 0.57735f
@@ -170,13 +171,18 @@ private class CouiGradientRenderer(
     }
 
     private fun updateEffects(size: IntSize) {
-        if (lastSize == size && lastHeight == height) return
+        val geometryChanged = lastSize != size || lastHeight != height
+        val gradientHeight = if (gradientSpeed == null) fadeHeightPx else height
+        // 原厂每次执行卷积时取一个百分位种子，两遍共用。
+        val noiseSeed = Random.nextInt(101) / 100f
         shaders.forEachIndexed { index, shader ->
-            shader.setFloatUniform("inputSize", size.width.toFloat(), size.height.toFloat())
-            val gradientHeight = if (gradientSpeed == null) fadeHeightPx else height
-            shader.setFloatUniform("gradientTop", padding + height - gradientHeight)
-            shader.setFloatUniform("gradientHeight", gradientHeight)
-            // RenderEffect 保存 uniform 快照; 仅几何改变时更新, 普通滚动复用。
+            if (geometryChanged) {
+                shader.setFloatUniform("inputSize", size.width.toFloat(), size.height.toFloat())
+                shader.setFloatUniform("gradientTop", padding + height - gradientHeight)
+                shader.setFloatUniform("gradientHeight", gradientHeight)
+            }
+            shader.setFloatUniform("in_random", noiseSeed)
+            // RenderEffect 保存 uniform 快照，种子随绘制录制更新。
             passes[index].renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "child")
                 .asComposeRenderEffect()
         }
@@ -186,7 +192,6 @@ private class CouiGradientRenderer(
 }
 
 // libhwui.so: OplusGradientGaussianBlurEffect::make_blur_effect, 保留整数半径、权重和剩余中心权重。
-// shortcut: 噪声种子固定, 不复刻原厂逐次随机的时间变化; 需要动态噪声时再接入渲染时钟。
 private fun gradientGaussianShader(kernelRadius: Int, gradientSpeed: Float?): String = """
     const int in_blurRadius = $kernelRadius;
     const float PI = 3.1415926;
@@ -194,6 +199,7 @@ private fun gradientGaussianShader(kernelRadius: Int, gradientSpeed: Float?): St
     uniform float2 inputSize;
     uniform float gradientTop;
     uniform float gradientHeight;
+    uniform float in_random;
     uniform half2 in_blurOffset;
 
     float4 sampleChild(float2 coord) {
@@ -238,7 +244,7 @@ private fun gradientGaussianShader(kernelRadius: Int, gradientSpeed: Float?): St
         // 屏幕外没有页面采样; 恢复有效颜色但不扩张中心覆盖度, 避免顶边变暗或补成不透明。
         if (finalColor.a <= 0.0) return half4(0.0);
         finalColor = float4(finalColor.rgb * (c.a / finalColor.a), c.a);
-        float noise = interleavedGradientNoise(coord + 0.5) - 0.5;
+        float noise = interleavedGradientNoise(coord + in_random) - 0.5;
         finalColor.rgb = clamp(finalColor.rgb + noise * c.a / 200.0, float3(0.0), float3(c.a));
         return half4(finalColor);
     }

@@ -14,13 +14,15 @@ TopAppBar 在相应平台通过 CouiGradientBlur 移植位置可变 Gaussian。�
 
 独立 Density 用于采样录制，不能让 DrawScope 成为自己的密度代理。背景源、坐标和裁剪继续复用 CouiBackdrop；渐进输出排除标题与按钮，按钮采样该输出并通过 parent 补足源区域外底图。
 
-低层入口可使用固定逻辑渐隐长度、下沿锚定和 smoothstep。完整顶栏使用固定像素参考半径和全高幂曲线。折叠时完整背景只平移，不随当前栏高压缩。两遍使用固定噪声种子，透明边界恢复有效样本颜色但不扩张中心 alpha。旧平台使用分层 Gaussian 和遮罩。
+低层入口可使用固定逻辑渐隐长度、下沿锚定和 smoothstep。完整顶栏使用固定像素参考半径和全高幂曲线。折叠时完整背景只平移，不随当前栏高压缩。透明边界恢复有效样本颜色并保留中心 alpha。旧平台使用分层 Gaussian 和遮罩。
 
-TopAppBarSurface 在模糊结果之上、标题和按钮之下叠加独立背景遮罩，以 GradientBackgroundDrawable 的深浅色透明度节点为基准。浅色连接处采用斜率连续的插值，深浅色均在底端以零斜率淡出，避免分段线性变化留下接痕；颜色节点使用扩展色彩编码，不先量化为 8 位。这些平滑处理属于项目定制。默认浅色白色、深色黑色；显式颜色覆盖默认值，Transparent 关闭遮罩。遮罩与模糊结果一起进入按钮背景源，使按钮采样到实际显示的顶栏背景。
+TopAppBarSurface 按背景模糊、颜色遮罩的顺序在目标 Canvas 上绘制。背景淡入透明度分别用于这两次合成。按钮背景源复用这组绘制指令。原厂优先使用不透明的顶栏底色，再取页面底色。COUI 使用显式颜色、Scaffold 不透明底色或当前主题底色，并采用 GradientBackgroundDrawable 的线性节点。
 
 ## Evidence
 
 来源为原宿主的同名 Note 与顶部栏渐进模糊契约。原厂基准是 PJZ110 Contacts、OppoNote2、Calendar 的 AppBarBlurHelper.applyGradientBlurRenderEffect，经 framework 的 GradientBlur 进入 libhwui 的 OplusGradientGaussianBlurEffect。对应起止强度不同分支先横后纵，两遍共用竖向半径场，并绕过普通 Gaussian 的降采样分支。原厂独立背景 Drawable 的 positions/alphas 不是卷积核。
+
+原厂 `OplusGradientGaussianBlurEffect::blur` 每次执行生成一个百分位噪声种子，横纵共用，默认除数为 200。公开 `RenderEffect` 保存 uniform 快照，因此 COUI 在重录背景时更新两遍的快照，复用 Shader 编译结果和第二遍的录制指令。系统对已录制图层的内部重绘时机由 HWUI 决定。
 
 此证据仅限定该材料与分支，不证明任意画布矩阵或厂商缓存始终为屏幕原分辨率。原材料不作为本仓库运行依赖。当前算法与参数位置见 [CouiGradientBlur](../../../../coui/src/main/java/com/itos/coui/effect/CouiGradientBlur.kt)。
 
@@ -30,10 +32,12 @@ TopAppBarSurface 在模糊结果之上、标题和按钮之下叠加独立背景
 - **平台均匀 Gaussian 后渐变混合。** 实现简单，原厂也有备用分支，但不是已确认的默认位置可变核路径。
 - **反射厂商 RenderEffect。** 可以复用其执行器，但不满足跨品牌要求。
 
+- **密集节点与平滑遮罩。** 连续斜率能弱化控制点处的接痕，但深色纯底在零斜率尾部会形成更宽的同色区域。少量线性节点也避开了部分 Skia GPU 后端的多节点纹理路径。
+
 ## Consequences
 
 透明中心的工作省略与固定第二遍指令复用见[绘制工作省略](../simplification/2026-11-01-render-work-elision.md)；本篇的核、完整采样范围和既有视觉适配保持。
 
 移除粗网格放大来源，保留原尺寸卷积的采样成本。高 density 的强度适配会扩大卷积核和外沿，不能以图层减少宣称更快。
 
-原工程曾用生产与原片段离线 Skia 对照核、边界、顺序和锚点，并检查曲线与方差；这是历史证据，不是本仓库的 Android GPU 验收。本次迁入不改 Shader。当前公开承载的分配、精度、噪声时间行为及既有强度适配仍不能表述为原厂逐像素等价。
+原工程的离线 Skia 对照覆盖核、边界、顺序、锚点、曲线和方差。公开接口通过重放正文取得背景，原厂直接对目标 Canvas 取样。中间目标格式、噪声更新时机与色带观感需要设备对照。

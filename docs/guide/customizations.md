@@ -21,8 +21,7 @@ Demo 二级页统一使用 `LargeTopAppBar`（参考的原厂设置二级页使�
 
 ### 顶栏模糊强度与渐变
 
-- **模糊与渐隐曲线**：顶栏模糊强度采用项目调校值，配合浅色白色、深色黑色的背景遮罩。遮罩以原厂透明度节点为基准，平滑浅色中间节点的变化速度并在底端平缓淡出，减轻分段过渡接痕；通用顶栏背景预设使用固定逻辑高度的渐隐区与 smoothstep 曲线，渐隐区锚定底部并随顶栏高度变化移动。
-- **作用范围**：`TopAppBar` 与默认 `TopAppBarSurface` 使用通用预设；`LargeTopAppBar`、`CollapsingTopAppBar` 保留各自的模糊半径与渐变配置，不可将通用预设数值直接套用于所有顶栏。显式传入 `gradientSpeed` 时，改用对应的全高原厂幂函数曲线。
+- 直接使用 `TopAppBarSurface` 并省略 `gradientSpeed` 时，模糊强度采用固定逻辑高度的 smoothstep 渐隐区，锚定背景下沿。完整顶栏使用全高幂函数曲线。颜色遮罩的取色方式统一见[背景参数](../components/top-app-bar.md#背景参数)。
 - **参考入口**：[CouiTopAppBarDefaults](../../coui/src/main/java/com/itos/coui/topappbar/CouiTopAppBarDefaults.kt)、[TopAppBarSurface](../../coui/src/main/java/com/itos/coui/topappbar/TopAppBarSurface.kt)，取舍说明见[顶栏渐进模糊](../../.agents/notes/implemented/bug-fix/2026-10-18-coui-topbar-gradient-blur.md)。
 
 ### 按钮材质与搜索避让

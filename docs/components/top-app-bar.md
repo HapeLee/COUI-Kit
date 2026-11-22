@@ -40,7 +40,7 @@ fun PageToolbarExample(
 
 - **槽位与排版职责**：`navigationIcon` 放置返回等导航按钮，`actions` 位于 `RowScope` 中。`TopAppBar` 会向 `title` 提供 `18.sp`、基础字重 `700` 与 `sans-serif-semibold` 排版（与带导航按钮的 `LargeTopAppBar` 收起时一致，均跟随系统字体大小与粗体设置）；纯 Compose 文本请写为 `BasicText(title, style = LocalCouiTextStyle.current)`，自定义 `TopAppBarSurface` 可调用 `CouiTopAppBarDefaults.titleTextStyle()` 复用这套排版。
 - **按钮默认值**：`TopAppBarButton` 默认使用 `CouiTopAppBarButtonDefaults.style()`，搜索使用 `style(search = true)`。默认材质取顶栏背景并执行两层混色，附加模糊半径为零。显式传入 `style` 可覆盖默认样式。
-- **背景遮罩配色**：`CouiTopAppBarDefaults.colors(dark = dark)` 控制顶部渐变遮罩、标题、导航与操作颜色。默认在浅色模式使用白色、深色模式使用黑色向下渐隐；传入 `backgroundColor = Color.Transparent` 可关闭遮罩并仅保留模糊。
+- **背景遮罩配色**：顶栏在 `Scaffold` 的 `topBar` 槽位中默认使用不透明的 `containerColor`，其余情况使用当前主题的 `background`。要指定另一种底色，将 `CouiTopAppBarDefaults.colors(backgroundColor = pageColor)` 传给顶栏的 `colors`。传入 `Color.Transparent` 可关闭遮罩并保留模糊。
 - API 33+ 的完整顶栏按设备像素应用全高渐进模糊。直接使用 `TopAppBarSurface` 时，也可以指定参考半径、渐隐长度和曲线。
 - **大标题顶栏**：普通大标题页面的滚动折叠装配见[折叠顶栏](collapsing-app-bar.md#普通大标题)。
 
@@ -165,8 +165,8 @@ fun ToolbarActionsGroupExample(
 | `referenceBlurRadius` | `CouiTopAppBarDefaults.referenceBlurRadius` | 按 `dp` 解释的参考模糊半径（默认 `10.8.dp`）；若需固定引擎像素半径，请按当前 `density` 换算后传入 |
 | `bottomExtension` | `CouiTopAppBarDefaults.bottomExtension` | 背景向下额外延伸的距离（默认 `12.dp`），不改变布局高度与触摸范围 |
 | `topExtension` | `{ 0.dp }` | 在测量阶段读取的向上延伸距离；会将背景增加对应高度并向上平移，不改变内容占位与命中区域，常用于折叠顶栏保持渐隐曲线稳定 |
-| `backgroundAlpha` | `1f` | 同时控制模糊背景与遮罩的整体透明度（`0f..1f`），不影响标题和按钮 |
-| `gradientColor` | `Color.Unspecified` | 未指定时浅色用白色、深色用黑色向下渐隐；传入显式颜色会覆盖默认遮罩（其 `alpha` 与渐变曲线及 `backgroundAlpha` 相乘）；传入 `Color.Transparent` 关闭遮罩并保留模糊 |
+| `backgroundAlpha` | `1f` | 模糊背景与遮罩分别使用此透明度（`0f..1f`）合成。标题和按钮独立绘制 |
+| `gradientColor` | `Color.Unspecified` | 未指定时使用页面底色。显式传色时，其 `alpha` 与深浅模式的渐变透明度及 `backgroundAlpha` 相乘。`Color.Transparent` 关闭遮罩并保留模糊 |
 | `gradientSpeed` | `null` | API 33+ 有效：`null` 使用固定长度渐隐，正值启用全高幂曲线；API 31–32 使用分层平台模糊固定参数 |
 | `dark` | `CouiTheme.isDark` | 决定背景渐变的深浅色分支 |
 

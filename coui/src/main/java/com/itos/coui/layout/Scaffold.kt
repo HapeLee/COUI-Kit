@@ -19,7 +19,9 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +37,8 @@ import com.itos.coui.theme.CouiTheme
 import com.itos.coui.backdrop.ProvideCouiBackdrop
 import com.itos.coui.backdrop.couiBackdrop
 import com.itos.coui.backdrop.rememberCouiBackdrop
+
+internal val LocalScaffoldTopBarContainerColor = compositionLocalOf { Color.Unspecified }
 
 /**
  * 可选页面容器：录制完整正文视口，顶栏、底栏及浮动操作在采样层之外绘制。
@@ -83,7 +87,10 @@ fun Scaffold(
         }
         val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
         val top = subcompose(ScaffoldSlot.TopBar) {
-            ProvideCouiBackdrop(backdrop, content = topBar)
+            val topBarContainerColor = containerColor.takeIf { it.alpha == 1f } ?: Color.Unspecified
+            CompositionLocalProvider(LocalScaffoldTopBarContainerColor provides topBarContainerColor) {
+                ProvideCouiBackdrop(backdrop, content = topBar)
+            }
         }.map { it.measure(looseConstraints) }
         val bottom = subcompose(ScaffoldSlot.BottomBar) {
             ProvideCouiBackdrop(backdrop, content = bottomBar)

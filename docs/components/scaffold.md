@@ -58,7 +58,7 @@ fun BasicScaffoldPageExample(
 | --- | --- | --- |
 | `topBar` | `{}` | 顶部栏位，自动获得默认正文 `backdrop` |
 | `bottomBar` | `{}` | 底部栏位，自动获得默认正文 `backdrop` |
-| `containerColor` | `CouiTheme.colorScheme.background` | 正文底层背景色，会录入正文 `backdrop` 供浮动栏位采样，不修改内容槽局部主题 |
+| `containerColor` | `CouiTheme.colorScheme.background` | 正文底层背景色，录入正文 `backdrop`。不透明时也作为 [顶栏遮罩](top-app-bar.md#背景参数) 的默认颜色 |
 | `windowInsets` | `WindowInsets.systemBars.union(WindowInsets.displayCutout)` | 系统安全区与屏幕缺口；传入 `WindowInsets(0, 0, 0, 0)` 可关闭默认安全区处理 |
 | `floatingActionButton` | `null` | 位于 `BoxScope` 的浮动操作槽位，自动获得默认正文 `backdrop` 与安全留白 |
 
