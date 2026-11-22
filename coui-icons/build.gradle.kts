@@ -80,7 +80,6 @@ tasks.withType<Jar>().configureEach {
 
 dependencies {
     implementation(project(":coui"))
-    api(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.ui)
     api(libs.androidx.compose.runtime)
 }

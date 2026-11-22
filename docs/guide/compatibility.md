@@ -18,7 +18,7 @@
 
 ## 依赖对齐
 
-- **Compose 传递依赖**：核心库通过 `api(platform(...))` 提供 Compose alpha BOM，并公开 UI、Animation、Foundation 依赖；版本目录另显式请求 Foundation/Runtime，最终版本由 Gradle 解析结果决定。发生版本冲突时请检查宿主依赖图并对齐版本，不要使用 `force` 或 `exclude` 绕过约束。
+- **Compose 传递依赖**。各库只发布自身的直接 Compose 依赖及版本，版本由[版本目录](../../gradle/libs.versions.toml)维护。Compose BOM 仅供 Demo 使用，避免库给宿主的 Adaptive 等其他 Compose 组件引入额外版本约束。宿主可使用自己的 BOM，最终版本以 Gradle 依赖解析结果为准。
 - **`DynamicAnimation` 依赖对齐**：核心库请求 AndroidX `DynamicAnimation` `1.1.0`（Gradle 按宿主依赖图解析版本，例如与同样请求 `1.1.0` 的 Material Components for Android 共用）；取消后重启行为见[主动控制运动](../effects/motion.md#主动控制运动)。
 - **可选 Material 3 与图标模块**：`coui-material3` 会传递引入同版本的 `coui` 与 Material 3；`CouiIcons` 位于可选的 `coui-icons` 模块（依赖 `coui` 读取主题，核心不依赖图标模块）。同时声明多个模块时必须保持相同版本；核心库本身不依赖 Material 3 或 Material Icons。
 - **宿主自备依赖**：宿主直接调用 Material 3、Activity 等 API 时须自行声明相应依赖；Demo 的 `Capsule` 依赖无需随库引入。

@@ -81,6 +81,5 @@ tasks.withType<Jar>().configureEach {
 
 dependencies {
     api(project(":coui"))
-    api(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.material3)
 }
