@@ -123,6 +123,16 @@ internal fun SettingsDemo(dark: Boolean, preferences: DemoPreferences,
         DemoSwitchPreference(title = stringResource(R.string.right_accessory_toggle), checked = rightAccessory,
             onCheckedChange = onRightAccessoryChange)
     }
+    val progressiveBlurSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    Group(title = stringResource(R.string.progressive_blur_comparison)) {
+        DemoSwitchPreference(
+            title = stringResource(R.string.compose_progressive_blur),
+            summary = stringResource(if (progressiveBlurSupported) R.string.compose_progressive_blur_summary else R.string.requires_api_33),
+            checked = progressiveBlurSupported && preferences.composeProgressiveBlur,
+            onCheckedChange = preferences::composeProgressiveBlur,
+            enabled = progressiveBlurSupported,
+        )
+    }
     Group {
         DemoPreference(title = stringResource(R.string.settings_about), onClick = onAbout)
         Divider()

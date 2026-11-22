@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
@@ -38,11 +39,14 @@ import com.itos.coui.backdrop.LocalCouiBackdrop
 import com.itos.coui.effect.CouiCoverageBlurEffect
 import com.itos.coui.effect.CouiGradientTint
 import com.itos.coui.effect.CouiLightTintCurve
+import com.itos.coui.effect.drawComposeGradientBackdrop
 import com.itos.coui.effect.drawCouiGradientBackdrop
 import com.itos.coui.theme.CouiTheme
 
 internal val LocalCouiToolbarBackdrop = staticCompositionLocalOf<CouiBackdrop?> { null }
 internal val LocalCouiToolbarOverlay = staticCompositionLocalOf<SharedTransitionScope?> { null }
+
+internal val LocalUseCouiTopAppBarBlur = compositionLocalOf { false }
 
 private const val FadeStopCount = 65
 private const val LightTintTransitionSegments = 8
@@ -66,11 +70,21 @@ private val FadeColors = LongArray(FadeStopCount) { index ->
 }
 
 /**
+ * 为当前作用域的顶栏设置默认渐进模糊后端。Android 13 及以上传 true 使用 Compose，
+ * false 使用 COUI。顶栏显式传入的 useCouiBlur 优先。
+ */
+@Composable
+fun ProvideCouiTopAppBarBlur(useComposeBlur: Boolean, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalUseCouiTopAppBarBlur provides !useComposeBlur, content = content)
+}
+
+/**
  * 背景从标题栏顶部开始并向下延伸，不改变布局或触摸高度。
  * gradientSpeed 为 null 时保留项目固定渐隐；正值选择全高原厂幂曲线。
  * gradientColor 未指定时优先取 Scaffold 的不透明页面底色，其次取当前主题的页面底色。
  * 显式颜色覆盖默认值，其 alpha 与渐变透明度相乘。Color.Transparent 关闭遮罩。
  * topExtension 在测量时读取，背景向上延伸并平移，不改变内容占位或触摸范围。
+ * useCouiBlur 在 Android 13 及以上选择 COUI 渐进模糊；默认使用 Compose，可由作用域覆盖。
  */
 @Composable
 fun TopAppBarSurface(
@@ -86,6 +100,7 @@ fun TopAppBarSurface(
     gradientColor: Color = Color.Unspecified,
     dark: Boolean = CouiTheme.isDark,
     topExtension: () -> androidx.compose.ui.unit.Dp = { 0.dp },
+    useCouiBlur: Boolean = LocalUseCouiTopAppBarBlur.current,
     content: @Composable () -> Unit,
 ) {
     val density = LocalDensity.current.density
@@ -97,13 +112,16 @@ fun TopAppBarSurface(
     }.takeOrElse { Color.Transparent }
     val opacity = backgroundAlpha.coerceIn(0f, 1f)
     val backgroundModifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Modifier.drawCouiGradientBackdrop(
-            backdrop = backdrop,
-            fadeHeightPx = fadeHeight.value * density,
-            referenceBlurRadiusPx = referenceBlurRadius.value * density,
-            gradientSpeed = gradientSpeed,
-            tint = CouiGradientTint(resolvedGradientColor, opacity, dark),
-        )
+        val tint = CouiGradientTint(resolvedGradientColor, opacity, dark)
+        if (useCouiBlur) {
+            Modifier.drawCouiGradientBackdrop(
+                backdrop, fadeHeight.value * density, referenceBlurRadius.value * density, gradientSpeed, tint,
+            )
+        } else {
+            Modifier.drawComposeGradientBackdrop(
+                backdrop, fadeHeight.value * density, referenceBlurRadius.value * density, gradientSpeed, tint,
+            )
+        }
     } else {
         val blurEffects = remember(density) {
             BlurLayers.map { (radius, _) -> CouiCoverageBlurEffect(radius.value * density) }

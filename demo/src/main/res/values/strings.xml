@@ -95,4 +95,7 @@
     <string name="demo_settings">Settings</string>
     <string name="demo_theme_settings">Theme settings</string>
     <string name="demo_navigation_settings">Navigation bar settings</string>
+    <string name="progressive_blur_comparison">Top app bar blur</string>
+    <string name="compose_progressive_blur">Use Compose progressive blur</string>
+    <string name="compose_progressive_blur_summary">Applies to top app bars throughout the Demo. Turn off to use COUI progressive blur.</string>
 </resources>

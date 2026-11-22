@@ -95,4 +95,7 @@
     <string name="demo_settings">设置</string>
     <string name="demo_theme_settings">主题设置</string>
     <string name="demo_navigation_settings">底栏设置</string>
+    <string name="progressive_blur_comparison">顶栏模糊</string>
+    <string name="compose_progressive_blur">使用 Compose 渐进模糊</string>
+    <string name="compose_progressive_blur_summary">应用于 Demo 各页面的顶栏。关闭后使用 COUI 渐进模糊。</string>
 </resources>

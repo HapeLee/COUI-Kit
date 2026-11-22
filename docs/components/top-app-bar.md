@@ -2,7 +2,7 @@
 
 `TopAppBar` 提供标题、导航与操作槽位并自带渐进模糊背景；`TopAppBarSurface` 提供可自由排版的背景容器；`TopAppBarButton` 提供带光效与物理按压反馈的浮动操作按钮。大标题折叠请使用[折叠顶栏](collapsing-app-bar.md)。
 
-- **顶栏容器（`TopAppBar`、`TopAppBarSurface`）**：支持库最低版本（**API 31+**）；API 33+ 使用 `RuntimeShader` 渐进模糊，API 31–32 使用分层覆盖率模糊。
+- **顶栏容器（`TopAppBar`、`TopAppBarSurface`）**：支持 **API 31+**。API 33+ 默认使用 Compose 渐进模糊，API 31–32 使用分层覆盖率模糊。
 - **顶栏按钮与搜索（`TopAppBarButton`、`TopAppBarSearch`）**：要求 **API 34+**。
 - **背景源要求**：在 COUI `Scaffold` 的 `topBar` 槽位中可省略 `backdrop`；在第三方容器中使用时需显式传入不包含顶栏自身的 `backdrop`。
 
@@ -42,6 +42,8 @@ fun PageToolbarExample(
 - **按钮默认值**：`TopAppBarButton` 默认使用 `CouiTopAppBarButtonDefaults.style()`，搜索使用 `style(search = true)`。默认材质取顶栏背景并执行两层混色，附加模糊半径为零。显式传入 `style` 可覆盖默认样式。
 - **背景遮罩配色**：顶栏在 `Scaffold` 的 `topBar` 槽位中默认使用不透明的 `containerColor`，其余情况使用当前主题的 `background`。要指定另一种底色，将 `CouiTopAppBarDefaults.colors(backgroundColor = pageColor)` 传给顶栏的 `colors`。传入 `Color.Transparent` 可关闭遮罩并保留模糊。
 - API 33+ 的完整顶栏按设备像素应用全高渐进模糊。直接使用 `TopAppBarSurface` 时，也可以指定参考半径、渐隐长度和曲线。
+- Android 13 及以上，给 `TopAppBar`、`LargeTopAppBar`、`CollapsingTopAppBar` 或 `TopAppBarSurface` 传入 `useCouiBlur = true`，即可使用 COUI 渐进模糊。可以用 `ProvideCouiTopAppBarBlur(useComposeBlur = false) { … }` 为多个顶栏设置同一默认值，显式传参优先。两种后端共用参考半径、清晰端和渐隐位置。Compose 的采样核及半径上限以其 `BlurRadiusSpec` 为准。
+- 如果在调用括号内按位置传入 `CollapsingTopAppBar` 的搜索槽或 `TopAppBarSurface` 的内容槽，改用 `searchBar = { … }`、`content = { … }` 或尾随 lambda。
 - **大标题顶栏**：普通大标题页面的滚动折叠装配见[折叠顶栏](collapsing-app-bar.md#普通大标题)。
 
 ## 自定义表面与最小按钮（`TopAppBarSurface`）

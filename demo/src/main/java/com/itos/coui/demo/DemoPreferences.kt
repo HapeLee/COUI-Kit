@@ -17,6 +17,8 @@ internal class DemoPreferences private constructor(context: Context) {
     fun materialTheme(value: Boolean) { materialTheme = value; store.edit().putBoolean("materialTheme", value).apply() }
     var contour by mutableStateOf(store.getBoolean("contour", true))
         private set
+    var composeProgressiveBlur by mutableStateOf(store.getBoolean("composeProgressiveBlur", true))
+        private set
     var messageInputCamera by mutableStateOf(store.getBoolean("messageInputCamera", true))
         private set
     var messageInputMore by mutableStateOf(store.getBoolean("messageInputMore", true))
@@ -41,7 +43,11 @@ internal class DemoPreferences private constructor(context: Context) {
 
     fun dark(value: Boolean) { darkOverride = value; store.edit().putBoolean("dark", value).apply() }
     fun contour(value: Boolean) { contour = value; store.edit().putBoolean("contour", value).apply() }
-    fun reset() { materialTheme(false); contour(true) }
+    fun composeProgressiveBlur(value: Boolean) {
+        composeProgressiveBlur = value
+        store.edit().putBoolean("composeProgressiveBlur", value).apply()
+    }
+    fun reset() { materialTheme(false); contour(true); composeProgressiveBlur(true) }
 
     companion object {
         private var instance: DemoPreferences? = null
