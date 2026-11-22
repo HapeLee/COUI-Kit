@@ -66,20 +66,15 @@ data class CouiSheetButton(
     }
 }
 
-/** 顶部按钮只采样面板底图，避免采入按钮自身。 */
+/** 面板操作按钮的视觉与按压预选口径：工具栏与正文内自绘头部共用同一份。 */
 @Composable
-internal fun SheetToolbar(
-    leadingButton: CouiSheetButton?,
-    titleContent: @Composable (() -> Unit)?,
-    trailingButton: CouiSheetButton?,
-) {
-    val backdrop = rememberCouiSheetSurfaceBackdrop()
+internal fun rememberCouiSheetToolbarStyle(): CouiToolbarStyle {
     val dark = CouiTheme.isDark
     val density = LocalDensity.current.density
     val contour = LocalCouiContourGlowEnabled.current
     val buttonTextStyle = rememberSheetButtonTextStyle()
     val colors = CouiDialogDefaults.themeColors(dark)
-    val style = remember(dark, density, contour, buttonTextStyle, colors.action) {
+    return remember(dark, density, contour, buttonTextStyle, colors.action) {
         CouiToolbarStyle(dark, CouiTopAppBarButtonDefaults.circleShape, CouiCapsuleShape,
             material = { CouiSheetDefaults.toolbarMaterial(dark, it) },
             shadow = { CouiTopAppBarButtonDefaults.shadow(dark, it, density, contour, alphaScale = 1f) },
@@ -87,6 +82,18 @@ internal fun SheetToolbar(
             cursorColor = colors.action, contourGlowEnabled = contour,
             contourStyle = { capsule -> if (capsule) CouiContourStyle.Button else CouiContourStyle.CircleButton })
     }
+}
+
+/**
+ * 面板正文里的单个操作按钮：材质、圆角、按压预选与工具栏按钮同源。
+ *
+ * 工具栏每侧只有一个按钮槽，同侧多按钮或需要自绘头部几何时由调用方用本组件排布；
+ * 必须在 [BottomSheet] 的 `content` 内调用——按钮底色采样面板自身表面。
+ */
+@Composable
+fun CouiSheetActionButton(button: CouiSheetButton, modifier: Modifier = Modifier) {
+    val backdrop = rememberCouiSheetSurfaceBackdrop()
+    val style = rememberCouiSheetToolbarStyle()
     val touch = LocalSheetTouchSession.current
     val actionInput = if (touch == null) Modifier else Modifier.pointerInput(touch) {
         awaitEachGesture {
@@ -97,6 +104,31 @@ internal fun SheetToolbar(
             }
         }
     }
+    CompositionLocalProvider(LocalCouiToolbarBackdrop provides backdrop) {
+        Box(modifier.then(actionInput)) { SheetToolbarButton(button, style) }
+    }
+}
+
+/** 顶部按钮只采样面板底图，避免采入按钮自身。 */
+@Composable
+internal fun SheetToolbar(
+    leadingButton: CouiSheetButton?,
+    titleContent: @Composable (() -> Unit)?,
+    trailingButton: CouiSheetButton?,
+) {
+    val backdrop = rememberCouiSheetSurfaceBackdrop()
+    val style = rememberCouiSheetToolbarStyle()
+    val touch = LocalSheetTouchSession.current
+    val actionInput = if (touch == null) Modifier else Modifier.pointerInput(touch) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+            if (size.width > 0 && size.height > 0 && touch.firstPointer == down.id) {
+                // 对应原厂工具栏按下后禁止父层拦截；不消费按钮自身的点击和按压事件。
+                touch.toolbarOwnsTouch = true
+            }
+        }
+    }
+    val colors = CouiDialogDefaults.themeColors(CouiTheme.isDark)
     CompositionLocalProvider(LocalCouiToolbarBackdrop provides backdrop) {
         Layout(modifier = Modifier.fillMaxWidth().padding(top = CouiSheetDefaults.toolbarTopSpacing)
             .padding(horizontal = CouiSheetDefaults.toolbarHorizontalPadding), content = {
