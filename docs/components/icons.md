@@ -1,5 +1,17 @@
 # 图标
 
+## 怎么选图标
+
+由于 ColorOS 各应用的图标风格不完全一致，仅以下场景推荐使用 COUI 图标。
+
+- **底栏导航**采用同名的 `Outlined` 和 `Filled` 图标，分别用于未选中和选中状态。装配方式见[底栏](navigation-bar.md)。
+- **ColorOS 特有图形**可选用对应的 COUI 图标，例如设置选择行的上下双箭头 `Popup`。
+- **组件操作图标**可选用 `CouiIcons.Filled.Add` 作为 FAB 的加号，`CouiIcons.Outlined.Search` 作为自定义搜索按钮的图标。`SearchBar` 和 `TopAppBarSearch` 已内置搜索图标。
+
+**其他通用图标**建议优先考虑 [Lucide Icons](https://lucide.dev/icons/)。
+
+## 接入 COUI 图标
+
 `CouiIcons` 在 Composable 中提供矢量 `ImageVector` 与位图 `Painter`，并根据当前 `CouiTheme` 自动加载日间或夜间资源；颜色、点击热区与交互状态由宿主或外层组件承担。
 
 - **系统版本要求**：支持库最低系统版本（**API 31+**）。
@@ -26,7 +38,7 @@ fun VectorIconExample(
     contentDescription: String?,
 ) {
     Image(
-        imageVector = CouiIcons.Filled.Wifi,
+        imageVector = CouiIcons.Filled.Album,
         contentDescription = contentDescription,
         modifier = modifier,
     )
@@ -37,7 +49,7 @@ fun VectorIconExample(
 
 ~~~kotlin
 Icon(
-    imageVector = CouiIcons.Filled.Wifi,
+    imageVector = CouiIcons.Filled.Album,
     contentDescription = contentDescription,
     tint = Color.Unspecified,
 )
@@ -80,7 +92,7 @@ fun BitmapIconExample(
   ~~~kotlin
   val iconTint = if (CouiTheme.isDark) CouiColor.Night.BLUE else CouiColor.Day.BLUE
   Icon(
-      imageVector = CouiIcons.Filled.Wifi,
+      imageVector = CouiIcons.Filled.Album,
       contentDescription = contentDescription,
       tint = iconTint,
   )

@@ -39,7 +39,7 @@ dependencies {
 
 - 仓库配置、工具链要求及完整上手示例见[快速开始](docs/guide/getting-started.md)。
 - 部分高阶材质、模糊与浮动组件需要更高 Android 版本，详见[兼容要求](docs/guide/compatibility.md#效果门槛)。
-- 使用 `CouiIcons` 时，添加可选的图标依赖，详见[图标用法](docs/components/icons.md)。
+- 通用图标建议优先考虑 Lucide Icons。底栏状态、ColorOS 特有图形和组件推荐图标见[图标选用与接入](docs/components/icons.md)。
 
 ### 接入 Material 3
 
@@ -88,7 +88,7 @@ dependencies {
 | --- | --- |
 | [快速开始](docs/guide/getting-started.md) | 依赖配置、第一个组件、背景源与常见问题 |
 | [组件目录](docs/components/README.md) | 布局容器、顶栏/底栏、搜索、开关、滑条、弹窗、分段选择器与图标 |
-| [图标用法](docs/components/icons.md) | `coui-icons` 矢量与位图图标集、日夜资源与指定颜色 |
+| [图标选用与接入](docs/components/icons.md) | 图标选用建议、`coui-icons` 接入、日夜资源与指定颜色 |
 | [效果目录](docs/effects/README.md) | 背景采样、模糊材质、轮廓光、跟手光、投影、融球与回弹 |
 | [外观与预设](docs/guide/appearance.md) | 原生主题、M3 角色映射、主题优先级、插槽与染色规则 |
 | [宿主页面接入](docs/guide/secondary-pages.md) | 在 Material / 自有布局中组合 COUI、Padding/Insets 与采样源分层 |
