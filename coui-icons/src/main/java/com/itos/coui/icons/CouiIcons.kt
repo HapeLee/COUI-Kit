@@ -258,6 +258,25 @@ object CouiIcons {
         val Album: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_album_filled)
 
+        val Delete: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_delete_filled)
+
+        val Favorite: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_favorite_filled)
+
+        val Info: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_info_filled)
+
+        val Pen: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_pen_filled)
+
+        val Share: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_share_filled)
+
+        /** com.heytap.speechassist:drawable/aihome_input_ic_send_enable_normal。 */
+        val Send: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_send_filled)
+
         /** com.coloros.gallery3d:drawable/main_tab_creation_icon_selected。 */
         val WandSpark: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_wand_spark_filled)
@@ -313,7 +332,7 @@ object CouiIcons {
         val AddCircle: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_add_circle_outlined)
 
-        /** com.heytap.speechassist:drawable/aihome_input_ic_send_enable_normal。 */
+        /** 使用实心版的圆形外框和居中的箭头。 */
         val Send: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_send_outlined)
 
@@ -339,6 +358,27 @@ object CouiIcons {
         /** com.coloros.gallery3d:drawable/main_tab_album_icon_normal。 */
         val Album: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_album_outlined)
+
+        val Delete: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_delete_outlined)
+
+        val Favorite: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_favorite_outlined)
+
+        val Info: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_info_outlined)
+
+        val Pen: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_pen_outlined)
+
+        val ScanDocument: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_scan_document_outlined)
+
+        val Share: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_share_outlined)
+
+        val Translate: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_translate_outlined)
 
         /** com.coloros.gallery3d:drawable/main_tab_creation_icon_normal。 */
         val WandSpark: ImageVector

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24dp" android:width="24dp" android:viewportWidth="24" android:viewportHeight="24" android:name="Pen" android:tint="@color/coui_icon_tint_neutral_ff000000_ffffffff">
+    <path android:fillColor="#FF000000" android:fillAlpha="0.9" android:pathData="M18.3009,9.8353L8.5370,19.6000C8.3706,19.7664 8.1684,19.8931 7.9459,19.9708L3.2859,21.5988C2.7325,21.7921 2.2009,21.2605 2.3942,20.7071L4.0222,16.0471L4.0222,16.0470C4.1004,15.8232 4.2281,15.6201 4.3940,15.4560L14.1565,5.6936C16.6646,5.9832 18.0105,7.3280 18.3009,9.8353ZM20.5480,3.4420C21.7858,4.6798 21.9832,6.1545 21.0750,7.0610L19.4964,8.6397C18.9569,6.4347 17.5579,5.0365 15.3523,4.4978L16.9316,2.9185C17.8383,2.0100 19.3119,2.2059 20.5480,3.4420Z" />
+</vector>

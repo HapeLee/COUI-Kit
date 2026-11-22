@@ -53,5 +53,5 @@ coui/RESOURCE_SOURCES.md。该图像不适用本项目的 MPL-2.0 声明；原�
 ----------------------
 
 coui-icons/src/main/res/drawable/coui_camera_outlined.xml、coui_add_circle_outlined.xml、
-coui_send_outlined.xml 和 coui_keyboard_outlined.xml 的图形来自小布助手（com.heytap.speechassist）主页输入栏。来源说明见 coui/ICON_SOURCES.md。
+coui_send_filled.xml 和 coui_keyboard_outlined.xml 的图形来自小布助手（com.heytap.speechassist）主页输入栏。coui_send_outlined.xml 由实心发送图标派生。来源说明见 coui/ICON_SOURCES.md。
 原厂及上游权利保留，未检出附带的独立许可，这些图形不适用本项目自有源码的 MPL-2.0 声明。
