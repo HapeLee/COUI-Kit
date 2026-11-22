@@ -7,7 +7,7 @@
 | 项目 | 当前要求与依据 |
 | --- | --- |
 | 运行系统 | `minSdk` 以[库配置](../../coui/build.gradle.kts)为准（当前为 API 31）；具体效果还受下方平台门槛约束。 |
-| 编译 SDK | 不低于库 `aarMetadata.minCompileSdk`（当前为 37），与当前 Compose AAR 要求一致。 |
+| 编译 SDK | 不低于库 `aarMetadata.minCompileSdk` 声明的版本（当前为 37.1），与当前 Compose AAR 要求一致。 |
 | 消费者 AGP | 不低于库 `aarMetadata.minAgpVersion`（当前为 `9.1.0`）。 |
 | Java 字节码 | 库编译目标使用 Java 17。Gradle 运行 JVM 按所用 AGP / Gradle 要求选择，不能把字节码目标当作运行 JVM 要求。 |
 | Kotlin 与 Compose 编译器 | 源码接入先对齐[版本目录](../../gradle/libs.versions.toml)的开发基线，并配套 Compose 编译插件。更低 Kotlin 版本的元数据消费与 Compose 编译兼容尚未确认，不声明最低版本。 |
@@ -18,7 +18,7 @@
 
 ## 依赖对齐
 
-- **Compose 传递依赖**。各库只发布自身的直接 Compose 依赖及版本，版本由[版本目录](../../gradle/libs.versions.toml)维护。Compose BOM 仅供 Demo 使用，避免库给宿主的 Adaptive 等其他 Compose 组件引入额外版本约束。宿主可使用自己的 BOM，最终版本以 Gradle 依赖解析结果为准。
+- **Compose 传递依赖**。各库和 Demo 的 Compose 版本在[版本目录](../../gradle/libs.versions.toml)中显式声明。各库只发布自身的直接依赖及版本。宿主可使用自己的 BOM，最终版本以 Gradle 依赖解析结果为准。
 - **`DynamicAnimation` 依赖对齐**：核心库请求 AndroidX `DynamicAnimation` `1.1.0`（Gradle 按宿主依赖图解析版本，例如与同样请求 `1.1.0` 的 Material Components for Android 共用）；取消后重启行为见[主动控制运动](../effects/motion.md#主动控制运动)。
 - **可选 Material 3 与图标模块**：`coui-material3` 会传递引入同版本的 `coui` 与 Material 3；`CouiIcons` 位于可选的 `coui-icons` 模块（依赖 `coui` 读取主题，核心不依赖图标模块）。同时声明多个模块时必须保持相同版本；核心库本身不依赖 Material 3 或 Material Icons。
 - **宿主自备依赖**：宿主直接调用 Material 3、Activity 等 API 时须自行声明相应依赖；Demo 的 `Capsule` 依赖无需随库引入。

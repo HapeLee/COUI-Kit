@@ -13,11 +13,15 @@ plugins {
 
 android {
     namespace = "com.itos.coui.material3"
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 2 }
+    }
     defaultConfig {
         minSdk = 31
         aarMetadata {
-            minCompileSdk = 37
+            minCompileSdk {
+                version = release(37) { minorApiLevel = 1 }
+            }
             minAgpVersion = "9.1.0"
         }
     }

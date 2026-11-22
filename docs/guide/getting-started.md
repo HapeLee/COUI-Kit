@@ -3,7 +3,7 @@
 在已有的 Jetpack Compose Android 项目中添加 COUI 依赖，即可使用滑条、开关、弹窗、顶栏等组件。本页使用 Gradle Kotlin DSL 说明接入步骤。
 
 - **最低运行系统**：Android 12（API 31），部分高级效果与浮动组件需要 API 33 或 API 34+。
-- **编译环境基线**：`compileSdk` 37、AGP `9.1.0` 及以上，并启用 Jetpack Compose。完整环境要求见[兼容要求](compatibility.md)。
+- **编译环境基线**。使用 `compileSdk` 37.1、AGP `9.1.0` 及以上，并启用 Jetpack Compose。完整环境要求见[兼容要求](compatibility.md)。
 - **预览阶段说明**：当前版本处于早期预览期，API 可能发生不兼容调整。
 
 ## 引入 COUI
