@@ -36,6 +36,7 @@ import com.itos.coui.backdrop.drawCouiBackdrop
 import com.itos.coui.backdrop.rememberCouiBackdrop
 import com.itos.coui.backdrop.LocalCouiBackdrop
 import com.itos.coui.effect.CouiCoverageBlurEffect
+import com.itos.coui.effect.CouiGradientTint
 import com.itos.coui.effect.drawCouiGradientBackdrop
 import com.itos.coui.theme.CouiTheme
 
@@ -87,30 +88,35 @@ fun TopAppBarSurface(
 ) {
     val density = LocalDensity.current.density
     val destination = rememberCouiBackdrop(parent = backdrop)
-    // 模糊和遮罩在各自的目标 Canvas 上依次合成，按钮采样沿用同一组绘制指令。
+    // 按钮采样复用顶栏背景的绘制指令。
     SideEffect { destination.setIsolateWhenIdle(false) }
+    val resolvedGradientColor = gradientColor.takeOrElse {
+        CouiTopAppBarDefaults.defaultBackgroundColor(CouiTheme.colorSchemeFor(dark).background)
+    }.takeOrElse { Color.Transparent }
+    val opacity = backgroundAlpha.coerceIn(0f, 1f)
     val backgroundModifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         Modifier.drawCouiGradientBackdrop(
             backdrop = backdrop,
             fadeHeightPx = fadeHeight.value * density,
             referenceBlurRadiusPx = referenceBlurRadius.value * density,
             gradientSpeed = gradientSpeed,
+            tint = CouiGradientTint(resolvedGradientColor, opacity, dark),
         )
     } else {
         val blurEffects = remember(density) {
             BlurLayers.map { (radius, _) -> CouiCoverageBlurEffect(radius.value * density) }
         }
-        Modifier.drawCouiBackdrop(
+        Modifier.graphicsLayer {
+            compositingStrategy = CompositingStrategy.ModulateAlpha
+            alpha = opacity
+        }.drawCouiBackdrop(
             backdrop = backdrop,
             shape = { RectangleShape },
             effects = { progressiveBlur(blurEffects, fadeHeight) },
         )
     }
-    val resolvedGradientColor = gradientColor.takeOrElse {
-        CouiTopAppBarDefaults.defaultBackgroundColor(CouiTheme.colorSchemeFor(dark).background)
-    }
     val gradient = remember(resolvedGradientColor, dark) {
-        if (resolvedGradientColor.alpha == 0f) return@remember null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || resolvedGradientColor.alpha == 0f) return@remember null
         val color = resolvedGradientColor.copy(alpha = 1f)
         val transparent = color.copy(alpha = 0f)
         // GradientBackgroundDrawable 从下往上填节点。浅色 70% 节点在原厂截断为 178/255。
@@ -124,7 +130,6 @@ fun TopAppBarSurface(
             )
         }
     }
-    val opacity = backgroundAlpha.coerceIn(0f, 1f)
     SharedTransitionScope { overlayModifier ->
         Layout(
             modifier = modifier.then(overlayModifier)
@@ -132,10 +137,7 @@ fun TopAppBarSurface(
                 .pointerInput(Unit) {},
             content = {
                 Box(Modifier.couiBackdrop(destination)) {
-                    Spacer(Modifier.matchParentSize().graphicsLayer {
-                        compositingStrategy = CompositingStrategy.ModulateAlpha
-                        alpha = opacity
-                    }.then(backgroundModifier))
+                    Spacer(Modifier.matchParentSize().then(backgroundModifier))
                     if (gradient != null) {
                         Spacer(Modifier.matchParentSize().drawBehind {
                             drawRect(gradient, alpha = opacity * resolvedGradientColor.alpha)
