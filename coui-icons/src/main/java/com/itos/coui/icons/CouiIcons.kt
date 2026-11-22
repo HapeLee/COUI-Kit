@@ -63,6 +63,9 @@ object CouiIcons {
         val Add: ImageVector
             @Composable get() = Monochrome.Add
 
+        val AddCircle: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_add_circle_filled)
+
         /** com.android.settings:drawable/dark_theme。 */
         val DarkLight: ImageVector
             @Composable get() = Monochrome.DarkLight
@@ -270,6 +273,9 @@ object CouiIcons {
         val Pen: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_pen_filled)
 
+        val ScanDocument: ImageVector
+            @Composable get() = couiIconResource(R.drawable.coui_scan_document_filled)
+
         val Share: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_share_filled)
 
@@ -370,9 +376,6 @@ object CouiIcons {
 
         val Pen: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_pen_outlined)
-
-        val ScanDocument: ImageVector
-            @Composable get() = couiIconResource(R.drawable.coui_scan_document_outlined)
 
         val Share: ImageVector
             @Composable get() = couiIconResource(R.drawable.coui_share_outlined)
