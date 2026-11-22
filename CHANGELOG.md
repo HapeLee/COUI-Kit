@@ -2,6 +2,21 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
+## [0.0.1-alpha16] - 2026-11-23
+
+### 新增与改进
+
+- 新增 `Dialog` 的 `actionRows` 重载，支持自定义 1 至 4 行底部按钮，例如上方一个通栏按钮、下方两个并排按钮。宽度不足时自动拆成竖排，操作区独立于正文滚动。[弹窗](docs/components/dialog.md#自定义底部操作行)
+- 优化顶栏渐进模糊，带来更好的效果，传入 `useCouiBlur = true` 可切回旧实现。[顶栏](docs/components/top-app-bar.md)
+- 新增 HCT 颜色增强函数 `enhanceHctColor(seed, tone)`，可从种子色生成指定色调的增强色，适合用于 FAB 等需要强调的控件。中性灰保持中性。[外观与预设](docs/guide/appearance.md)
+- 新增删除、收藏、信息、编辑和分享图标，均提供 Filled 与 Outlined 两种样式。补充实心 AddCircle、实心 Send、文档扫描和翻译图标，调整描边 Send 的圆环与箭头样式。[图标](docs/components/icons.md)
+
+### 升级说明
+
+- 现有 `Dialog` 调用可直接沿用。需要自定义按钮排布时，改用 `actionRows` 重载。
+- 如果在调用括号内按位置传入 `TopAppBarSurface` 的 `content` 或 `CollapsingTopAppBar` 的 `searchBar`，请改用命名参数或尾随 lambda。
+- 如果希望保留 Alpha 15 的实心发送图标，请把 `CouiIcons.Outlined.Send` 改为 `CouiIcons.Filled.Send`。
+
 ## [0.0.1-alpha15] - 2026-11-22
 
 ### 新增与改进
