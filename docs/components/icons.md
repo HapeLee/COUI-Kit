@@ -15,10 +15,10 @@
 `CouiIcons` 在 Composable 中提供矢量 `ImageVector` 与位图 `Painter`，并根据当前 `CouiTheme` 自动加载日间或夜间资源；颜色、点击热区与交互状态由宿主或外层组件承担。
 
 - **系统版本要求**：支持库最低系统版本（**API 31+**）。
-- **可选依赖**：图标位于独立的 `coui-icons` 模块，使用时需在调用模块添加依赖并与核心库保持相同版本（仅使用核心组件时无需引入）：
+- **可选依赖**：图标位于独立的 `coui-icons` 模块，使用时需在调用模块添加依赖并与核心库保持相同版本（将 `<version>` 替换为 [Maven Central](https://central.sonatype.com/artifact/io.github.itoseo/coui-icons) 或 [Releases](https://github.com/ItosEO/COUI-Kit/releases) 上的最新版本；仅使用核心组件时无需引入）：
 
 ~~~kotlin
-val couiVersion = "0.0.1-alpha16"
+val couiVersion = "<version>"
 
 dependencies {
     implementation("io.github.itoseo:coui-icons:$couiVersion")

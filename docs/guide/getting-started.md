@@ -23,7 +23,7 @@
    }
    ~~~
 
-2. 在使用组件的模块 `build.gradle.kts` 中启用 Compose 并添加依赖：
+2. 在使用组件的模块 `build.gradle.kts` 中启用 Compose 并添加依赖（将 `<version>` 替换为 [Maven Central](https://central.sonatype.com/artifact/io.github.itoseo/coui) 或 [Releases](https://github.com/ItosEO/COUI-Kit/releases) 上的最新版本）：
 
    ~~~kotlin
    android {
@@ -31,11 +31,11 @@
    }
 
    dependencies {
-       implementation("io.github.itoseo:coui:0.0.1-alpha16")
+       implementation("io.github.itoseo:coui:<version>")
    }
    ~~~
 
-   需要自动跟随宿主 `MaterialTheme` 时，可改为引入同版本的 `io.github.itoseo:coui-material3:0.0.1-alpha16`，详见[接入 Material 3](../../README.md#接入-material-3)；需要 `CouiIcons` 时可额外添加同版本的 `io.github.itoseo:coui-icons:0.0.1-alpha16`，见[图标用法](../components/icons.md)。
+   需要自动跟随宿主 `MaterialTheme` 时，可改为引入同版本的 `io.github.itoseo:coui-material3:<version>`，详见[接入 Material 3](../../README.md#接入-material-3)；需要 `CouiIcons` 时可额外添加同版本的 `io.github.itoseo:coui-icons:<version>`，见[图标用法](../components/icons.md)。
 
 ### GitHub Packages 预览版
 

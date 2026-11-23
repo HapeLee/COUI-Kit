@@ -2,6 +2,22 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
+## [0.0.1-alpha17] - 2026-11-24
+
+### 新增与改进
+
+- 新增单选弹窗 `SingleChoiceDialog`，保持标题与底部操作区固定，中间列表独立滚动。支持通过 `CouiSingleChoiceItem` 配置行首图标与禁用态，并支持 0 至 4 行底部操作按钮。[弹窗](docs/components/dialog.md#单选弹窗)
+- 新增 Nav3 预测性返回转场 `PredictiveBackNavDisplay` 与 `CouiBackPreset` 预设，支持 `AOSP` 跟手圆角卡片缩放和 `CHATGPT` 水平共享轴转场，兼容多标签与分栏场景。[Nav3 页面转场](docs/components/predictive-back.md)
+- 统一全库中性模糊材质的主题染色管道，所有组件共用保亮度染色算法与库内固定强度。为 `Dialog` 系列、`Menu`、`SearchBar`、`MessageInputBar`、`SegmentedControl`、`ChipTab` 系列、顶栏组件及 `rememberCouiMaterialEffect` 统一补全或规范 `themeTint` 参数；菜单染色收敛至 AGSL 内部执行。[外观与预设](docs/guide/appearance.md#背景材质染色)
+- 修复 `CouiGradientBlur` 的渐变模糊边界问题，避免屏幕外透明外沿拉低边界 alpha，防止顶边透出未模糊正文或产生外溢不透明边，并优化全高渐隐曲线的边界过渡。
+- 新增 `coui-kit` 外部接入 Agent Skill，并在 README 补充安装指令与推荐工具，方便外部项目通过 AI 辅助接入组件。[SKILL.md](skills/coui-kit/SKILL.md)
+
+### 升级说明
+
+- 如果在调用括号内按位置传入 `Dialog` 的 `content`、`ChipTabButton` 的 `icon`、`TopAppBarButton` 的 `content`、`TopAppBarSearch` 的 `title` 或 `Menu` 的 `onSpotlightDiagnostic`，请改用命名参数或尾随 lambda。
+- 开启 Material 3 适配后，弹窗、顶栏按钮、搜索栏、消息输入栏、分段选择器、分类栏、菜单、底栏和底部面板默认使用宿主 `surface` 作为材质染色基准色。传入 `themeTint = Color.Transparent` 或使用 `CouiTheme(materialTint = Color.Transparent)` 可关闭染色；自定义 `themeTint` 时，库会忽略颜色自身的 alpha 并应用统一强度。
+- 核心库 `coui` 新增 `androidx.navigation3:navigation3-ui:1.2.1` 的 API 依赖。`coui`、`coui-material3` 和 `coui-icons` 继续使用同一版本，升级后重新编译宿主模块。
+
 ## [0.0.1-alpha16] - 2026-11-23
 
 ### 新增与改进
