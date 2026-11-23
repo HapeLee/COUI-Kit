@@ -82,30 +82,41 @@ dependencies {
 
 显式组件参数始终优先；局部原生主题、字体映射与染色规则见[外观与预设](docs/guide/appearance.md)。
 
-### AI 编程助手（Skill）
+### Skill
 
-使用 AI 编程助手接入 COUI-Kit 时，可使用本仓库在 [skills/coui-kit](skills/coui-kit/SKILL.md) 提供的 Agent Skill。它汇总了组件推荐写法、Material 3 适配、背景采样源分层以及 API 门槛和常见样式避坑规则。
+我们提供了面向外部开发者的 Agent Skill：[skills/coui-kit](skills/coui-kit/SKILL.md)，涵盖 COUI-Kit 组件推荐写法、Material 3 适配、背景采样源分层、API 门槛与常见样式避坑规则。
 
-- **手动引入**：将 `skills/coui-kit/` 目录复制到目标项目的 Agent 技能目录（如 `.agents/skills/`、`.claude/skills/` 等）。
-- **工具安装**：也可使用支持 Agent Skills 规范的技能管理工具，从本仓库的 `skills/coui-kit` 路径安装。
+- **Codex**：运行以下命令安装，或将 `skills/coui-kit/` 复制到项目 `.agents/skills/coui-kit/`（全局 `~/.agents/skills/coui-kit/`）：
+
+  ~~~sh
+  npx skills add ItosEO/COUI-Kit --skill coui-kit -a codex
+  ~~~
+
+- **Claude Code**：运行以下命令安装，或将 `skills/coui-kit/` 复制到项目 `.claude/skills/coui-kit/`（全局 `~/.claude/skills/coui-kit/`）：
+
+  ~~~sh
+  npx skills add ItosEO/COUI-Kit --skill coui-kit -a claude-code
+  ~~~
+
+- **CC-Switch（推荐）**：推荐使用 [CC-Switch](https://github.com/farion1231/cc-switch) 统一管理。在 **Skills → 发现 → 仓库管理** 中添加 `ItosEO/COUI-Kit`，刷新后安装 `coui-kit` 并同步到 Codex、Claude Code 等工具。
 
 ## 文档
 
-| 文档 | 说明 |
-| --- | --- |
-| [快速开始](docs/guide/getting-started.md) | 依赖配置、第一个组件、背景源与常见问题 |
-| [组件目录](docs/components/README.md) | 布局容器、顶栏/底栏、搜索、开关、滑条、弹窗、分段选择器与图标 |
-| [Nav3 页面转场](docs/components/predictive-back.md) | 为现有返回栈选用 AOSP 或 ChatGPT 转场预设 |
-| [图标选用与接入](docs/components/icons.md) | 图标选用建议、`coui-icons` 接入、日夜资源与指定颜色 |
-| [效果目录](docs/effects/README.md) | 背景采样、模糊材质、轮廓光、跟手光、投影、融球与回弹 |
-| [外观与预设](docs/guide/appearance.md) | 原生主题、M3 角色映射、主题优先级、插槽与染色规则 |
-| [宿主页面接入](docs/guide/secondary-pages.md) | 在 Material / 自有布局中组合 COUI、Padding/Insets 与采样源分层 |
-| [兼容要求](docs/guide/compatibility.md) | 工具链基线、依赖对齐与各能力 Android 版本门槛 |
-| [Demo 指南](docs/guide/demo.md) | 运行、签名配置与页面示例说明 |
-| [与原厂的定制差异](docs/guide/customizations.md) | 相对参考版本的视觉与交互微调及作用范围 |
-| [GitHub Packages 开发快照](docs/guide/github-packages.md) | 配置快照仓库、凭据与 CI 下载 |
-| [Agent Skill（coui-kit）](skills/coui-kit/SKILL.md) | 供外部项目 AI 编程助手使用的组件接入与避坑指南 |
-| [更新记录与版本映射](CHANGELOG.md) | 版本变更与旧版命名迁移 |
+| 文档                                                      | 说明                                                           |
+|-----------------------------------------------------------|----------------------------------------------------------------|
+| [快速开始](docs/guide/getting-started.md)                 | 依赖配置、第一个组件、背景源与常见问题                         |
+| [组件目录](docs/components/README.md)                     | 布局容器、顶栏/底栏、搜索、开关、滑条、弹窗、分段选择器与图标  |
+| [Nav3 页面转场](docs/components/predictive-back.md)       | 为现有返回栈选用 AOSP 或 ChatGPT 转场预设                      |
+| [图标选用与接入](docs/components/icons.md)                | 图标选用建议、`coui-icons` 接入、日夜资源与指定颜色            |
+| [效果目录](docs/effects/README.md)                        | 背景采样、模糊材质、轮廓光、跟手光、投影、融球与回弹           |
+| [外观与预设](docs/guide/appearance.md)                    | 原生主题、M3 角色映射、主题优先级、插槽与染色规则              |
+| [宿主页面接入](docs/guide/secondary-pages.md)             | 在 Material / 自有布局中组合 COUI、Padding/Insets 与采样源分层 |
+| [兼容要求](docs/guide/compatibility.md)                   | 工具链基线、依赖对齐与各能力 Android 版本门槛                  |
+| [Demo 指南](docs/guide/demo.md)                           | 运行、签名配置与页面示例说明                                   |
+| [与原厂的定制差异](docs/guide/customizations.md)          | 相对参考版本的视觉与交互微调及作用范围                         |
+| [GitHub Packages 开发快照](docs/guide/github-packages.md) | 配置快照仓库、凭据与 CI 下载                                   |
+| [Agent Skill（coui-kit）](skills/coui-kit/SKILL.md)       | 供外部项目 AI 编程助手使用的组件接入与避坑指南                 |
+| [更新记录与版本映射](CHANGELOG.md)                        | 版本变更与旧版命名迁移                                         |
 
 ## 反馈与贡献
 
