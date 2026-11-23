@@ -99,7 +99,7 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 
 | 组件 | 原生默认 | M3 适配默认 | 自定义或关闭染色方式 |
 | --- | --- | --- | --- |
-| `Dialog` / `InputDialog` / `LoadingDialog`（API 33+ `material != null`） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint` 基准色，或传 `Color.Transparent` 关闭；不透明弹窗忽略 |
+| `Dialog` / `SingleChoiceDialog` / `InputDialog` / `LoadingDialog`（API 33+ `material != null`） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 可通过 `themeTint` 覆盖基准色，或传 `Color.Transparent` 关闭染色 |
 | `BottomSheet`（API 33+ `material != null`） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint` 基准色，或传 `Color.Transparent` 关闭；顶部按钮采面板底图不二次染色 |
 | `Menu`（有 `backdrop` 时） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 直接传入 `Menu(..., themeTint = ...)` 或覆盖 `CouiMenuStyle.themeTint`；`Color.Transparent` 关闭 |
 | `NavigationBar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；作用于胶囊与左透明按钮，右有色附件排除（图标固定白色） |

@@ -108,8 +108,7 @@ fun Dialog(
     themeTint: Color = CouiTheme.materialTintFor(dark),
     content: @Composable ColumnScope.() -> Unit = {},
 ) {
-    require(actionRows.size in 1..4) { "操作行数必须在 1 到 4 之间" }
-    require(actionRows.all { it.isNotEmpty() }) { "每行至少需要一个操作" }
+    requireDialogActionRows(actionRows)
     DialogWithActions(modifier, onDismissRequest, dark, title, message, placement, colors, shape, cornerRadius,
         material, backdrop, properties, visible, themeTint, actionRows, content)
 }
@@ -137,20 +136,13 @@ private fun DialogWithActions(
 ) {
     CouiDialogWindow(modifier, onDismissRequest, colors, dark, placement, shape, cornerRadius,
         properties, material, backdrop, visible, themeTint = themeTint) {
-        val configuration = LocalConfiguration.current
         var messageLines by remember(message) { mutableIntStateOf(1) }
         var multipleRows by remember(actionRows.size) { mutableStateOf(actionRows.size > 1) }
         val tall = messageLines > 1 || multipleRows
         Column(Modifier.fillMaxWidth()) {
             // 对应正文/标题的滚动区与独立 buttonPanel；操作不随长文滚出窗口。
             Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
-                if (!title.isNullOrEmpty()) Box(Modifier.fillMaxWidth().padding(
-                    start = CouiDialogDefaults.contentPadding, end = CouiDialogDefaults.contentPadding,
-                    top = CouiDialogDefaults.titleTop, bottom = CouiDialogDefaults.titleBottom)) {
-                    DialogText(text = title, kind = DialogTextKind.Title, color = colors.title, modifier = Modifier.fillMaxWidth()
-                        .heightIn(max = CouiDialogDefaults.titleMaxHeight(configuration.screenHeightDp))
-                        .verticalScroll(rememberScrollState()))
-                }
+                if (!title.isNullOrEmpty()) DialogTitle(title, colors.title)
                 if (!message.isNullOrEmpty()) DialogText(text = message, kind = DialogTextKind.Message, color = colors.message, modifier =
                     Modifier.fillMaxWidth().padding(horizontal = CouiDialogDefaults.contentPadding)
                         .padding(top = if (title.isNullOrEmpty() && !tall) CouiDialogDefaults.messageTopWithoutTitle else 0.dp,
@@ -165,14 +157,32 @@ private fun DialogWithActions(
 }
 
 @Composable
-private fun DialogActions(
+internal fun DialogTitle(title: String, color: Color) {
+    val screenHeightDp = LocalConfiguration.current.screenHeightDp
+    Box(Modifier.fillMaxWidth().padding(
+        start = CouiDialogDefaults.contentPadding, end = CouiDialogDefaults.contentPadding,
+        top = CouiDialogDefaults.titleTop, bottom = CouiDialogDefaults.titleBottom)) {
+        DialogText(text = title, kind = DialogTextKind.Title, color = color, modifier = Modifier.fillMaxWidth()
+            .heightIn(max = CouiDialogDefaults.titleMaxHeight(screenHeightDp))
+            .verticalScroll(rememberScrollState()))
+    }
+}
+
+internal fun requireDialogActionRows(actionRows: List<List<CouiDialogAction>>, minRows: Int = 1) {
+    require(actionRows.size in minRows..4) { "操作行数必须在 $minRows 到 4 之间" }
+    require(actionRows.all { it.isNotEmpty() }) { "每行至少需要一个操作" }
+}
+
+@Composable
+internal fun DialogActions(
     actionRows: List<List<CouiDialogAction>>,
-    overflowOrder: List<CouiDialogAction>?,
-    destructiveAction: CouiDialogAction?,
+    overflowOrder: List<CouiDialogAction>? = null,
+    destructiveAction: CouiDialogAction? = null,
     colors: CouiDialogColors,
     dark: Boolean,
     material: Boolean,
-    onMultipleRows: (Boolean) -> Unit,
+    interactive: Boolean = true,
+    onMultipleRows: (Boolean) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val textStyle = rememberDialogTextStyle(DialogTextKind.Button)
@@ -237,6 +247,7 @@ private fun DialogActions(
                             DialogActionButton(
                                 action, if (action === destructiveAction) colors.copy(action = colors.destructive) else colors,
                                 dark, material, Modifier.weight(1f), row.size == 1 && textWidths.getValue(action) > available,
+                                interactive,
                             )
                         }
                     }
@@ -248,9 +259,10 @@ private fun DialogActions(
 
 @Composable
 private fun DialogActionButton(action: CouiDialogAction, colors: CouiDialogColors, dark: Boolean, material: Boolean,
-    modifier: Modifier, multiline: Boolean = false) {
+    modifier: Modifier, multiline: Boolean, interactive: Boolean) {
     DialogButton(modifier = modifier.heightIn(min = if (multiline) CouiDialogDefaults.multilineButtonHeight
-        else CouiDialogDefaults.buttonHeight), text = action.text, onClick = action.onClick,
+        else CouiDialogDefaults.buttonHeight), text = action.text,
+        onClick = { if (interactive && action.enabled) action.onClick() },
         dark = dark, enabled = action.enabled, style = action.style, material = material,
         colors = action.colors ?: DialogButtonDefaults.secondaryColors(dark, material).copy(
             content = colors.action, disabledContent = colors.disabledAction))

@@ -1,8 +1,8 @@
 # 弹窗
 
-`Dialog` 提供底部或居中显示的确认与警告弹窗，`InputDialog` 提供内置单行输入区的输入型弹窗，`LoadingDialog` 在任务执行期间显示居中的加载圆弧与提示文案。这些组件位于 `com.itos.coui.dialog`，显隐状态、文案、输入校验与业务提交均由宿主持有。
+`Dialog` 用于确认与警告，`SingleChoiceDialog` 用于从列表选择一项，`InputDialog` 用于单行输入，`LoadingDialog` 在任务执行时显示加载提示。这些组件位于 `com.itos.coui.dialog`，显隐状态、文案、输入校验与业务提交均由宿主持有。
 
-- **基础不透明弹窗（`Dialog`、`InputDialog`、`LoadingDialog`）**：支持库的最低系统版本（API 31+）。
+- **基础不透明弹窗**支持库的最低系统版本（API 31+）。
 - **半透明模糊材质与轮廓光**：要求 Android 13（API 33）及以上，并需要宿主提供不包含本弹窗的窗口背景源（`backdrop`）。
 
 ## 基本用法
@@ -131,6 +131,34 @@ Dialog(
 ~~~
 
 可声明 1 至 4 行，每行至少提供一个操作。宽度不足拆行后，实际显示的行数可能更多。按钮样式和配色由各自的 `CouiDialogAction` 指定，关闭弹窗由操作回调负责。`confirmAction`、`dismissAction` 与 `neutralAction` 属于自动排布重载。
+
+## 单选弹窗
+
+当设置项需要从多个候选值中选择时，可用 `SingleChoiceDialog` 保持标题和底部操作区固定，中间列表独立滚动。需要确认后再保存时，打开前将当前值复制到草稿，点选只更新草稿。
+
+~~~kotlin
+val close = { showChoices = false }
+SingleChoiceDialog(
+    visible = showChoices,
+    title = title,
+    items = options,
+    selectedValue = draft,
+    onItemSelected = { draft = it },
+    onDismissRequest = close,
+    actionRows = listOf(listOf(
+        CouiDialogAction(cancelLabel, close),
+        CouiDialogAction(confirmLabel, {
+            currentValue = draft
+            close()
+        }),
+    )),
+)
+~~~
+
+- 用 `CouiSingleChoiceItem(value, text)` 定义候选项。至少提供一项，选项值须唯一且稳定，文案须非空白。用 `icon` 添加行首图标，用 `enabled = false` 禁用该项。传 `selectedValue = null` 时初始无选中项。
+- `actionRows` 可声明 0 至 4 行操作，每行至少一个按钮。默认省略底部操作区。需要点选即保存时，可在 `onItemSelected` 中保存并关闭。
+- `onDismissRequest` 接收返回键和外点关闭请求。底部各按钮由自己的 `onClick` 决定行为，可复用同一个关闭回调。将组件留在组合中，用 `visible` 控制退场。
+- 默认在底部显示，宽屏宿主可传 `placement = CouiDialogPlacement.Center`。API 33+ 且有窗口背景源时默认启用模糊材质。传 `material = null` 可使用纯色表面。
 
 ## 输入型弹窗
 
@@ -300,5 +328,5 @@ fun HostPageWithDialogExample(
 
 ## 源码与完整示例
 
-- **公开入口与预设**：[Dialog.kt](../../coui/src/main/java/com/itos/coui/dialog/Dialog.kt)、[InputDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/InputDialog.kt)、[LoadingDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/LoadingDialog.kt)、[CouiDialogButton.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogButton.kt)、[CouiDialogDefaults.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogDefaults.kt)
+- **公开入口与预设** [Dialog.kt](../../coui/src/main/java/com/itos/coui/dialog/Dialog.kt)、[SingleChoiceDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/SingleChoiceDialog.kt)、[InputDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/InputDialog.kt)、[LoadingDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/LoadingDialog.kt)、[CouiDialogButton.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogButton.kt)、[CouiDialogDefaults.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogDefaults.kt)
 - **Demo 完整示例**：[DemoDialogSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)、[DemoDialogInputSample.kt](../../demo/src/main/java/com/itos/coui/demo/DemoDialogInputSample.kt)

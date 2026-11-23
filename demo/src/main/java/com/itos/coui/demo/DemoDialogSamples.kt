@@ -1,9 +1,11 @@
 package com.itos.coui.demo
 
 import android.os.Build
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -14,7 +16,10 @@ import com.itos.coui.dialog.CouiDialogAction
 import com.itos.coui.dialog.CouiDialogDefaults
 import com.itos.coui.dialog.CouiDialogPlacement
 import com.itos.coui.dialog.CouiDialogActionStyle
+import com.itos.coui.dialog.CouiSingleChoiceItem
 import com.itos.coui.dialog.LoadingDialog
+import com.itos.coui.dialog.SingleChoiceDialog
+import com.itos.coui.icons.CouiIcons
 import com.itos.coui.menu.rememberCouiWindowBackdrop
 import com.itos.coui.layout.*
 import com.itos.coui.theme.CouiTheme
@@ -28,19 +33,25 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
     var material by rememberSaveable { mutableStateOf(Build.VERSION.SDK_INT >= 33) }
     val initialDeviceName = stringResource(R.string.dialog_device_name_initial)
     var deviceName by rememberSaveable { mutableStateOf(initialDeviceName) }
+    var usbMode by rememberSaveable { mutableIntStateOf(R.string.dialog_usb_charge) }
     val windowBackdrop = rememberCouiWindowBackdrop()
     val supported = Build.VERSION.SDK_INT >= 33 && windowBackdrop != null
     val variants = listOf("primary" to R.string.dialog_primary, "bottom" to R.string.dialog_bottom, "center" to R.string.dialog_center,
         "long" to R.string.dialog_long, "three" to R.string.dialog_three, "actionRows" to R.string.dialog_action_rows,
         "disabled" to R.string.dialog_disabled,
-        "input" to R.string.dialog_input, "loading" to R.string.dialog_loading) +
+        "input" to R.string.dialog_input, "singleChoice" to R.string.dialog_single_choice,
+        "loading" to R.string.dialog_loading) +
         if (onToggleTheme != null) listOf("theme" to R.string.dialog_theme_live) else emptyList()
     if (supported) Group {
         DemoSwitchPreference(title = stringResource(R.string.dialog_material), checked = material, onCheckedChange = { material = it })
     }
     Group {
         variants.forEachIndexed { index, (key, label) ->
-            DemoPreference(title = stringResource(label), onClick = { opened = key; session++; visible = true })
+            DemoPreference(
+                title = stringResource(label),
+                summary = if (key == "singleChoice") stringResource(usbMode) else null,
+                onClick = { opened = key; session++; visible = true },
+            )
             if (index < variants.lastIndex) Divider()
         }
     }
@@ -69,6 +80,33 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
             RenameDeviceDialogSample(dark = dark, initialName = deviceName, visible = visible,
                 material = dialogMaterial != null, backdrop = windowBackdrop, onDismissRequest = dismiss,
             onSave = { deviceName = it; visible = false })
+        } else if (variant == "singleChoice") {
+            SingleChoiceDialog(
+                visible = visible,
+                title = stringResource(R.string.dialog_usb_title),
+                items = listOf(
+                    CouiSingleChoiceItem(R.string.dialog_usb_charge, stringResource(R.string.dialog_usb_charge),
+                        icon = { Icon(CouiIcons.Filled.Battery, contentDescription = null) }),
+                    CouiSingleChoiceItem(R.string.dialog_usb_files, stringResource(R.string.dialog_usb_files),
+                        icon = { Icon(CouiIcons.Filled.Transfer, contentDescription = null) }),
+                    CouiSingleChoiceItem(R.string.dialog_usb_photos, stringResource(R.string.dialog_usb_photos),
+                        icon = { Icon(CouiIcons.Outlined.Photo, contentDescription = null) }),
+                    CouiSingleChoiceItem(R.string.dialog_usb_tethering, stringResource(R.string.dialog_usb_tethering),
+                        icon = { Icon(CouiIcons.Filled.Wifi, contentDescription = null) }),
+                    CouiSingleChoiceItem(R.string.dialog_usb_midi, stringResource(R.string.dialog_usb_midi),
+                        icon = { Icon(CouiIcons.Filled.Volume, contentDescription = null) }),
+                ),
+                selectedValue = usbMode,
+                onItemSelected = { mode ->
+                    usbMode = mode
+                    visible = false
+                },
+                onDismissRequest = dismiss,
+                actionRows = listOf(listOf(CouiDialogAction(stringResource(R.string.dialog_cancel), dismiss))),
+                dark = dark,
+                material = dialogMaterial,
+                backdrop = windowBackdrop,
+            )
         } else if (variant == "actionRows") {
             Dialog(
                 onDismissRequest = dismiss,

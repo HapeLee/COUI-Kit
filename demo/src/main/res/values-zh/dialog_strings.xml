@@ -8,6 +8,13 @@
     <string name="dialog_disabled">禁用确认操作</string>
     <string name="dialog_primary">主题色确认弹窗</string>
     <string name="dialog_input">输入型弹窗：重命名设备</string>
+    <string name="dialog_single_choice">单选弹窗</string>
+    <string name="dialog_usb_title">USB 用于</string>
+    <string name="dialog_usb_charge">仅充电</string>
+    <string name="dialog_usb_files">传输文件 / Android Auto</string>
+    <string name="dialog_usb_photos">传输照片</string>
+    <string name="dialog_usb_tethering">USB 网络共享</string>
+    <string name="dialog_usb_midi">MIDI</string>
     <string name="dialog_loading">加载弹窗</string>
     <string name="dialog_loading_message">正在处理…</string>
     <string name="dialog_device_name_initial">COUI Demo</string>

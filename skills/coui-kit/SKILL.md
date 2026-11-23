@@ -14,7 +14,7 @@ description: 在 Android Jetpack Compose 应用接入或使用 COUI-Kit（组件
    - **API 33+**：`RuntimeShader` 渐进模糊、轮廓光、`CouiMetaballRenderer`、弹窗与面板材质。
 2. **背景源分流**：顶栏、底栏、`Fab`、搜索、输入栏用**正文源**（COUI `Scaffold` 自动提供；第三方容器挂 `.couiBackdrop`）。`Menu`、`Dialog`、`BottomSheet` 用**窗口源**（`Scaffold` 不提供，根部挂 `ProvideCouiMenuBackdrop`）。**禁止自采样。**
 3. **M3 适配两步**：引 `coui-material3` 后，在 `Application.onCreate()` 调一次 `Coui.initialize(defaultStyle = CouiMaterial3Style())`。支持独立切深浅色时，同步提供 `LocalCouiDarkTheme`。
-4. **默认材质**：API 33+ 有窗口源时，弹窗与面板启用材质。`BottomSheet` 省略 `material` 自动启用；`Dialog` 系列默认 `null`，须显式传 `CouiDialogDefaults.material` + `backdrop`（无源或 API < 33 勿传非空）。卡片内 `SegmentedControl` 用填色，勿传面板源。
+4. **默认材质**。API 33+ 且有窗口源时，`SingleChoiceDialog` 与 `BottomSheet` 自动启用材质。`Dialog`、`InputDialog` 和 `LoadingDialog` 可显式传入 `CouiDialogDefaults.material` 与 `backdrop`。卡片内 `SegmentedControl` 用填色。
 5. **独立 Renderer**：`CouiFloatingRenderer`、`CouiMetaballRenderer`、`CouiShadowRenderer` 禁止跨节点共享；`standalone()` 与无参构造不可混用；创建失败由宿主降级。
 6. **浮层常驻**：`Dialog` 系列传 `visible`，`BottomSheet` 传 `MutableState<Boolean>`。禁止外包 `if (visible)`，否则丢退场动画。
 7. **版本对齐**：`coui`、`coui-material3`、`coui-icons` 同版本，勿混用源码与 Maven 坐标。接入基线（`minSdk` 31、`compileSdk` 37.1、AGP `9.1.0`）见 [官方指南](https://github.com/ItosEO/COUI-Kit/tree/main/docs/guide)。

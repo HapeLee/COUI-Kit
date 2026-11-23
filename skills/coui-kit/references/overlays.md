@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | `Menu` | `expanded: Boolean` | 自动启用模糊与光效（无源回退纯色） |
 | `Dialog` / `InputDialog` / `LoadingDialog` | `visible: Boolean` | 默认 `material = null`，**须显式传 `material` + `backdrop`** |
+| `SingleChoiceDialog` | `visible: Boolean` | 自动启用，传 `material = null` 使用纯色表面 |
 | `BottomSheet` | `visible: MutableState<Boolean>` | 省略 `material` 即自动启用 |
 
 ## Menu
@@ -59,6 +60,9 @@ Dialog(visible = visible, onDismissRequest = { visible = false }, title = title,
 ```
 
 - 多行操作用 `Dialog(actionRows = ...)`（1–4 行，每行非空）。
+- **`SingleChoiceDialog`** 使用 `CouiSingleChoiceItem(value, text)` 描述选项。`actionRows` 为空时省略按钮区，各按钮执行自己的 `onClick`。返回和外点触发 `onDismissRequest`。
+  - **图标颜色**。启用 `CouiMaterial3Style` 时，`icon` 槽里的 Material 3 `Icon` 省略 `tint` 会继承选项行的内容色。显式传 `tint` 可指定颜色，传 `tint = Color.Unspecified` 可保留多色图标原色。
+  - **提交时机**。点选触发 `onItemSelected(value)`，即时提交时可在回调中保存并关闭。需要点「确定」才提交时，每次打开用已保存值初始化草稿，将 `selectedValue` 绑定到草稿，点选只更新草稿。「确定」的 `onClick` 保存并关闭，取消、返回和外点可只关闭。
 - **`InputDialog`**（复用 `material`/`backdrop`）：打开重置 `draft`；保存失败“重新编辑”直接设 `editing = true` 保留输入：
 
 ```kotlin
@@ -74,7 +78,7 @@ InputDialog(state = draft, visible = editing, title = title, clearContentDescrip
 
 ### 避坑
 
-- **只装窗口源仍是实色**：须显式传 `material` + `backdrop`；但 **API < 33 或无 `backdrop` 时传非空 `material` 直接崩溃**。
+- **启用材质**。`Dialog`、`InputDialog` 和 `LoadingDialog` 需要显式开启。传入非空 `material` 时需要 API 33+ 与有效窗口源。
 - **外包 `if (visible)`**：立即毁窗，丢退场动画。
 - **`require` 崩溃**：`CouiDialogAction.text`、`LoadingDialog.message` 不可空白；`CouiDialogActionStyle.Primary` 必配 `colors = CouiDialogDefaults.primaryActionColors(accent)`。
 - 自定义非 `CouiShape` 开材质须传 `cornerRadius`。宿主页 `imePadding()` 仅在 `LocalWindowInfo.current.isWindowFocused` 为真时启用，防背景页随输入弹窗抬起。
