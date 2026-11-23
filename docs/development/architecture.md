@@ -30,7 +30,7 @@ Group、Item、Divider、Footer 处理局部分组和行布局。Item.onClick �
 | 包 | 职责 |
 | --- | --- |
 | layout | 可选页面容器、分组与行布局；Scaffold 管理局部正文源，不持有业务状态 |
-| topappbar、search、navigation、floatingactionbutton、menu、slider、checkbox、radiobutton、switch、chip、dialog、picker、text | 局部组件的布局、状态装配、语义与公开 Defaults |
+| topappbar、search、navigation、navigation3、floatingactionbutton、menu、messageinput、slider、checkbox、radiobutton、switch、chip、dialog、sheet、segmentbutton、picker、text | 各组件布局、局部交互、语义与所属 Defaults |
 | backdrop | 所属窗口的内容源、绘制录制与采样坐标映射 |
 | effect | 普通投影、模糊、材质、光效与融合绘制 |
 | shape | 公共 Shape 与几何约定 |
@@ -38,7 +38,7 @@ Group、Item、Divider、Footer 处理局部分组和行布局。Item.onClick �
 | diagnostic | 按需启停的开发诊断 |
 | theme | 可选外观上下文、原生配色、普通字体与内容局部样式 |
 
-这些是现有 coui 模块内的职责划分。新入口放到实际负责的组件族；共享算法按职责复用，不按导入或文件名搬迁。不要新增只转发参数的包装层。
+这些是现有 `coui` 模块内的职责划分。新入口放到实际负责的组件族；共享算法按职责复用，不按导入或文件名搬迁。公开 API 契约与参数归属见[API 设计](api-design.md)。
 
 ## 状态与资源
 
