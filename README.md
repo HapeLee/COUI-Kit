@@ -82,6 +82,13 @@ dependencies {
 
 显式组件参数始终优先；局部原生主题、字体映射与染色规则见[外观与预设](docs/guide/appearance.md)。
 
+### AI 编程助手（Skill）
+
+使用 AI 编程助手接入 COUI-Kit 时，可使用本仓库在 [skills/coui-kit](skills/coui-kit/SKILL.md) 提供的 Agent Skill。它汇总了组件推荐写法、Material 3 适配、背景采样源分层以及 API 门槛和常见样式避坑规则。
+
+- **手动引入**：将 `skills/coui-kit/` 目录复制到目标项目的 Agent 技能目录（如 `.agents/skills/`、`.claude/skills/` 等）。
+- **工具安装**：也可使用支持 Agent Skills 规范的技能管理工具，从本仓库的 `skills/coui-kit` 路径安装。
+
 ## 文档
 
 | 文档 | 说明 |
@@ -97,6 +104,7 @@ dependencies {
 | [Demo 指南](docs/guide/demo.md) | 运行、签名配置与页面示例说明 |
 | [与原厂的定制差异](docs/guide/customizations.md) | 相对参考版本的视觉与交互微调及作用范围 |
 | [GitHub Packages 开发快照](docs/guide/github-packages.md) | 配置快照仓库、凭据与 CI 下载 |
+| [Agent Skill（coui-kit）](skills/coui-kit/SKILL.md) | 供外部项目 AI 编程助手使用的组件接入与避坑指南 |
 | [更新记录与版本映射](CHANGELOG.md) | 版本变更与旧版命名迁移 |
 
 ## 反馈与贡献
