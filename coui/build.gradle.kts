@@ -103,6 +103,8 @@ dependencies {
     api(libs.androidx.compose.ui)
     api(libs.androidx.compose.animation)
     api(libs.androidx.compose.foundation)
+    api(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.dynamicanimation)
     implementation(libs.androidx.core.ktx)

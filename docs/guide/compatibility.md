@@ -18,6 +18,7 @@
 
 ## 依赖对齐
 
+- **Navigation 3**。[导航转场](../components/predictive-back.md)位于核心 `coui`，通过 API 依赖引入 `navigation3-ui`。传入的条目和分栏策略使用同一套 AndroidX 类型。
 - **Compose 传递依赖**。各库和 Demo 的 Compose 版本在[版本目录](../../gradle/libs.versions.toml)中显式声明。各库只发布自身的直接依赖及版本。宿主可使用自己的 BOM，最终版本以 Gradle 依赖解析结果为准。
 - **`DynamicAnimation` 依赖对齐**：核心库请求 AndroidX `DynamicAnimation` `1.1.0`（Gradle 按宿主依赖图解析版本，例如与同样请求 `1.1.0` 的 Material Components for Android 共用）；取消后重启行为见[主动控制运动](../effects/motion.md#主动控制运动)。
 - **可选 Material 3 与图标模块**：`coui-material3` 会传递引入同版本的 `coui` 与 Material 3；`CouiIcons` 位于可选的 `coui-icons` 模块（依赖 `coui` 读取主题，核心不依赖图标模块）。同时声明多个模块时必须保持相同版本；核心库本身不依赖 Material 3 或 Material Icons。

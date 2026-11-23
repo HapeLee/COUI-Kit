@@ -11,6 +11,7 @@
 | 组件 | 定位与核心能力 | 最低版本 / 前置依赖 |
 | --- | --- | --- |
 | [页面容器](scaffold.md) | 可选的 `Scaffold`，统一顶栏、底栏与正文 `PaddingValues`、安全区及自动背景源 | API 31+；无需 Material 3 |
+| [导航转场](predictive-back.md) | Nav3 的 AOSP 跟手缩放与 ChatGPT 水平转场预设 | API 31+；跟手预览需要系统提供手势进度 |
 | [顶栏与按钮](top-app-bar.md) | `TopAppBar` 标题与操作槽位、`TopAppBarSurface` 自定义渐进模糊背景容器、`TopAppBarButton` 浮动按钮 | 容器 API 31+；按钮需 API 34+ 与 `backdrop` |
 | [折叠顶栏](collapsing-app-bar.md) | `LargeTopAppBar` 大标题弧线收起、`CollapsingTopAppBar` 联动常驻搜索折叠 | 容器 API 31+；需滚动连接与 `backdrop` |
 | [顶栏搜索](search.md) | `TopAppBarSearch` 顶栏搜索按钮到胶囊输入框的融合展开转场 | API 34+；需位于顶栏作用域内 |

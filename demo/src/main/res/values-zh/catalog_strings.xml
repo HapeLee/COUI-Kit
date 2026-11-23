@@ -121,4 +121,5 @@
     <string name="chip_category_shared">共享</string>
     <string name="chip_category_all">全部</string>
     <string name="list_item_text_preview">这是可调节字号的文字预览。</string>
+    <string name="effect_transition_style">界面切换动画效果</string>
 </resources>

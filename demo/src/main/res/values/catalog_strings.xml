@@ -124,4 +124,7 @@
     <string name="chip_category_shared">Shared</string>
     <string name="chip_category_all">All</string>
     <string name="list_item_text_preview">This text preview changes with the selected size.</string>
+    <string name="effect_transition_style">Page transition animation</string>
+    <string name="effect_transition_aosp" translatable="false">AOSP</string>
+    <string name="effect_transition_chatgpt" translatable="false">ChatGPT</string>
 </resources>

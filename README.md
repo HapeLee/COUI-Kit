@@ -88,6 +88,7 @@ dependencies {
 | --- | --- |
 | [快速开始](docs/guide/getting-started.md) | 依赖配置、第一个组件、背景源与常见问题 |
 | [组件目录](docs/components/README.md) | 布局容器、顶栏/底栏、搜索、开关、滑条、弹窗、分段选择器与图标 |
+| [Nav3 页面转场](docs/components/predictive-back.md) | 为现有返回栈选用 AOSP 或 ChatGPT 转场预设 |
 | [图标选用与接入](docs/components/icons.md) | 图标选用建议、`coui-icons` 接入、日夜资源与指定颜色 |
 | [效果目录](docs/effects/README.md) | 背景采样、模糊材质、轮廓光、跟手光、投影、融球与回弹 |
 | [外观与预设](docs/guide/appearance.md) | 原生主题、M3 角色映射、主题优先级、插槽与染色规则 |
