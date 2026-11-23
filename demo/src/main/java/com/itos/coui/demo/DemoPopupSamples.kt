@@ -88,7 +88,7 @@ internal fun MenuSamples(dark: Boolean) {
                             shape = RoundedCornerShape(16.dp),
                             radius = 16.dp,
                             itemShape = RoundedCornerShape(8.dp),
-                            themeTint = accent.copy(alpha = 0.28f),
+                            themeTint = accent,
                         ))
                 }
             }

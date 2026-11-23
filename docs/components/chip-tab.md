@@ -98,6 +98,7 @@ fun CategoryChipTabWithActionExample(
 | `renderers` | 自动按 `items.key` 创建 | 各个 `ChipTab` 对应的 `CouiFloatingRenderer` 列表；显式传入时数量须与 `items` 一致且实例不可重复。 |
 | `selectedColor` | `null` | 可选选中背景色；省略或传 `null` 时使用中性玻璃材质。 |
 | `selectedContentColor` | `contentColor` | 随选中进度过渡的前景色；传 `Color.Unspecified` 时继承当前内容色，禁用项统一取 `disabledContentColor`（内部图标与文字的显式着色优先）。 |
+| `themeTint` | `CouiTheme.materialTintFor(dark)` | 中性透明玻璃底层的染色基准色（强度由库内统一控制，传 `Color.Transparent` 关闭）；仅作用于玻璃材质，不干扰 `selectedColor` 叠色与前景色。 |
 
 - **选中配色定制**：`ChipTab` 与 `ChipTabRow` 均可分别设置 `selectedColor` 与 `selectedContentColor`。需要跟随强调色时，可传入 `CouiTheme.colorScheme.accent` 与 `onAccent`，Material 3 宿主可传入 `primary` 与 `onPrimary`。
 

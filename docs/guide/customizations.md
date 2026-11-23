@@ -53,7 +53,7 @@ Demo 二级页统一使用 `LargeTopAppBar`（参考的原厂设置二级页使�
 | 组件 | 定制行为 | 作用范围与依据 |
 | --- | --- | --- |
 | [BottomSheet](../components/bottom-sheet.md) | 顶部两侧按钮对面板底图做局部模糊，并叠加半透明底色。 | Android 14（API 34）及以上生效。原厂 Panel 的窗口内 Drawable 分支关闭按钮自身的模糊。 |
-| 菜单、底栏、搜索栏与底部面板 | 可叠加宿主表面色相，保留材质亮度。 | 宿主提供染色或启用 M3 主题策略时生效。原生主题默认使用透明染色。见[外观与预设](appearance.md#背景材质染色)。 |
+| 模糊材质组件（`Dialog` 系列、`BottomSheet`、`Menu`、`NavigationBar`、`SearchBar`、`TopAppBar` 按钮与搜索、`MessageInputBar`、透明 `SegmentedControl`、`ChipTab` 系列） | 按库内统一固定强度与共享保亮度算法叠加染色基准色，保留材质明暗层次。 | 仅在启用模糊材质且 `themeTint` 非透明时生效（原生默认透明，M3 适配默认取宿主 `surface`）；不影响不透明表面与渐变遮罩。见[外观与预设](appearance.md#背景材质染色)。 |
 | `ChipTab` | 投影复用库内顶栏胶囊按钮预设并随选中进度变化，减轻浅色背景上的底部亮带。 | 仅代表投影预设选择，不表示分类间距、滚动或边缘渐隐属于主动视觉定制。见 [CouiChipTabDefaults](../../coui/src/main/java/com/itos/coui/chip/CouiChipTabDefaults.kt) 与[装配依据](../../.agents/notes/implemented/feature/2026-10-24-chip-tab.md)。 |
 | [分段选择器](../components/segmented-control.md) | 亮色透明模式下，胶囊外轮廓沿用本库菜单的颜色处理（过亮描边按比例压低，内晕按透明度与模糊底色混合，减轻边缘泛白）。 | 混色属于本库定制，轮廓形状沿用原厂分段选择器的胶囊预设。见[分段选择器依据](../../.agents/notes/implemented/feature/2026-11-07-coui-segmented-control.md)。 |
 | `Slider` | 默认轨道采用 G2 平滑胶囊轮廓，背景、进度与光效共用同一 `Shape`；拇指保持圆形。 | 宿主可覆盖 `Shape`；平滑轨道不称为原厂默认。见 [Slider](../../coui/src/main/java/com/itos/coui/slider/Slider.kt) 与[滑条依据](../../.agents/notes/implemented/feature/2026-10-21-coui-slider.md)。 |

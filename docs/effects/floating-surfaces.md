@@ -96,7 +96,7 @@ fun FloatingSurfaceSample(
 | `CouiFloatingSurface.cornerWeight` | 无量纲权重（默认 `1f`） | 圆角矩形建议使用 `>= 2f`（例如 `2.5f`），并让传入的 `shape` 使用相同的半径与权重 |
 | `CouiFloatingSurface.alpha` / `visible` | `0f..1f` / `Boolean` | 控制该主体的显示透明度与参与绘制状态 |
 | `CouiFloatingShadow` | 长度均使用 **px** | `lightZ == 0f` 时保留基于设备显示尺寸计算的默认光源高度；`smoothCorner = true` 对应底栏 `SmoothCapsule` 投影轮廓 |
-| `CouiFloatingMaterial` | 各字段以公开声明为准（`edgeWidthDp` 为 **dp**，`blurRadius`/`extension` 等为 **px**） | 固定预设应从所属组件 `Defaults` 获取（如 `CouiFabDefaults`、`CouiSearchBarDefaults`、`CouiNavigationBarDefaults`） |
+| `CouiFloatingMaterial` | 各字段以公开声明为准（`edgeWidthDp` 为 **dp**，`blurRadius`/`extension` 等为 **px**） | 固定预设应从所属组件 `Defaults` 获取（如 `CouiFabDefaults`、`CouiSearchBarDefaults`、`CouiNavigationBarDefaults`）；`themeTint` 为染色基准色，忽略外部 alpha 并采用库内统一固定强度（`Color.Transparent` 或 `Color.Unspecified` 关闭染色） |
 
 ### 合成模式与扩展绘制
 

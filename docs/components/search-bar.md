@@ -93,7 +93,8 @@ fun PersistentSearchBarExample(
 | --- | --- | --- |
 | `shadowProgress` | `0f` | 可直接传入折叠顶栏的 `collapsedFraction`；默认不带滚动投影，展开后使用搜索自身的投影动画 |
 | `colors` | `CouiSearchBarDefaults.colors(dark)` | 通过 `copy(...)` 覆盖 `foreground`（输入/取消文字）、`secondary`（占位文字与搜索图标）、`clear`（清除图标圆底）及 `fallbackBackground`（仅 API 31–33 生效） |
-| `dark` | `CouiTheme.isDark` | 控制默认配色、高光与深浅材质分支；API 34+ 材质读取当前主题 `materialTint`（M3 取 `surface` 染色，原生默认为透明，可在局部 `CouiTheme` 调整或关闭） |
+| `dark` | `CouiTheme.isDark` | 控制默认配色、高光与深浅材质分支 |
+| `themeTint` | `CouiTheme.materialTintFor(dark)` | API 34+ 浮动材质的染色基准色（强度由库内统一控制）；传 `Color.Transparent` 关闭，API 31–33 降级背景忽略 |
 | `backdrop` | `LocalCouiToolbarBackdrop.current ?: LocalCouiBackdrop.current` | 背景采样源，不可包含 `SearchBar` 自身 |
 
 ## 装配注意事项

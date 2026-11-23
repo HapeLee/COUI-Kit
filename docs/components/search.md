@@ -215,6 +215,7 @@ fun rememberSearchToolbarStyle(
 | `TopAppBarSearch` | `endPadding` | `6.dp` | 展开后搜索胶囊右侧预留间距 |
 | `TopAppBarSearch` | `enabled` / `visible` | `true` / `true` | `enabled` 控制输入与动作交互；`visible` 控制整组淡化显隐 |
 | `TopAppBarSearch` | `action` / `onActionClick` | `null` / `null` | 配置从胶囊融合分离的右侧独立动作 |
+| `TopAppBarSearch` / `TopAppBarSearchButton` | `style` / `themeTint` | `CouiTopAppBarButtonDefaults.style(search = true)` / `Color.Unspecified` | 默认 `style(search = true)` 自动跟随主题 `materialTintFor(dark)`；传入非 `Color.Unspecified` 的 `themeTint` 时按库内固定强度覆盖染色基准色（`Color.Transparent` 关闭） |
 | `TopAppBarSearchAction` | `visibleWhileSearching` | `false` | `false` 原位淡出，`true` 随搜索展开平移保留 |
 
 ## 装配注意事项

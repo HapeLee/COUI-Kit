@@ -69,7 +69,7 @@ fun BasicBottomSheetExample(
 
 日常接入省略 `material` 和 `backdrop` 即可：在 **API 33+** 且宿主外层已安装 `ProvideCouiMenuBackdrop` 时，面板**默认自动开启**背景模糊材质与轮廓光；在 API 33 以下或缺少窗口背景源时自动使用不透明 `colors.surface`。显式传入 `material = null` 可强制使用不透明表面。
 
-启用 Material 3 适配后，模糊材质默认以宿主的 `surface` 色染色，并保留材质亮度。传入 `themeTint` 可覆盖染色，颜色的 alpha 决定强度，`Color.Transparent` 关闭染色。该设置也适用于显式传入的模糊材质，仅影响面板底图。参见[外观与预设](../guide/appearance.md#背景材质染色)。
+启用 Material 3 适配后，模糊材质默认以宿主的 `surface` 基准色按库内固定强度执行保亮度染色。传入 `themeTint` 可覆盖染色基准色，`Color.Transparent` 关闭染色（传入颜色自身的 alpha 不调节强度）。该设置仅影响 `material != null` 且 API 33+ 时的面板底图，不影响顶部按钮与不透明表面。参见[外观与预设](../guide/appearance.md#背景材质染色)。
 
 宿主已有窗口源时直接复用；首次接入时，在宿主窗口根部安装 `ProvideCouiMenuBackdrop`，将回调给出的 `windowSource` 挂到实际绘制页面内容的根节点，并在同一作用域（源节点之外）调用 `BottomSheet`（COUI `Scaffold` 为栏位提供的正文源独立于该窗口源）：
 
@@ -144,7 +144,7 @@ fun HostPageWithSheetExample(
 | `colors` | `CouiDialogDefaults.themeColors(dark)` | 控制面板不透明底色与遮罩最大透明度（`dimAmount`）。需要固定原生面板配色时传入 `CouiSheetDefaults.colors(dark)`。 |
 | `backdrop` | `null` | 显式传入面板采样窗口源；为 `null` 时读取外层 `ProvideCouiMenuBackdrop` 提供的窗口源。 |
 | `material` | API 33+ 且有窗口源时使用 `CouiSheetDefaults.material(dark)`，其余为 `null` | 控制面板的模糊与轮廓光；传入 `null` 强制使用不透明表面。 |
-| `themeTint` | `CouiTheme.materialTintFor(dark)` | 控制模糊材质染色。透明色关闭染色。 |
+| `themeTint` | `CouiTheme.materialTintFor(dark)` | 模糊材质染色基准色（强度由库内统一控制）；传 `Color.Transparent` 关闭染色。 |
 
 ## 装配注意事项
 

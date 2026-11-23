@@ -122,7 +122,7 @@ fun NavigationBarWithAccessoriesExample(
 | `backdrop` | `LocalCouiBackdrop.current` | COUI `Scaffold` 的 `bottomBar` 自动提供；第三方容器需显式传入覆盖正文且不含底栏的源 |
 | `dark` | `CouiTheme.isDark` | 控制底栏深浅色材质与前景颜色 |
 | `selectedColor` / `unselectedColor` | `Color.Unspecified` | 仅覆盖中间导航项的选中/未选中图标与文字颜色；默认日间黑色、夜间白色，选中态不透明度 `230 / 255`、未选中态 `184 / 255`。显式传入颜色时按原值应用（如 `CouiColor.Day.BLUE` / `CouiColor.Day.GRAY`），不再额外叠加状态透明度；图标应使用不含状态透明度的资源 |
-| `themeTint` | `CouiTheme.materialTintFor(dark)` | 原生模式默认透明；M3 适配默认读取宿主 `surface` 染色；传入 `Color.Transparent` 关闭染色，传入其他颜色按该颜色染色（详见[外观与预设](../guide/appearance.md)） |
+| `themeTint` | `CouiTheme.materialTintFor(dark)` | 材质染色基准色（强度由库内统一控制）。原生默认透明；M3 适配默认取宿主 `surface`。仅作用于胶囊与左透明按钮（右有色按钮排除），传入 `Color.Transparent` 关闭染色（详见[外观与预设](../guide/appearance.md#背景材质染色)） |
 | `lightColor` | `Color.White` | 控制表面高光与焦散光颜色 |
 | `circleShape` / `capsuleShape` | `CouiTopAppBarButtonDefaults.circleShape` / `CouiCapsuleShape` | 分别控制两侧附件与中间胶囊导航栏的形状 |
 

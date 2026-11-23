@@ -269,7 +269,7 @@ fun HostPageWithDialogExample(
 
 - **版本与背景源校验**：当 `material != null` 时，系统低于 API 33 或未通过 `backdrop` / `ProvideCouiMenuBackdrop` 提供有效背景源会直接抛出异常。不支持材质时传入 `material = null`，使用不透明表面。`InputDialog` 与 `LoadingDialog` 使用相同的材质接入方式。
 - **背景源节点边界**：`Dialog` 必须放在 `windowSource` 修饰的页面内容节点之外，不能让弹窗自身进入背景源，也不要只在弹窗内部新建背景源来代替宿主背景。
-- 启用材质时，`colors.dimAmount` 同时控制窗口遮罩与面板采样的压暗强度。面板先压暗采样，再做模糊。底图恢复到面板尺寸后，先按 `mix` 的 alpha 逐通道混合 RGB，再执行 `blendMode`。模糊等级为 `0` 时直接混色。窗口外遮罩由系统独立淡入淡出。传入 `visible` 时，入场在窗口完成布局后开始，背景模糊采样与卡片当前帧位置、缩放实时同步。
+- 启用材质时，`colors.dimAmount` 同时控制窗口遮罩与面板采样的压暗强度。面板先压暗采样，再做模糊。底图恢复到面板尺寸后，先按 `mix` 的 alpha 逐通道混合 RGB，再执行 `blendMode`；若 `themeTint` 非透明，则在最后按库内固定强度执行保亮度染色（`Color.Transparent` 关闭，仅 `material != null` 时生效，不透明表面、白光轮廓及文字按钮不参与染色）。模糊等级为 `0` 时直接混色。窗口外遮罩由系统独立淡入淡出。传入 `visible` 时，入场在窗口完成布局后开始，背景模糊采样与卡片当前帧位置、缩放实时同步。参见[外观与预设](../guide/appearance.md#背景材质染色)。
 
 ## 位置、圆角与外观
 
@@ -287,6 +287,7 @@ fun HostPageWithDialogExample(
 | `dismissAction` / `neutralAction` | `null` | 可选取消与第三操作；`neutralAction` 默认使用破坏性文字色。 |
 | `placement` | `CouiDialogPlacement.Bottom` | 弹窗位置：底部（`Bottom`）或居中（`Center`）。 |
 | `material` / `backdrop` | `null` | API 33+ 背景材质配置与窗口背景源；`material` 非空时必须同时具备 API 33+ 与有效背景源。 |
+| `themeTint` | `CouiTheme.materialTintFor(dark)` | 模糊材质染色基准色，采用库内固定染色强度；传 `Color.Transparent` 关闭染色。仅 `material != null` 时生效，`material == null` 忽略。 |
 | `properties` | `usePlatformDefaultWidth = false` | `DialogProperties` 配置；`InputDialog` 额外要求保留 `decorFitsSystemWindows = true`。 |
 | `autoFocus` | `true` | 仅 `InputDialog` 可用；窗口获焦后自动请求输入焦点并弹出键盘。 |
 

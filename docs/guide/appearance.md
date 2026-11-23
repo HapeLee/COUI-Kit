@@ -47,7 +47,7 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 
 | 优先级 | 条件 | 实际生效外观 |
 | --- | --- | --- |
-| 1. 显式组件参数 | 显式传入颜色、`Style`、`Shape`、`material` 或 `shadow` | 直接生效，由调用方负责与组件 `dark` 匹配。 |
+| 1. 显式组件参数 | 显式传入颜色、`Style`、`Shape`、`material`、`shadow` 或 `themeTint` | 直接生效，由调用方负责与组件 `dark` 匹配。 |
 | 2. 局部 `CouiTheme` | 存在局部 `CouiTheme` 且组件 `dark` 与之匹配 | 使用局部 `CouiTheme` 的 `colorScheme`、`typography` 与 `materialTint`。 |
 | 3. 局部 `CouiTheme`（模式不匹配） | 存在局部 `CouiTheme`，但组件 `dark` 与之不一致 | 直接回退到对应模式的原生预设（`CouiPresets.Light` / `CouiPresets.Dark`）与透明 `materialTint`，**不再尝试全局初始化策略**。 |
 | 4. 全局初始化策略 | 无局部 `CouiTheme`，且组件 `dark` 与 `CouiTheme.isDark` 一致 | 使用 `Coui.initialize(...)` 设定的策略（默认 `NativeCouiStyle`，或 `CouiMaterial3Style`）。 |
@@ -95,17 +95,24 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 
 ## 背景材质染色
 
-| 组件 | 原生默认 | M3 适配默认 | 关闭染色 / 自定义方式 |
-| --- | --- | --- | --- |
-| `Menu` | 透明（不染色） | 使用宿主 `surface` 染色（保留材质亮度） | 传入 `CouiMenuDefaults.style().copy(themeTint = Color.Transparent)` |
-| `NavigationBar` | 透明（不染色） | 使用宿主 `surface` 染色（保留材质亮度） | 显式传入 `themeTint = Color.Transparent`；右附件图标固定为白色 |
-| `SearchBar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 染色（保留材质亮度） | 通过局部 `CouiTheme` 的 `materialTint` 调整或关闭染色 |
-| `BottomSheet`（API 33+ 模糊材质） | 透明（不染色） | 使用宿主 `surface` 染色（保留材质亮度） | 传入 `themeTint = Color.Transparent` 关闭染色，或传入自定义颜色 |
-| `Fab` | 取主题强调色，不叠加页面 `themeTint` | 取 M3 `primary`，不叠加页面 `themeTint` | 日夜默认内容色均为不透明白色（显式 `material` 同样适用）；可通过 `contentColor` 覆盖（传 `Color.Unspecified` 继承外部内容色），子图标显式 `tint` 优先 |
+所有支持模糊材质的中性组件共用同一套保亮度染色算法与库内固定染色强度（不对外部开放强度调节）：传入的 `themeTint` 仅作为**染色基准色**（忽略外部颜色自身的 alpha），`Color.Transparent` 表示关闭染色。染色只作用于已启用模糊材质的组件表面，**绝不影响**页面底色、不透明表面、模糊补底色、窗口遮罩或顶栏/输入栏渐变遮罩。
 
-- 局部 `CouiTheme(materialTint = ...)` 同样可提供自定义染色，`Color.Transparent` 表示关闭。
-- 关闭染色后，背景采样仍会自然包含后方页面颜色；显式传入的 `material` 参数始终优先。
-- FAB 配色预设详见 [FAB](../components/fab.md)。
+| 组件 | 原生默认 | M3 适配默认 | 自定义或关闭染色方式 |
+| --- | --- | --- | --- |
+| `Dialog` / `InputDialog` / `LoadingDialog`（API 33+ `material != null`） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint` 基准色，或传 `Color.Transparent` 关闭；不透明弹窗忽略 |
+| `BottomSheet`（API 33+ `material != null`） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint` 基准色，或传 `Color.Transparent` 关闭；顶部按钮采面板底图不二次染色 |
+| `Menu`（有 `backdrop` 时） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 直接传入 `Menu(..., themeTint = ...)` 或覆盖 `CouiMenuStyle.themeTint`；`Color.Transparent` 关闭 |
+| `NavigationBar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；作用于胶囊与左透明按钮，右有色附件排除（图标固定白色） |
+| `SearchBar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；API 31–33 降级不透明背景不受影响 |
+| `TopAppBarButton` / `TopAppBarSearch` / `TopAppBarSearchButton`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 默认从 `CouiTopAppBarButtonDefaults.style()` 继承；传具体 `themeTint` 覆盖 `style`，传 `Color.Unspecified` 沿用 `style` |
+| `MessageInputBar`（API 34+ 且开启系统模糊） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；系统模糊关闭退回不透明底色时自动关闭染色 |
+| `SegmentedControl`（API 34+ `backdrop != null` 透明模糊模式） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；普通填色模式（`backdrop == null`）与指示器不受影响 |
+| `ChipTab` / `ChipTabButton` / `ChipTabRow`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；仅作用于中性玻璃底层，不干扰 `selectedColor` |
+| `Fab` | 取主题强调色，不叠加页面 `themeTint` | 取 M3 `primary`，不叠加页面 `themeTint` | 日夜默认内容色均为不透明白色（显式 `material` 同样适用）；自装透明材质可通过 `CouiFloatingMaterial.themeTint` 传入染色基准色 |
+
+- 局部 `CouiTheme(materialTint = ...)` 同样可提供整树自定义染色（`Color.Transparent` 表示关闭）；单组件显式传入的 `themeTint` 优先级更高。
+- 关闭染色后，背景采样仍会自然包含后方页面颜色；显式传入其他 `material` 参数（`mix`、`blend` 等）仍然优先，但其 `themeTint` 也使用同一基准色与固定强度规则。
+- `TopAppBarSurface` 渐进遮罩按页面背景渐变着色，不属于材质染色；FAB 配色预设详见 [FAB](../components/fab.md)。
 
 ## 内容插槽与最小交互尺寸
 

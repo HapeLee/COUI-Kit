@@ -53,7 +53,7 @@ fun LitSurface(
 | 入口 | 平台门槛 | 输入与行为 | 关键约束 |
 | --- | --- | --- | --- |
 | `CouiContour(floating, style)` | **API 33+** | 输入表面色、尺寸、`density`、像素半径、角权重与各透明度；绘制独立白光轮廓与内晕 | **不采样背景**；输出已包含 `surfaceColor`，不可再叠一次底色 |
-| `CouiEdge(...)` | **API 33+** | 输入描边样式（`CouiEdgeStyle.Light`/`Dark`）、像素圆角、角权重、两次材质混色与开关；返回与尺寸匹配的 `RenderEffect` | 接收原始模糊图执行背景感知描边；`cornerWeight` 须 `>= 2f` 且与裁剪 `Shape` 一致 |
+| `CouiEdge(...)` | **API 33+** | 输入描边样式（`CouiEdgeStyle.Light`/`Dark`）、像素圆角、角权重、两次材质混色、开关与可选 `themeTint`；返回与尺寸匹配的 `RenderEffect` | 接收原始模糊图执行背景感知描边；`cornerWeight` 须 `>= 2f` 且与裁剪 `Shape` 一致；`themeTint` 为染色基准色（按库内固定强度作用于最终输出，关闭轮廓光时同样生效，透明关闭） |
 | `rememberCouiSpotlight(...)` | **API 33+**（旧平台返回 `Modifier to null`） | 返回 `(触摸 Modifier, 可空绘制回调)`，不接管点击或滚动 | 熄灭后回调为 `null`；绘制回调要求硬件加速 `Canvas` |
 | `SpotlightPreset` | **API 33+** | 原厂跟手光预设（`TranslucentLarge1`、`OpaqueSmall1`、`OpaqueMedium1`、`OpaqueSmall2`、`OpaqueMedium2`、`ChipTab`） | 半径与光源高度使用**设备像素（px）**，不随 `density` 再次换算 |
 | `couiButtonFeedback` | **API 31+** | 普通按钮或列表行（`list = true`）的 `hover`/`focus`/`press` 蒙层 | 宿主将同一 `MutableInteractionSource` 交给唯一 `clickable`/`toggleable` owner 并自行裁剪 |

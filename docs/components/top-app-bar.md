@@ -179,6 +179,7 @@ fun ToolbarActionsGroupExample(
 | `TopAppBar` | `colors` | `CouiTopAppBarDefaults.colors(dark = dark)` | 配置背景遮罩、标题、导航及操作区颜色 |
 | `TopAppBar` | `windowInsets` | `CouiTopAppBarDefaults.windowInsets` | 默认消费顶部系统栏与屏幕缺口及横向安全区 |
 | `TopAppBarButton` | `renderer` | `remember { CouiFloatingRenderer.standalone() }` | 每个按钮需独立 `renderer`；如需捕获创建失败，可自行创建后传入 |
+| `TopAppBarButton` | `style` / `themeTint` | `CouiTopAppBarButtonDefaults.style()` / `Color.Unspecified` | `style()` 默认从 `CouiTheme.materialTintFor(dark)` 注入染色基准色（支持传 `themeTint` 覆盖）；按钮 `themeTint` 为 `Color.Unspecified` 时沿用 `style`，指定具体颜色时按库内固定强度覆盖染色（`Color.Transparent` 关闭） |
 | `TopAppBarButton` | `text` | `false` | `false` 为 `40.dp` 圆形图标按钮，`true` 为自适应宽度胶囊文字按钮 |
 | `TopAppBarActionVisibility` | `durationMillis` / `animateSize` | `280` / `true` | 控制淡化时长及是否伴随横向宽度收放动画 |
 

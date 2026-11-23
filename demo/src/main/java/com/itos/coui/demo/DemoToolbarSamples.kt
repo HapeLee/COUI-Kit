@@ -60,7 +60,7 @@ internal fun ToolbarSample() {
             }
         }) { backdrop ->
             val state = if (Build.VERSION.SDK_INT >= 34) rememberCouiTopAppBarSearchState(expanded) else null
-            val style = CouiTopAppBarButtonDefaults.style(search = true).withDemoThemeTint()
+            val style = CouiTopAppBarButtonDefaults.style(search = true)
             val title: @Composable () -> Unit = { Text(stringResource(R.string.toolbar_preview_title), maxLines = 1) }
             TopAppBar(
                 modifier = Modifier.align(Alignment.TopCenter),
@@ -145,7 +145,7 @@ internal fun SearchSamples(dark: Boolean) {
                 Column {
                     if (Build.VERSION.SDK_INT >= 34) {
                         val state = rememberCouiTopAppBarSearchState(toolbarExpanded)
-                        val style = CouiTopAppBarButtonDefaults.style(search = true).withDemoThemeTint()
+                        val style = CouiTopAppBarButtonDefaults.style(search = true)
                         Row(Modifier.fillMaxWidth().height(toolbarHeight).padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically) {
                             TopAppBarSearch(modifier = Modifier.weight(1f), state = state, style = style,
