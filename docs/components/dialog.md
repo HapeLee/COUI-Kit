@@ -134,13 +134,14 @@ Dialog(
 
 ## 单选弹窗
 
-当设置项需要从多个候选值中选择时，可用 `SingleChoiceDialog` 保持标题和底部操作区固定，中间列表独立滚动。需要确认后再保存时，打开前将当前值复制到草稿，点选只更新草稿。
+当设置项需要从多个候选值中选择时，可用 `SingleChoiceDialog` 保持标题和底部操作区固定，说明和选项共用滚动区。需要确认后再保存时，打开前将当前值复制到草稿，点选只更新草稿。
 
 ~~~kotlin
 val close = { showChoices = false }
 SingleChoiceDialog(
     visible = showChoices,
     title = title,
+    message = description,
     items = options,
     selectedValue = draft,
     onItemSelected = { draft = it },
@@ -155,6 +156,7 @@ SingleChoiceDialog(
 )
 ~~~
 
+- 用 `message` 在标题下、选项前补充说明。省略或传入空白文本时隐藏说明区。
 - 用 `CouiSingleChoiceItem(value, text)` 定义候选项。至少提供一项，选项值须唯一且稳定，文案须非空白。用 `icon` 添加行首图标，用 `enabled = false` 禁用该项。传 `selectedValue = null` 时初始无选中项。
 - `actionRows` 可声明 0 至 4 行操作，每行至少一个按钮。默认省略底部操作区。需要点选即保存时，可在 `onItemSelected` 中保存并关闭。
 - `onDismissRequest` 接收返回键和外点关闭请求。底部各按钮由自己的 `onClick` 决定行为，可复用同一个关闭回调。将组件留在组合中，用 `visible` 控制退场。

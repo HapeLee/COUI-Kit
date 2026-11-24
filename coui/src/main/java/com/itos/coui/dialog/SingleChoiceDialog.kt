@@ -52,7 +52,7 @@ private object SingleChoiceListDefaults {
 }
 
 /**
- * 单选弹窗的标题和底部操作区固定，中间选项独立滚动。
+ * 单选弹窗的标题和底部操作区固定，正文和选项共用滚动区。
  *
  * 将调用留在组合中，由 [visible] 控制显隐。宿主通过 [onItemSelected] 更新选中值。
  * [selectedValue] 为空或不在 [items] 中时，所有选项均未选中。
@@ -60,6 +60,7 @@ private object SingleChoiceListDefaults {
  * API 33 及以上且有 [backdrop] 时默认启用模糊材质，显式传入 `material = null` 可使用纯色表面。
  *
  * @param actionRows 从上到下声明 0 至 4 行操作，行内从布局起始侧到末端排列。空列表隐藏操作区。
+ * @param message 标题下、选项前的说明文字。为 null 或空白时省略。
  * @throws IllegalArgumentException 标题为空白、选项为空或存在重复值，或操作行超出范围或包含空行。
  */
 @Composable
@@ -80,6 +81,7 @@ fun <T : Any> SingleChoiceDialog(
     material: CouiDialogMaterial? = if (backdrop != null && CouiDialogDefaults.isMaterialSupported())
         CouiDialogDefaults.material(dark) else null,
     themeTint: Color = CouiTheme.materialTintFor(dark),
+    message: String? = null,
 ) {
     require(title.isNotBlank()) { "单选弹窗标题不能为空" }
     requireDialogActionRows(actionRows, minRows = 0)
@@ -98,15 +100,26 @@ fun <T : Any> SingleChoiceDialog(
     ) {
         Column(Modifier.fillMaxWidth()) {
             DialogTitle(title, colors.title)
-            SingleChoiceList(
-                modifier = Modifier.weight(1f, fill = false),
-                items = items,
-                selectedValue = selectedValue,
-                onItemSelected = onItemSelected,
-                interactive = visible,
-                dark = dark,
-                colors = colors,
-            )
+            Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
+                if (!message.isNullOrBlank()) {
+                    DialogText(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = CouiDialogDefaults.contentPadding)
+                            .padding(bottom = CouiDialogDefaults.messageBottom),
+                        text = message,
+                        kind = DialogTextKind.Message,
+                        color = colors.message,
+                    )
+                }
+                SingleChoiceList(
+                    items = items,
+                    selectedValue = selectedValue,
+                    onItemSelected = onItemSelected,
+                    interactive = visible,
+                    dark = dark,
+                    colors = colors,
+                )
+            }
             if (actionRows.isNotEmpty()) {
                 DialogActions(
                     actionRows = actionRows,
@@ -122,7 +135,6 @@ fun <T : Any> SingleChoiceDialog(
 
 @Composable
 private fun <T : Any> SingleChoiceList(
-    modifier: Modifier = Modifier,
     items: List<CouiSingleChoiceItem<T>>,
     selectedValue: T?,
     onItemSelected: (T) -> Unit,
@@ -135,7 +147,7 @@ private fun <T : Any> SingleChoiceList(
     }
     val colorScheme = CouiTheme.colorSchemeFor(dark)
     val radioColors = CouiRadioButtonDefaults.colors(colorScheme.accent, dark)
-    Column(modifier.verticalScroll(rememberScrollState()).fillMaxWidth().selectableGroup()) {
+    Column(Modifier.fillMaxWidth().selectableGroup()) {
         items.forEachIndexed { index, item ->
             key(item.value) {
                 val selected = item.value == selectedValue

@@ -61,6 +61,7 @@ Dialog(visible = visible, onDismissRequest = { visible = false }, title = title,
 
 - 多行操作用 `Dialog(actionRows = ...)`（1–4 行，每行非空）。
 - **`SingleChoiceDialog`** 使用 `CouiSingleChoiceItem(value, text)` 描述选项。`actionRows` 为空时省略按钮区，各按钮执行自己的 `onClick`。返回和外点触发 `onDismissRequest`。
+  - **说明文字**。可选参数 `message` 默认是 `null`。非空白时显示在标题下、选项前并随选项滚动，标题和底部操作区保持固定。
   - **图标颜色**。启用 `CouiMaterial3Style` 时，`icon` 槽里的 Material 3 `Icon` 省略 `tint` 会继承选项行的内容色。显式传 `tint` 可指定颜色，传 `tint = Color.Unspecified` 可保留多色图标原色。
   - **提交时机**。点选触发 `onItemSelected(value)`，即时提交时可在回调中保存并关闭。需要点「确定」才提交时，每次打开用已保存值初始化草稿，将 `selectedValue` 绑定到草稿，点选只更新草稿。「确定」的 `onClick` 保存并关闭，取消、返回和外点可只关闭。
 - **`InputDialog`**（复用 `material`/`backdrop`）：打开重置 `draft`；保存失败“重新编辑”直接设 `editing = true` 保留输入：
