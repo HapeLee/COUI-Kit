@@ -29,7 +29,7 @@ COUI-Kit 参考 ColorOS 17 的「凝光视效」，提供背景模糊、材质�
 
 ### 引入依赖
 
-在已启用 Compose 的模块中添加核心依赖（最低支持 Android 12 / API 31，将 `<version>` 替换为上方 Maven Central 徽章或 [Releases](https://github.com/ItosEO/COUI-Kit/releases) 上的最新版本）：
+在已启用 Compose 的模块中添加核心依赖（最低支持 Android 12 / API 31，将 `<version>` 替换为上方 Maven Central 徽章显示的版本）：
 
 ~~~kotlin
 dependencies {
@@ -38,6 +38,7 @@ dependencies {
 ~~~
 
 - 仓库配置、工具链要求及完整上手示例见[快速开始](docs/guide/getting-started.md)。
+- 使用 Alpha 版时，按 [JitPack 接入说明](docs/guide/getting-started.md#jitpack)添加依赖。
 - 部分高阶材质、模糊与浮动组件需要更高 Android 版本，详见[兼容要求](docs/guide/compatibility.md#效果门槛)。
 - 通用图标建议优先考虑 Lucide Icons。底栏状态、ColorOS 特有图形和组件推荐图标见[图标选用与接入](docs/components/icons.md)。
 

@@ -2,6 +2,18 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
+## [0.0.1-alpha18] - 2026-11-24
+
+### 新增与改进
+
+- 为单选弹窗 `SingleChoiceDialog` 新增可选的 `message` 参数。说明文字显示在标题下方，与选项一起滚动，标题和底部操作区保持固定。[弹窗](docs/components/dialog.md#单选弹窗)
+- 修复 Nav3 预测性返回的窗口圆角读取兼容性。窗口圆角 API 不可用时，沿用系统圆角资源。
+
+### 升级说明
+
+- Alpha18 通过 JitPack 发布。升级时，在 `settings.gradle.kts` 中添加 JitPack 仓库，将已使用的 COUI 模块统一切换到 `com.github.itoseo.coui-kit`，版本设为 `0.0.1-alpha18`。[快速开始](docs/guide/getting-started.md#jitpack)
+- 核心库坐标为 `com.github.itoseo.coui-kit:coui:0.0.1-alpha18`。如使用 `coui-material3` 或 `coui-icons`，请同步切换到同一渠道和版本。
+
 ## [0.0.1-alpha17] - 2026-11-24
 
 ### 新增与改进
