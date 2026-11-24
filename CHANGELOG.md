@@ -2,9 +2,17 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
-## 未发布
+## [0.0.1-alpha19] - 2026-11-24
 
-- `NavigationBar` 使用 `leftAction`、`rightAction` 独立配置两侧按钮。将原来的图标、描述、显隐与点击参数移入各自的 `CouiNavigationBarAction`，将 `rightContainerColor` 传给 `coloredActionStyle(containerColor = …)`，将 `circleShape` 移入各侧的 `style.shape`。两侧默认透明。中间胶囊统一使用 `CouiCapsuleShape`，升级时删除 `capsuleShape` 实参。中间胶囊的 `material`、`lightColor` 和 `themeTint` 只作用于胶囊。 [底栏用法](docs/components/navigation-bar.md#左右附件)
+### 新增与改进
+
+- 重构 `NavigationBar` 左右附件配置，新增 `CouiNavigationBarAction`、`CouiNavigationBarActionStyle` 与 `CouiNavigationBarDefaults`（`material`、`transparentActionStyle`、`coloredActionStyle`）。两侧附件均支持独立选用默认透明、主题强调色或自定义外观（材质、投影、图标颜色、形状、光斑与悬停反馈），`visible` 控制融合收起动画，省略 `onClick` 时仅保留拖拽与光效。[底栏用法](docs/components/navigation-bar.md#左右附件)
+- `NavigationBar` 新增 `material` 参数用于定制中间胶囊材质（与 `lightColor`、`themeTint` 共同仅作用于中间胶囊）；同步更新底栏组件文档、外观染色说明与 `coui-kit` 外部接入 Skill。
+
+### 升级说明
+
+- 升级时将 `NavigationBar` 原有的 `leftIcon`、`rightIcon`、`leftDescription`、`rightDescription`、`leftVisible`、`rightVisible`、`onLeftClick`、`onRightClick` 迁入 `leftAction` / `rightAction`（`CouiNavigationBarAction`）；将 `rightContainerColor` 传给 `CouiNavigationBarDefaults.coloredActionStyle(containerColor = …)`；将 `circleShape` 移入各侧的 `style.shape`。中间胶囊统一使用 `CouiCapsuleShape`，升级时删除 `capsuleShape` 实参。保留附件配置并将其 `visible` 设为 `false` 可播放收起动画，传 `null` 会直接移除附件。
+- Alpha19 通过 JitPack 发布，坐标为 `com.github.itoseo.coui-kit:coui:0.0.1-alpha19`；使用 `coui-material3` 或 `coui-icons` 时请同步升级至 `0.0.1-alpha19`。
 
 ## [0.0.1-alpha18] - 2026-11-24
 
