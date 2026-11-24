@@ -85,7 +85,7 @@ private fun FloatingToolbarContent(dark: Boolean) {
                 selectedFlags = selected.toMutableList().also { it[item.value] = !it[item.value] }
             },
             menuStyle = menuStyle,
-            closeOnItemClick = false,
+            closeOnItemClick = { false },
         )
         Divider()
         DemoSwitchPreference(

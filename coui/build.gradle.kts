@@ -13,11 +13,15 @@ plugins {
 
 android {
     namespace = "com.itos.coui"
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 2 }
+    }
     defaultConfig {
         minSdk = 31
         aarMetadata {
-            minCompileSdk = 37
+            minCompileSdk {
+                version = release(37) { minorApiLevel = 1 }
+            }
             minAgpVersion = "9.1.0"
         }
     }
@@ -96,10 +100,11 @@ tasks.withType<Jar>().configureEach {
 }
 
 dependencies {
-    api(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.ui)
     api(libs.androidx.compose.animation)
     api(libs.androidx.compose.foundation)
+    api(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.dynamicanimation)
     implementation(libs.androidx.core.ktx)

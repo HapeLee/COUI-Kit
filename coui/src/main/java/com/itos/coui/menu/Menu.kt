@@ -55,10 +55,12 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionOnScreen
@@ -75,6 +77,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.window.Popup
@@ -89,8 +94,9 @@ import com.itos.coui.motion.couiTouchMotion
 import com.itos.coui.motion.rememberCouiTouchMotion
 
 internal val CouiMenuItemHeight = 40.dp
-internal val CouiMenuMinWidth = 128.dp
-internal val CouiMenuMaxWidth = 280.dp
+internal val CouiMenuMinWidth = 160.dp
+internal val CouiMenuMinWidthWithSubMenu = 196.dp
+internal val CouiMenuMaxWidth = 256.dp
 private val CouiMenuItemStateHorizontalInset = 8.dp
 private val CouiMenuItemStateVerticalInset = 1.5.dp
 private val CouiMenuItemContentHorizontalPadding = 12.dp
@@ -479,18 +485,32 @@ internal fun CouiMenuPopup(
     val shadow = rememberCouiMenuShadow(shape, motion, touchMotion, transitionProgress)
 
     val density = LocalDensity.current
+    val hostView = LocalView.current
+    val boundary = LocalCouiMenuVisibleBounds.current
+    val contentBounds: (() -> IntRect?)? = remember(boundary, hostView) {
+        boundary?.let { { it.boundsInWindow(hostView) } }
+    }
+    val contentSizeLimit = if (contentBounds != null) Modifier.layout { measurable, constraints ->
+        val bounds = contentBounds()
+        val menuConstraints = if (bounds == null) constraints else constraints.copy(
+            maxWidth = constraints.constrainWidth(bounds.width.coerceAtLeast(0)),
+            maxHeight = constraints.constrainHeight((bounds.height - 48.dp.roundToPx()).coerceAtLeast(0)),
+        )
+        val placeable = measurable.measure(menuConstraints)
+        layout(placeable.width, placeable.height) { placeable.placeRelative(0, 0) }
+    } else Modifier
     val materialPositionProvider = remember(offset, density) { CouiMenuPositionProvider(offset, density) }
     val touchOffsetY = with(LocalDensity.current) { offset.y.roundToPx() }
-    val positionProvider = remember(materialPositionProvider, motion, anchor, touchOffsetY) {
+    val positionProvider = remember(materialPositionProvider, motion, anchor, touchOffsetY, contentBounds) {
         CouiMenuMotionPositionProvider(
             materialPositionProvider, motion,
             anchorPosition = { anchor?.positionInWindow },
-            visibleWindowBounds = { anchor?.visibleWindowBounds },
+            visibleWindowBounds = { contentBounds?.invoke() ?: anchor?.visibleWindowBounds },
             touchOffsetY = touchOffsetY,
+            contentBounds = contentBounds,
         )
     }
     val currentOnOutsideRequest by rememberUpdatedState(onOutsideRequest)
-    val hostView = LocalView.current
     Popup(
         popupPositionProvider = positionProvider,
         onDismissRequest = onDismissRequest,
@@ -548,6 +568,7 @@ internal fun CouiMenuPopup(
                         .then(if (properties.excludeFromSystemGesture) Modifier.systemGestureExclusion() else Modifier)
                         .background(containerColor, shape)
                         .clip(shape)
+                        .then(contentSizeLimit)
                         .then(modifier)
                         .width(IntrinsicSize.Max)
                         .then(couiMenuScrollBar(scrollBar, expanded, scrollEnabled,
@@ -759,7 +780,10 @@ private fun CouiMenuDivider() {
     )
 }
 
-/** 默认使用当前 COUI 主题；显式 style 优先。菜单独立管理窗口、输入和退场资源。 */
+/**
+ * 默认使用当前 COUI 主题；显式 style 优先。菜单独立管理窗口、输入和退场资源。
+ * themeTint 覆盖材质染色基准色（强度由库统一控制，Color.Transparent 关闭染色）。
+ */
 @Composable
 fun <T> Menu(
     modifier: Modifier = Modifier,
@@ -773,15 +797,18 @@ fun <T> Menu(
     anchor: CouiMenuAnchor? = null,
     headerText: String? = null,
     headerTextAlign: TextAlign = TextAlign.Center,
+    themeTint: Color = style.themeTint,
     onSpotlightDiagnostic: ((SpotlightDiagnostic) -> Unit)? = null,
 ) {
+    val resolvedStyle = if (themeTint == style.themeTint) style else style.copy(themeTint = themeTint)
     CompositionLocalProvider(
-        LocalCouiMenuStyle provides style,
+        LocalCouiMenuStyle provides resolvedStyle,
         LocalCouiMenuDiagnostic provides onSpotlightDiagnostic,
     ) {
         CouiMenuContent(
             expanded, onDismissRequest, items, onItemClick, modifier,
-            offset, properties, anchor, headerText, headerTextAlign, style.themeTint.alpha > 0f,
+            offset, properties, anchor, headerText, headerTextAlign,
+            resolvedStyle.themeTint.isSpecified && resolvedStyle.themeTint.alpha > 0f,
         )
     }
 }

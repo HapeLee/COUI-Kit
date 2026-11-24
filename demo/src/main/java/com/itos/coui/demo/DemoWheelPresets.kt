@@ -73,18 +73,22 @@ internal fun DemoTimePicker(
             enabled = enabled, wrap = false, textSize = 18.dp, formatter = { periods[it] })
     }
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        Row(modifier.fillMaxWidth().couiPickerSelectionLines(CouiTheme.colorScheme.outlineVariant,
-            if (fillColumns) 0.dp else 16.dp).padding(vertical = CouiPickerDefaults.padding),
+        Row(modifier.fillMaxWidth().couiPickerSelectionLines(CouiTheme.colorScheme.outlineVariant)
+            .padding(vertical = CouiPickerDefaults.padding),
             horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             if (!is24Hour && periodFirst) period()
             WheelPicker(if (fillColumns) Modifier.weight(1f) else Modifier.width(CouiPickerDefaults.columnWidth),
                 if (is24Hour) value.hour else ((value.hour + 11) % 12 + 1),
                 { submit(latest.copy(hour = if (is24Hour) it else it % 12 + latest.hour / 12 * 12)) },
                 if (is24Hour) 0..23 else 1..12, hourLabel, enabled = enabled,
-                formatter = { String.format(locale, if (twoDigitHours) "%02d" else "%d", it) })
+                formatter = { String.format(locale, if (twoDigitHours) "%02d" else "%d", it) },
+                visualWidth = if (fillColumns) 76.dp else androidx.compose.ui.unit.Dp.Unspecified,
+                visualAlignment = if (fillColumns) Alignment.End else Alignment.CenterHorizontally)
             WheelPicker(if (fillColumns) Modifier.weight(1f) else Modifier.width(CouiPickerDefaults.columnWidth), value.minute,
                 { submit(latest.copy(minute = it)) }, 0..59, minuteLabel, enabled = enabled,
-                repeatIntervalMillis = 100, formatter = { String.format(locale, "%02d", it) })
+                repeatIntervalMillis = 100, formatter = { String.format(locale, "%02d", it) },
+                visualWidth = if (fillColumns) 76.dp else androidx.compose.ui.unit.Dp.Unspecified,
+                visualAlignment = if (fillColumns) Alignment.Start else Alignment.CenterHorizontally)
             if (!is24Hour && !periodFirst) period()
         }
     }
@@ -122,32 +126,6 @@ internal fun DemoCountdownPicker(
                 if (index < 2) BasicText(":", Modifier.width(CountdownSeparatorWidth).padding(bottom = 4.dp),
                     style = TextStyle(fontSize = 38.sp, fontWeight = FontWeight.Bold,
                         color = foreground.copy(alpha = foreground.alpha * if (enabled) 1f else .5f), textAlign = TextAlign.Center))
-            }
-        }
-    }
-}
-
-/** 新建倒计时的 MiniTimePickerView：135dp 三列，不使用主页的大号数字与冒号。 */
-@Composable
-internal fun DemoTimerEditorPicker(
-    modifier: Modifier = Modifier,
-    value: DemoDuration,
-    onValueChange: (DemoDuration) -> Unit,
-    labels: List<String>,
-) {
-    val locale = LocalConfiguration.current.locales[0]
-    var latest by remember { mutableStateOf(value) }
-    SideEffect { if (latest != value) latest = value }
-    fun submit(next: DemoDuration) { latest = next; onValueChange(next) }
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        Row(modifier.fillMaxWidth().couiPickerSelectionLines(CouiTheme.colorScheme.outlineVariant, 0.dp),
-            horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            listOf(value.hour, value.minute, value.second).forEachIndexed { index, number ->
-                WheelPicker(Modifier.width(58.dp), number, { next -> submit(when (index) {
-                    0 -> latest.copy(hour = next); 1 -> latest.copy(minute = next); else -> latest.copy(second = next)
-                }) }, if (index == 0) 0..23 else 0..59, labels[index],
-                    repeatIntervalMillis = if (index == 0) 300 else 100,
-                    formatter = { String.format(locale, "%02d", it) })
             }
         }
     }

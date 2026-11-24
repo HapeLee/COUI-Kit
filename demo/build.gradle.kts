@@ -31,15 +31,20 @@ val signingValues = if (hasSigningEnvironment || signingPropertiesFile.exists())
 
 android {
     namespace = "com.itos.coui.demo"
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 2 }
+    }
     defaultConfig {
         applicationId = "com.itos.coui.demo"
         minSdk = 31
         targetSdk = 37
         versionCode = gitCommitCount.get()
-        versionName = "0.0.1-alpha12"
+        versionName = "0.0.1-alpha19"
     }
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
     val demoSigning = if (signingValues.isNotEmpty()) {
         signingConfigs.create("demo") {
             storeFile = rootProject.file(signingValues.getValue("KEYSTORE_FILE")).also {
@@ -76,7 +81,6 @@ dependencies {
     implementation(libs.capsule)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
 }

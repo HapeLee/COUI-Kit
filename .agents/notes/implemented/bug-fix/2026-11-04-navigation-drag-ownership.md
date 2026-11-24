@@ -24,7 +24,7 @@ Demo 的底栏附件只展示显隐和拖拽，不接入导航或计数。中间
 
 ## Consequences
 
-底栏与独立 FAB 可以展示没有业务点击的节点，拖拽有明确的移动所有者。底栏公共签名不变，显示附件仍必须提供图标和描述；独立 Fab 的 onClick 允许为空并可省略。用法见[左右附件](../../../../docs/components/navigation-bar.md#左右附件)和[FAB](../../../../docs/components/fab.md)。
+底栏与独立 FAB 可以展示没有业务点击的节点，拖拽有明确的移动所有者。底栏的附件配置要求图标与描述，点击回调可省略。用法见[左右附件](../../../../docs/components/navigation-bar.md#左右附件)和[FAB](../../../../docs/components/fab.md)。
 
 阈值、交接和消费分支的离线检查不能代替 Compose 的实际事件分发。父滚动、轻触、出界、CANCEL、多指、隐藏收尾及拖动后不误点击仍需设备验证，未执行 Android 构建或设备操作。
 

@@ -22,12 +22,19 @@ object CouiTopAppBarButtonDefaults {
     val circleShape = CouiShape(999.dp, cornerWeight = 2f)
 
     @Composable
-    fun style(dark: Boolean = CouiTheme.isDark, search: Boolean = false): CouiToolbarStyle {
+    fun style(
+        dark: Boolean = CouiTheme.isDark,
+        search: Boolean = false,
+        themeTint: Color = CouiTheme.materialTintFor(dark),
+    ): CouiToolbarStyle {
         val density = LocalDensity.current.density
         val contour = LocalCouiContourGlowEnabled.current
         val colors = CouiTheme.colorSchemeFor(dark)
         return CouiToolbarStyle(dark, circleShape, CouiCapsuleShape,
-            material = { capsule -> material(dark, capsule, search) },
+            material = { capsule ->
+                val material = systemMaterial(dark, capsule).copy(themeTint = themeTint)
+                if (search) material else material.copy(innerGlowAlpha = material.innerGlowAlpha * .85f)
+            },
             shadow = { capsule -> shadow(dark, capsule, density, contour, search) },
             contentColor = LocalCouiToolbarContentColor.current.takeOrElse { colors.onSurface },
             textStyle = CouiTheme.typography.body,
@@ -46,6 +53,7 @@ object CouiTopAppBarButtonDefaults {
         innerGlowScale = if (capsule && !dark) 1.15f else 1f,
     )
 
+    /** 延续已采用底栏混色的宿主样式。 */
     fun material(dark: Boolean, capsule: Boolean, search: Boolean = false): CouiFloatingMaterial = CouiFloatingMaterial(
         firstColor = Color(if (dark) 0x80666666 else 0xA3666666),
         firstBlendMode = if (dark) BlendMode.OVERLAY else BlendMode.COLOR_DODGE,

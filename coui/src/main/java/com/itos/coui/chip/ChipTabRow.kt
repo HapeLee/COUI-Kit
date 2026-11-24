@@ -72,6 +72,7 @@ import androidx.dynamicanimation.animation.FloatValueHolder
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
 import com.itos.coui.backdrop.CouiBackdrop
+import com.itos.coui.backdrop.LocalCouiBackdrop
 import com.itos.coui.effect.CouiFloatingRenderer
 import com.itos.coui.effect.LocalCouiContourGlowEnabled
 import com.itos.coui.input.isCouiTouchCancelled
@@ -111,6 +112,10 @@ data class CouiChipTabItem(
  * leadingAction 位于单选组之外，为 null 时只显示分类列表；leadingActionVisible 控制其动画显隐。
  * 需要退出过渡时保留 leadingAction 内容，只切换 leadingActionVisible。
  * renderers 与项目按顺序对应，不得跨节点复用。
+ * selectedColor / selectedContentColor 分别覆盖选中背景与前景；未指定选中前景时沿用 contentColor。
+ * 前景色传入 Color.Unspecified 时继承当前内容色。
+ * 禁用项的选中与未选中前景均使用 disabledContentColor。
+ * themeTint 为中性玻璃底层的染色基准色（强度由库统一控制，透明关闭，不干扰 selectedColor）。
  */
 @RequiresApi(34)
 @Composable
@@ -119,7 +124,9 @@ fun ChipTabRow(
     items: List<CouiChipTabItem>,
     selectedKey: Any?,
     onSelectedKeyChange: (Any) -> Unit,
-    backdrop: CouiBackdrop,
+    backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) {
+        "ChipTabRow 需要显式 backdrop 或容器提供的背景源"
+    },
     dark: Boolean = CouiTheme.isDark,
     enabled: Boolean = true,
     leadingAction: (@Composable () -> Unit)? = null,
@@ -131,6 +138,9 @@ fun ChipTabRow(
     textStyle: TextStyle = CouiChipTabDefaults.themeTextStyle(),
     contourGlowEnabled: Boolean = LocalCouiContourGlowEnabled.current,
     renderers: List<CouiFloatingRenderer> = remember(items.map { it.key }) { items.map { CouiFloatingRenderer.standalone() } },
+    selectedColor: Color? = null,
+    selectedContentColor: Color = contentColor,
+    themeTint: Color = CouiTheme.materialTintFor(dark),
 ) {
     require(items.map { it.key }.distinct().size == items.size) { "分类项的 key 必须唯一" }
     val selectedIndex = items.indexOfFirst { it.key == selectedKey }
@@ -236,6 +246,9 @@ fun ChipTabRow(
                             label = item.label, backdrop = backdrop, dark = dark, enabled = enabled && item.enabled,
                             icon = item.icon, contentColor = if (enabled && item.enabled) contentColor else disabledContentColor,
                             textStyle = textStyle, contourGlowEnabled = contourGlowEnabled, renderer = renderers[index],
+                            selectedColor = selectedColor,
+                            selectedContentColor = if (enabled && item.enabled) selectedContentColor else disabledContentColor,
+                            themeTint = themeTint,
                         )
                     }
                 }

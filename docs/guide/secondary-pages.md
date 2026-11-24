@@ -7,7 +7,7 @@ COUI 组件可以直接放入现有的 Material 3、Miuix 或自有页面布局�
 | 普通分组与控件 | 直接放入已有布局，见 [Group](../components/group.md) |
 | COUI 惯性与边界回弹 | 在实际滚动容器上使用 [couiVerticalScroll](../effects/overscroll.md) |
 | 模糊顶栏、底栏或 FAB | COUI `Scaffold` 自动提供正文源；第三方容器需显式接入 `Backdrop` |
-| 材质菜单或弹窗 | 按需在宿主根部提供窗口背景源 |
+| 材质菜单、弹窗或 Sheet 面板 | 按需在宿主根部提供窗口背景源 |
 
 配色来自组件显式参数或当前 `CouiTheme`；Material 3 适配为可选模块，配置见[外观与预设](appearance.md)。
 
@@ -99,7 +99,7 @@ COUI 背景采样区分**正文源**（给栏位和局部浮动组件采样）�
 | --- | --- | --- | --- |
 | 正文源（COUI `Scaffold`） | 容器自动创建并录制正文视口与 `containerColor` | `topBar`、`bottomBar`、`floatingActionButton` 槽位内的组件（可省略 `backdrop`，显式优先） | 正文 `content` 不获得自身源；正文内的模糊组件须另建独立源 |
 | 正文源（第三方容器） | 宿主调用 `rememberCouiBackdrop()`，并在应用滚动 Padding **之前**挂 `.couiBackdrop(backdrop)` | 显式传参给 `TopAppBar`、`NavigationBar`、`Fab` 等消费者 | 必须覆盖完整视口与不透明底色，避免栏位下方出现未录制区域；消费者绝不能被录入自身采样的源 |
-| 窗口源（`Menu` / `Dialog`） | `Scaffold` **不安装**窗口源；宿主在根部使用 `ProvideCouiMenuBackdrop` | 子树中的菜单或材质弹窗通过 `rememberCouiWindowBackdrop()` 读取（未提供时返回 `null`） | 仅在存在消费者时安装；每个源只挂到一个实际节点，每个绘制节点持有独立可变 `renderer` |
+| 窗口源（`Menu` / `Dialog` / `Sheet`） | `Scaffold` **不安装**窗口源；宿主在根部使用 `ProvideCouiMenuBackdrop` | 子树中的菜单、材质弹窗或材质 Sheet 面板通过 `rememberCouiWindowBackdrop()` 读取（未提供时返回 `null`） | 仅在存在消费者时安装；每个源只挂到一个实际节点，每个绘制节点持有独立可变 `renderer` |
 
 在第三方容器中挂载正文源时，无需额外包装容器或安装 Provider，直接把 `.couiBackdrop(backdrop)` 挂到现有正文节点即可（详见[背景采样](../effects/backdrop.md#顶栏接入)）。窗口源典型装配如下：
 
@@ -108,12 +108,12 @@ COUI 背景采样区分**正文源**（给栏位和局部浮动组件采样）�
 ProvideCouiMenuBackdrop { windowSource ->
     Box(Modifier.fillMaxSize().then(windowSource)) {
         // 原有页面；正文 Backdrop 保持独立。
-        // 菜单与弹窗按各自接口使用窗口源，在独立浮层中绘制。
+        // 菜单、弹窗与 Sheet 面板按各自接口使用窗口源，在独立浮层中绘制。
     }
 }
 ~~~
 
-资源管理与失败处理详见[背景采样](../effects/backdrop.md)，具体消费见[菜单](../components/menu.md)与[弹窗](../components/dialog.md)。
+资源管理与失败处理详见[背景采样](../effects/backdrop.md)，具体消费见[菜单](../components/menu.md)、[弹窗](../components/dialog.md)与 [Sheet 面板](../components/bottom-sheet.md)。
 
 ## 状态与导航
 

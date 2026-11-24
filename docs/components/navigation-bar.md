@@ -1,141 +1,86 @@
 # 底栏
 
-`NavigationBar` 在页面底部渲染胶囊式导航栏，并支持在左右两侧以融合动画展开或收起独立圆形操作按钮。选中索引与页面路由由宿主持有。
+`NavigationBar`（包名 `com.itos.coui.navigation`）在页面底部渲染胶囊导航栏，并支持在左右两侧以融合动画展开或收起独立圆形操作按钮。选中索引与页面路由由宿主持有。
 
-- **最低系统版本**：要求 **API 34+**。低于 API 34 时需由宿主提供自有的替代导航栏。
-- **前置依赖**：需要页面背景源 `backdrop`（放入 COUI `Scaffold` 的 `bottomBar` 时可省略）；每个底栏默认各自创建独立的三主体 `CouiFloatingRenderer()`，如需在外部捕获 Shader 初始化失败也可显式传入 `renderer`（**不能**使用 `standalone()`）。
+- **最低版本**：**API 34+**（标记 `@RequiresApi(34)`）；低于 API 34 时由宿主提供普通底部导航替代。
+- **前置依赖**：需要不包含底栏自身的正文 `backdrop`（放入 COUI `Scaffold.bottomBar` 时自动获取）；默认各自创建三主体 `CouiFloatingRenderer()`，如需在外部捕获 Shader 初始化失败，可在 `remember` 中预创建后显式传入（**不能**使用 `standalone()`）。
 
-## 最小调用
+## 最小可用用法
 
-传入导航项列表 `items`（不可为空）、当前选中索引 `selectedIndex` 与切换回调 `onSelection`；在 COUI `Scaffold` 的 `bottomBar` 外使用时需显式传入 `backdrop`：
-
-~~~kotlin
-@RequiresApi(34)
-@Composable
-fun BasicNavigationBarExample(
-    modifier: Modifier = Modifier,
-    backdrop: CouiBackdrop,
-    items: List<CouiNavigationItem>,
-    selectedIndex: Int,
-    onSelection: (Int) -> Unit,
-) {
-    NavigationBar(
-        modifier = modifier,
-        backdrop = backdrop,
-        items = items,
-        selectedIndex = selectedIndex,
-        onSelection = onSelection,
-    )
-}
-~~~
-
-接入说明：
-
-- **`items` 与索引约束**：`items` 不能为空，且 `selectedIndex` 必须处于 `items.indices` 范围内，否则组件会抛出异常。
-- **`CouiNavigationItem` 图标**：`icon` 为未选中图形，`selectedIcon` 为选中与拖动预选图形；省略 `selectedIcon` 时两种状态共用 `icon`。底栏内部负责绘制 `24.dp` 图标并自动应用状态透明度，无需调用方计算 alpha。
-
-## 搭配左右附件与自定义配色
-
-下面展示包含 3 个导航项、左右两侧融合操作按钮及自定义右侧按钮底色的完整装配（示例使用可选的 `coui-icons` 图标包，原生主题与 M3 适配均可直接使用）：
+在 COUI `Scaffold` 的 `bottomBar` 槽位中直接调用，省略外观参数即自动跟随当前 `CouiTheme` 或 Material 3 主题（在第三方容器中使用时显式传入 `backdrop`）：
 
 ~~~kotlin
-@RequiresApi(34)
-@Composable
-fun NavigationBarWithAccessoriesExample(
-    modifier: Modifier = Modifier,
-    backdrop: CouiBackdrop,
-    dark: Boolean,
-    surfaceTint: Color,
-    leftVisible: Boolean,
-    rightVisible: Boolean,
-    leftDescription: String,
-    rightDescription: String,
-    albumTitle: String,
-    cloudTitle: String,
-    createTitle: String,
-    selectedIndex: Int,
-    onSelection: (Int) -> Unit,
-    onLeftClick: () -> Unit,
-    onRightClick: () -> Unit,
-) {
-    val items = listOf(
-        CouiNavigationItem(
-            title = albumTitle,
-            icon = CouiIcons.Outlined.Album,
-            selectedIcon = CouiIcons.Filled.Album,
-        ),
-        CouiNavigationItem(
-            title = cloudTitle,
-            icon = CouiIcons.Outlined.CloudData,
-            selectedIcon = CouiIcons.Filled.CloudData,
-        ),
-        CouiNavigationItem(
-            title = createTitle,
-            icon = CouiIcons.Outlined.WandSpark,
-            selectedIcon = CouiIcons.Filled.WandSpark,
-        ),
-    )
-
-    NavigationBar(
-        modifier = modifier,
-        backdrop = backdrop,
-        items = items,
-        selectedIndex = selectedIndex,
-        leftIcon = CouiIcons.Filled.DarkLight,
-        leftDescription = leftDescription,
-        rightIcon = CouiIcons.Filled.Add,
-        rightDescription = rightDescription,
-        leftVisible = leftVisible,
-        rightVisible = rightVisible,
-        onLeftClick = onLeftClick,
-        onRightClick = onRightClick,
-        rightContainerColor = CouiFabDefaults.containerColor(CouiFabColor.Notes, dark),
-        dark = dark,
-        lightColor = Color.White,
-        themeTint = surfaceTint,
-        circleShape = CircleShape,
-        capsuleShape = CouiCapsuleShape,
-        onSelection = onSelection,
-    )
-}
+NavigationBar(
+    items = destinations,
+    selectedIndex = selectedIndex,
+    onSelection = onSelectPage,
+)
 ~~~
+
+- `CouiNavigationItem` 的 `icon` 与 `selectedIcon` 推荐配对同名 `Outlined` 和 `Filled` 图标（见[图标选用与接入](icons.md)）；省略 `selectedIcon` 时两种状态共用 `icon`。
+- 组件内部按选中状态绘制 `24.dp` 图标与透明度和文字颜色，图标资源勿预乘透明度；`selectedColor` / `unselectedColor` 可按需显式覆盖。
 
 ## 左右附件
 
-| 参数 | 默认值 | 行为说明 |
-| --- | --- | --- |
-| `leftVisible` / `rightVisible` | `false` / `false` | 控制左右两侧独立圆形按钮的融合展开与收起 |
-| `leftIcon` / `leftDescription` | `null` / `null` | `leftVisible = true` 时**必须同时提供**图标与无障碍描述，否则校验失败 |
-| `rightIcon` / `rightDescription` | `null` / `null` | `rightVisible = true` 时**必须同时提供**图标与无障碍描述，否则校验失败 |
-| `onLeftClick` / `onRightClick` | `null` / `null` | 省略回调（`null`）时仍保留图标展示与拖拽形变反馈，但不注册点击或 `Role.Button` 语义 |
-| `rightContainerColor` | `Color.Unspecified` | 右侧附件底色；未指定时自动解析为 COUI 主题强调色 `accent` |
+通过 `leftAction` 和 `rightAction` 分别传入 `CouiNavigationBarAction`，任一侧均可使用默认透明样式、主题强调色有色样式或自定义外观：
 
-- **保留收起动画内容**：从可见切换为隐藏（`leftVisible = false` 或 `rightVisible = false`）时，请**继续传入**对应侧的图标参数，只切换布尔值，以便退场缩放融合期间图标内容完整保留。
-- **右侧图标固定白色**：右侧附件图标按设计固定为白色（`Color.White`），即使底色自动取主题强调色也不读取 `onAccent`；自定义 `rightContainerColor` 时应确保与白色图标保持足够对比度。当页面同时包含独立 `Fab` 时，可传入同一个颜色保持视觉一致。
-- **拖拽与轻触手势**：底栏主体及两侧附件的拖拽超过系统触摸阈值后会接管移动事件，避免误触带动父级页面滚动；轻触与横向滑选松手仍由导航项或点击回调处理。
+~~~kotlin
+NavigationBar(
+    items = destinations,
+    selectedIndex = selectedIndex,
+    leftAction = CouiNavigationBarAction(
+        icon = themeIcon,
+        contentDescription = themeDescription,
+        visible = showLeftAction,
+        onClick = onToggleTheme,
+    ),
+    rightAction = CouiNavigationBarAction(
+        icon = addIcon,
+        contentDescription = addDescription,
+        visible = showRightAction,
+        onClick = onAdd,
+        style = CouiNavigationBarDefaults.coloredActionStyle(),
+    ),
+    onSelection = onSelectPage,
+)
+~~~
 
-## 配色、形状与 Insets 速查
+- **显隐控制**：`CouiNavigationBarAction.visible` 默认为 `true`。需要播放融合收起动画时，保留该侧配置对象并将其 `visible` 设为 `false`；将 `leftAction` 或 `rightAction` 设为 `null` 会立即移除按钮并销毁动画状态。
+- **内置样式与有色按钮**：省略 `style` 时使用 `CouiNavigationBarDefaults.transparentActionStyle()`；`CouiNavigationBarDefaults.coloredActionStyle()` 省略 `containerColor` 时取当前主题强调色，图标默认不透明白色。
+- **可选点击与拖拽**：省略 `onClick`（默认 `null`）时不创建点击与 `Button` 语义，但保留拖拽、按压与光斑反馈；主体与附件横向拖动超过阈值后自动接管移动，避免带动父级滚动。
 
-| 参数 | 默认值 | 说明 |
-| --- | --- | --- |
-| `renderer` | `remember { CouiFloatingRenderer() }` | 默认由组件各自创建三主体绘制器；需处理 Shader 初始化失败时可自行创建后传入，不可使用 `standalone()` 或跨节点共享 |
-| `backdrop` | `LocalCouiBackdrop.current` | COUI `Scaffold` 的 `bottomBar` 自动提供；第三方容器需显式传入覆盖正文且不含底栏的源 |
-| `dark` | `CouiTheme.isDark` | 控制底栏深浅色材质与前景颜色 |
-| `selectedColor` / `unselectedColor` | `Color.Unspecified` | 仅覆盖中间导航项的选中/未选中图标与文字颜色；默认日间黑色、夜间白色，选中态不透明度 `230 / 255`、未选中态 `184 / 255`。显式传入颜色时按原值应用（如 `CouiColor.Day.BLUE` / `CouiColor.Day.GRAY`），不再额外叠加状态透明度；图标应使用不含状态透明度的资源 |
-| `themeTint` | `CouiTheme.materialTintFor(dark)` | 原生模式默认透明；M3 适配默认读取宿主 `surface` 染色；传入 `Color.Transparent` 关闭染色，传入其他颜色按该颜色染色（详见[外观与预设](../guide/appearance.md)） |
-| `lightColor` | `Color.White` | 控制表面高光与焦散光颜色 |
-| `circleShape` / `capsuleShape` | `CouiTopAppBarButtonDefaults.circleShape` / `CouiCapsuleShape` | 分别控制两侧附件与中间胶囊导航栏的形状 |
+## 自定义胶囊与附件材质
 
-- **系统 Insets 与正文占位**：`NavigationBar` 内部会自动处理水平与底部可点击区安全区（`WindowInsets.tappableElement`）以及悬浮底边距，**不会**自行给页面正文留白。放入 COUI `Scaffold` 的 `bottomBar` 时，容器会测量底栏高度并通过正文 `padding.bottom` 回传占位；在第三方容器中需按底栏实测高度给正文留白，不要再重复叠加底部系统 `Insets`。
-- **M3 字体继承**：启用 M3 适配时，导航项文字会继承宿主的 ambient 字体属性，同时保留底栏自身的字号、行高与字重；左右附件图标继续遵守各自配色契约。
+`NavigationBar` 顶层的 `material`、`themeTint` 与 `lightColor` **只作用于中间胶囊**。需要调整胶囊混色、高光或关闭染色，并让透明附件同步保持一致时，将自定义 `material` 一并传给 `transparentActionStyle(material = ...)`：
 
-## 装配注意事项
+~~~kotlin
+val customMaterial = CouiNavigationBarDefaults.material(
+    themeTint = Color.Transparent, // 仅关闭额外染色；也可改用 copy 覆盖混色
+)
+NavigationBar(
+    items = destinations,
+    selectedIndex = selectedIndex,
+    material = customMaterial,
+    leftAction = CouiNavigationBarAction(
+        icon = themeIcon,
+        contentDescription = themeDescription,
+        style = CouiNavigationBarDefaults.transparentActionStyle(material = customMaterial),
+    ),
+    onSelection = onSelectPage,
+)
+~~~
 
-- **保持稳定组合位置**：切换页面或 Tab 内容时，请把 `NavigationBar` 与其 `renderer` 留在外层稳定组合树中，只替换上方正文内容，避免切换页面时重建 `renderer` 或中断动画。
-- **放置于背景源之外**：使用第三方容器时，将 `NavigationBar` 放在页面叠加层的底部（正文 `.couiBackdrop(backdrop)` 节点之外），切勿让底栏被录入自身采样的背景源中。
-- **处理 API 版本门槛**：由于依赖 API 34+ 的多主体浮动渲染器，在支持更低版本系统的应用中请在外层判断 `Build.VERSION.SDK_INT >= 34`，低版本提供常规导航栏回退。
+## 约束与避坑
+
+- **入参校验**：`items` 不能为空且 `selectedIndex` 必须在 `items.indices` 内，否则触发 `require` 异常。
+- **材质与染色隔离**：不要假设传给 `NavigationBar` 的 `material`、`themeTint` 或 `lightColor` 会自动影响左右附件；透明附件与有色附件分别从各自的 `CouiNavigationBarAction.style` 读取材质、投影与染色（完整染色规则见[外观与预设](../guide/appearance.md#背景材质染色)）。
+- **自定义附件样式**：中间胶囊固定使用 `CouiCapsuleShape`；手动构造 `CouiNavigationBarActionStyle` 时，`shape` 应使用 `CouiShape` 以保证内容裁剪、投影和融合轮廓一致，且 `shadow` 须读取 `LocalCouiContourGlowEnabled.current`。
+- **Insets 与正文留白**：底栏已处理横向与底部安全区（`WindowInsets.tappableElement`）及悬浮边距，不要在外部再叠 `navigationBarsPadding()`；放入 COUI `Scaffold` 会自动通过 `PaddingValues.bottom` 为正文留白，第三方容器须按底栏实测高度给正文留白。
+- **稳定组合位置与源分层**：切页时将 `NavigationBar` 及 `renderer` 留在外层稳定组合树中，避免重建导致动画中断；在第三方容器中使用时必须将其放在 `.couiBackdrop(backdrop)` 录制节点之外。
+- **版本与渲染失败降级**：接入时判断 `Build.VERSION.SDK_INT >= 34`，同时捕获手动创建的 `CouiFloatingRenderer()` 构造异常；不满足条件时在同一底栏槽位改用宿主普通导航栏。
+- **M3 字体继承**：启用 `CouiMaterial3Style` 时，导航项文字继承宿主字体族，同时保留组件自身的字号、行高与字重。
 
 ## 源码与完整示例
 
-- **公开实现**：[NavigationBar.kt](../../coui/src/main/java/com/itos/coui/navigation/NavigationBar.kt)
-- **首页完整示例**：[DemoApp.kt](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt)
+- **公开实现**：[NavigationBar.kt](../../coui/src/main/java/com/itos/coui/navigation/NavigationBar.kt)、[CouiNavigationBarAction.kt](../../coui/src/main/java/com/itos/coui/navigation/CouiNavigationBarAction.kt)、[CouiNavigationBarDefaults.kt](../../coui/src/main/java/com/itos/coui/navigation/CouiNavigationBarDefaults.kt)
+- **首页与控件示例**：[DemoApp.kt](../../demo/src/main/java/com/itos/coui/demo/DemoApp.kt)、[DemoChromeDetail.kt](../../demo/src/main/java/com/itos/coui/demo/DemoChromeDetail.kt)

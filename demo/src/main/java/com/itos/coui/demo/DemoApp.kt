@@ -18,6 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,11 +38,17 @@ import com.itos.coui.effect.couiNavigationFeedback
 import com.itos.coui.floatingactionbutton.CouiFabColor
 import com.itos.coui.floatingactionbutton.CouiFabDefaults
 import com.itos.coui.navigation.NavigationBar
+import com.itos.coui.navigation.CouiNavigationBarAction
+import com.itos.coui.navigation.CouiNavigationBarDefaults
 import com.itos.coui.navigation.CouiNavigationItem
 import com.itos.coui.search.SearchBar
 import com.itos.coui.search.rememberCouiSearchBarState
 import com.itos.coui.layout.CouiPageDefaults
+import com.itos.coui.menu.CouiMenuItem
+import com.itos.coui.layout.Group
 import com.itos.coui.layout.Scaffold
+import com.itos.coui.navigation3.CouiBackPreset
+import com.itos.coui.navigation3.PredictiveBackNavDisplay
 import com.itos.coui.topappbar.CollapsingTopAppBar
 import com.itos.coui.topappbar.CouiTopAppBarDefaults
 import com.itos.coui.topappbar.LargeTopAppBar
@@ -51,6 +60,29 @@ private class DemoRenderers {
 
 @Composable
 internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme: () -> Unit, openPage: (String) -> Unit) {
+    var effectPage by rememberSaveable { mutableStateOf<String?>(null) }
+    val home by rememberUpdatedState<@Composable () -> Unit> {
+        DemoHome(dark, preferences, onToggleTheme, openPage, openEffect = { effectPage = it })
+    }
+    val effectDetail by rememberUpdatedState<@Composable (String) -> Unit> { route ->
+        DemoSecondaryPage(route, dark, preferences, back = { effectPage = null })
+    }
+    val entries = rememberDecoratedNavEntries(
+        backStack = listOfNotNull("home", effectPage),
+        entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator<String>()),
+    ) { route ->
+        NavEntry(route) { if (route == "home") home() else effectDetail(route) }
+    }
+    PredictiveBackNavDisplay(
+        entries = entries,
+        preset = preferences.backPreset,
+        onBack = { effectPage = null },
+    )
+}
+
+@Composable
+private fun DemoHome(dark: Boolean, preferences: DemoPreferences, onToggleTheme: () -> Unit,
+    openPage: (String) -> Unit, openEffect: (String) -> Unit) {
     var page by rememberSaveable { mutableIntStateOf(0) }
     val contour = preferences.contour
     var leftAccessory by rememberSaveable { mutableStateOf(true) }
@@ -90,7 +122,7 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
             topBar = {
                 if (page == 0) {
                     CollapsingTopAppBar(state = header, searchState = search, title = titles[page],
-                        color = colors.onSurface, backgroundColor = LocalDemoTopBarGradient.current, dark = dark) {
+                        color = colors.onSurface, dark = dark) {
                             SearchBar(state = search, query = query, onQueryChange = { query = it },
                                 onExpandedChange = { searching = it; if (!it) query = "" },
                                 placeholder = stringResource(R.string.catalog_search_hint),
@@ -100,8 +132,7 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
                     }
                 } else LargeTopAppBar(title = { Text(titles[page], maxLines = 1) },
                     scrollBehavior = behavior, dark = dark,
-                    colors = CouiTopAppBarDefaults.colors(backgroundColor = LocalDemoTopBarGradient.current,
-                        titleColor = colors.onSurface, dark = dark))
+                    colors = CouiTopAppBarDefaults.colors(titleColor = colors.onSurface, dark = dark))
             }, bottomBar = {
                 if (Build.VERSION.SDK_INT >= 34 && renderers != null) {
                     Box(Modifier.fillMaxWidth()) {
@@ -111,12 +142,22 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
                             items = titles.mapIndexed { index, title ->
                                 CouiNavigationItem(title = title, icon = navigation[index], selectedIcon = selectedNavigation[index])
                             },
-                            selectedIndex = page, leftIcon = CouiIcons.Filled.DarkLight, leftDescription = stringResource(R.string.toggle_theme),
-                            rightIcon = CouiIcons.Filled.Add, rightDescription = stringResource(R.string.catalog_fab),
-                            leftVisible = leftAccessory, rightVisible = rightAccessory,
-                            onLeftClick = onToggleTheme, onRightClick = { openPage("fab") }, rightContainerColor = color,
-                            dark = dark, lightColor = Color.White,
-                            circleShape = DemoShapes.couiCircle, capsuleShape = DemoShapes.couiCapsule, onSelection = selectPage,
+                            selectedIndex = page,
+                            leftAction = CouiNavigationBarAction(
+                                icon = CouiIcons.Filled.DarkLight,
+                                contentDescription = stringResource(R.string.toggle_theme),
+                                onClick = onToggleTheme,
+                                visible = leftAccessory,
+                            ),
+                            rightAction = CouiNavigationBarAction(
+                                icon = CouiIcons.Filled.Add,
+                                contentDescription = stringResource(R.string.catalog_fab),
+                                onClick = { openPage("fab") },
+                                visible = rightAccessory,
+                                style = CouiNavigationBarDefaults.coloredActionStyle(color, dark),
+                            ),
+                            dark = dark,
+                            onSelection = selectPage,
                         )
                     }
                 } else PlainDemoBottomBar(titles, navigation, selectedNavigation, page, selectPage, dark)
@@ -132,7 +173,28 @@ internal fun DemoApp(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
                     }
                     when (page) {
                         0 -> DemoCatalog(DemoComponentGroups, open, query = query)
-                        1 -> DemoCatalog(DemoEffectGroups, open)
+                        1 -> {
+                            var menuExpanded by remember { mutableStateOf(false) }
+                            val options = CouiBackPreset.entries.map { preset ->
+                                val label = when (preset) {
+                                    CouiBackPreset.AOSP -> R.string.effect_transition_aosp
+                                    CouiBackPreset.CHATGPT -> R.string.effect_transition_chatgpt
+                                }
+                                CouiMenuItem(preset, stringResource(label), selected = preset == preferences.backPreset)
+                            }
+                            Group {
+                                DemoPopupPreference(
+                                    title = stringResource(R.string.effect_transition_style),
+                                    value = options.first { it.selected }.text,
+                                    expanded = menuExpanded,
+                                    onExpandedChange = { menuExpanded = it },
+                                    items = options,
+                                    onItemClick = { preferences.setTransitionPreset(it.value) },
+                                    menuStyle = demoMenuStyle(dark),
+                                )
+                            }
+                            DemoCatalog(DemoEffectGroups, openEffect)
+                        }
                         else -> SettingsDemo(dark, preferences, leftAccessory, { leftAccessory = it },
                             rightAccessory, { rightAccessory = it }, onAbout = { openPage("about") },
                             onReset = { preferences.reset(); leftAccessory = true; rightAccessory = true })

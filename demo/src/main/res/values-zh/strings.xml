@@ -28,9 +28,20 @@
     <string name="menu_pinned">固定</string>
     <string name="menu_more">子菜单</string>
     <string name="menu_disabled">禁用项</string>
-    <string name="menu_selection">已选择：%1$s</string>
-    <string name="open_menu">打开菜单</string>
-    <string name="menu_header">选择与子菜单</string>
+    <string name="menu_header">请选择运行模式</string>
+    <string name="menu_blur">菜单背景模糊</string>
+    <string name="menu_blur_summary">关闭后，示例菜单使用纯色背景。</string>
+    <string name="menu_anchors">菜单定位</string>
+    <string name="menu_button_anchor">按按钮位置弹出</string>
+    <string name="menu_touch_anchor">菜单跟随手指按下的位置弹出。</string>
+    <string name="menu_checkable">勾选项与分隔线</string>
+    <string name="menu_show_details">显示详情</string>
+    <string name="menu_done">完成</string>
+    <string name="menu_submenu">二级菜单</string>
+    <string name="menu_titled">带标题菜单</string>
+    <string name="menu_header_center">标题居中</string>
+    <string name="menu_header_start">标题靠起始侧</string>
+    <string name="menu_custom_style">自定义圆角与染色</string>
     <string name="shadow_title">阴影</string>
     <string name="elevation_value">投影高度：%1$d dp</string>
     <string name="shadow_subject">阴影主体</string>
@@ -49,7 +60,7 @@
     <string name="continuous_slider">连续滑动选择条</string>
     <string name="section_slider">显示点位的分段选择条</string>
     <string name="implicit_slider">隐藏点位的步进选择条</string>
-    <string name="scroll_menu">显示可滚动长菜单</string>
+    <string name="menu_scrollable">可滚动长菜单</string>
     <string name="menu_item_number">第 %1$d 项</string>
     <string name="left_accessory_toggle">显示左侧附件</string>
     <string name="right_accessory_toggle">显示右侧附件</string>
@@ -84,4 +95,7 @@
     <string name="demo_settings">设置</string>
     <string name="demo_theme_settings">主题设置</string>
     <string name="demo_navigation_settings">底栏设置</string>
+    <string name="progressive_blur_comparison">顶栏模糊</string>
+    <string name="compose_progressive_blur">使用 Compose 渐进模糊</string>
+    <string name="compose_progressive_blur_summary">应用于 Demo 各页面的顶栏。关闭后使用 COUI 渐进模糊。</string>
 </resources>

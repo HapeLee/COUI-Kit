@@ -112,6 +112,7 @@ internal fun CouiDialogWindow(
     visible: Boolean? = null,
     maxWidth: Dp = CouiDialogDefaults.maxWidth,
     horizontalMargin: Dp = CouiDialogDefaults.horizontalMargin,
+    themeTint: Color = Color.Transparent,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val hostView = LocalView.current
@@ -291,7 +292,7 @@ internal fun CouiDialogWindow(
                 .onGloballyPositioned { windowSize = it.size }
                 .padding(horizontal = horizontalMargin).padding(bottom = padding)) {
                 DialogCard(modifier.fillMaxWidth().heightIn(max = minOf(maxCardHeight, availableHeight)),
-                    material, windowBackdrop, colors, shape, edge, dark, radiusPx, edgeWeight,
+                    material, windowBackdrop, colors, shape, edge, dark, radiusPx, edgeWeight, themeTint,
                     frameScale, frameTranslation?.minus(imeTranslation), frameAlpha,
                     with(density) { bottomPadding.toPx() }, { cardCoordinates = it }, content)
             }
@@ -313,6 +314,7 @@ private fun DialogCard(
     dark: Boolean,
     radiusPx: Float,
     edgeWeight: Float,
+    themeTint: Color,
     frameScale: Float,
     frameTranslationY: Float?,
     frameAlpha: Float,
@@ -321,8 +323,13 @@ private fun DialogCard(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val blur = if (material != null) rememberCouiKawaseBlur(checkNotNull(backdrop), colors.surface, material.blurRadius) else null
-    val materialEffect = if (Build.VERSION.SDK_INT >= 33 && material != null)
-        rememberCouiMaterialEffect(material.mix, material.blend, material.blendMode) else null
+    val materialEffect = if (Build.VERSION.SDK_INT >= 33 && material != null) {
+        rememberCouiMaterialEffect(
+            material.mix, material.blend, material.blendMode,
+            rgbMix = true, slightDither = material.blurRadius > 0, themeTint = themeTint,
+        )
+    } else null
+    val surfaceEffect = remember(materialEffect) { materialEffect?.asComposeRenderEffect() }
     val layer = rememberGraphicsLayer()
     val recordingDensity = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
@@ -341,9 +348,9 @@ private fun DialogCard(
         val sampleTranslation = Offset(size.width * (1f - frameScale) / 2f,
             size.height * (1f - frameScale) / 2f + (frameTranslationY ?: (size.height + bottomPaddingPx)))
         val target = coordinates
-        if (Build.VERSION.SDK_INT >= 33 && blur != null && materialEffect != null &&
+        if (Build.VERSION.SDK_INT >= 33 && blur != null && surfaceEffect != null &&
             target != null && target.isAttached && size.width > 0f && size.height > 0f) {
-            layer.renderEffect = materialEffect.asComposeRenderEffect()
+            layer.renderEffect = surfaceEffect
             layer.record(recordingDensity, layoutDirection,
                 IntSize(size.width.toInt().coerceAtLeast(1), size.height.toInt().coerceAtLeast(1))) {
                 blur.draw(this, target, frameScale, sampleTranslation, dimAmount = colors.dimAmount)

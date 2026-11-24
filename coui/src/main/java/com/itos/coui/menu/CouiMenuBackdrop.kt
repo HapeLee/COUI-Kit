@@ -35,7 +35,16 @@ fun ProvideCouiMenuBackdrop(
 ) {
     val backdrop = rememberCouiBackdrop(parent = LocalCouiMenuBackdrop.current, diagnosticName = "menu-window")
     SideEffect { backdrop.setIsolateWhenIdle(isolateContent) }
-    CompositionLocalProvider(LocalCouiMenuBackdrop provides backdrop) {
+    ProvideCouiMenuBackdrop(backdrop) {
         content(Modifier.couiBackdrop(backdrop))
     }
+}
+
+/**
+ * 为当前内容提供同一窗口的既有采样源，源仍由宿主录制。
+ * 传 null 可在此范围内停用窗口背景采样，菜单会使用纯色底。
+ */
+@Composable
+fun ProvideCouiMenuBackdrop(backdrop: CouiBackdrop?, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalCouiMenuBackdrop provides backdrop, content = content)
 }

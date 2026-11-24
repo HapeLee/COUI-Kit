@@ -240,7 +240,7 @@ COUIPopupListWindow / COUIPopupWindow
 | 静止正常，淡入淡出时阴影被裁            | `clip=false` 不能解除祖先 alpha 离屏纹理边界。逐层核对动画 outsets，不用布局 padding 改测量、命中和菜单锚点        | [动画绘制边界](../../coui/src/main/java/com/itos/coui/topappbar/TopAppBarButtonGroup.kt)                 |
 | 将每个按钮单独提升到 overlay 就能保留动画 | 可能丢失内部祖先淡化。当前提升完整槽位、保留原位输入与锚点；局部 overlay 仍受页面/Pager 外层变换约束                      | [槽位与背景](../../.agents/notes/implemented/bug-fix/2026-10-20-topappbar-search-transition-boundaries.md)  |
 | 聚焦搜索时突然翻页，必然是 overlay 跨页  | 先追焦点 → BringIntoView → Pager。关闭用户滑动不等于禁止焦点滚动；固定顶栏应约束向祖先传递的可见范围，不延迟焦点或强制跳回页面掩盖原因 | [搜索转场边界](../../.agents/notes/implemented/bug-fix/2026-10-20-topappbar-search-transition-boundaries.md) |
-| 搜索起点跳一下、收起偶发横移            | 点击时捕获实际中心，真实放置时换算；转场端点保持稳定，宽度与位移使用同帧进度。不能等待全局坐标后修正首帧，也不能由操作区恢复重定向收起路径           | 同上                                                                                                     |
+| 搜索起点跳一下、收起偶发横移 | 点击时捕获实际中心，收起时保留展开端点和排版宽度，并在布局时用已恢复占位的入口更新收起端点。宽度与位移使用同帧进度 | 同上 |
 | 隐藏搜索时操作区向右下缩，搜索先收再消失      | UI 隐藏不等于结束业务搜索。纯淡化须保留实际测量及预布局尺寸；查询、展收目标、可见性和焦点分别处理                              | 同上                                                                                                     |
 | 收起尾部偶发方形亮块                | 排查残留透明点击区继承的 Material indication，而不是只检查 COUI Shader 裁剪                          | 同上                                                                                                     |
 | FAB 展开时无法点击，等弹簧结束才恢复      | 官方把按钮启用与收放期间的形变限制分开。不能用一个 running 开关关闭点击、语义、跟手光和形变                              | [附件控制器](../../coui/src/main/java/com/itos/coui/navigation/CouiFabExpansion.kt)                         |

@@ -3,7 +3,7 @@
 `ChipTabRow` 用于横向排列单选分类胶囊，支持超宽惯性滚动、边缘渐隐与前置独立动作按钮（`ChipTabButton`）；也提供可单独使用的 `ChipTab`。
 
 - **系统版本要求**：要求 Android 14（**API 34+**），公开组件均标注 `@RequiresApi(34)`。
-- **前置依赖**：必须传入覆盖不透明页面内容的 `CouiBackdrop` 背景源，且分类栏自身必须位于采样源节点之外。
+- **前置依赖**：需要覆盖不透明页面内容的 `CouiBackdrop` 背景源，且分类栏自身必须位于采样源节点之外。`ChipTabRow` 在 [Sheet 面板](bottom-sheet.md)或 `ProvideCouiBackdrop` 作用域内可省略 `backdrop`（自动读取容器提供的背景源），其余情况及 `ChipTab` / `ChipTabButton` 需显式传入。
 
 ## 基本用法
 
@@ -85,18 +85,22 @@ fun CategoryChipTabWithActionExample(
 | `items` | 必填 | `CouiChipTabItem(key, label, enabled, icon)` 列表；`key` 须唯一且稳定。 |
 | `selectedKey` | 必填 | 当前选中的 `key`；非空列表须有效，空列表须为 `null`。 |
 | `onSelectedKeyChange` | 必填 | 点击未选中分类项时的选择回调。 |
-| `backdrop` | 必填 | 覆盖不透明背景内容的采样源，严禁包含分类栏自身。 |
+| `backdrop` | `LocalCouiBackdrop.current`（无作用域时必填） | `ChipTabRow` 在 [Sheet 面板](bottom-sheet.md)或 `ProvideCouiBackdrop` 内可省略（自动使用容器底图），其余情况必填；`ChipTab` 与 `ChipTabButton` 始终必填。源须覆盖不透明背景，并排除分类栏自身。 |
 | `dark` | `CouiTheme.isDark` | 明暗外观模式。 |
 | `enabled` | `true` | 整栏启用状态（单项可由 `CouiChipTabItem.enabled` 单独禁用）。 |
 | `leadingAction` | `null` | 前置独立动作槽位，通常放置 `ChipTabButton`。 |
 | `leadingActionVisible` | `true` | 控制 `leadingAction` 的动画显隐并联动列表起始留白。 |
 | `itemSpacing` | `8.dp` | 分类胶囊间距，必须为有限非负 `Dp`。 |
 | `animationLevel` | `1` | 横向滚动物理动画等级，范围 `1..4`（`1` 最明显，`4` 最弱）。 |
-| `contentColor` / `disabledContentColor` | `CouiChipTabDefaults.contentColor(...)` | 正常态与禁用态前景颜色。 |
+| `contentColor` / `disabledContentColor` | `CouiChipTabDefaults.contentColor(...)` | 正常态和禁用态前景色。传入 `Color.Unspecified` 时继承当前内容色。禁用项统一取 `disabledContentColor`。 |
 | `textStyle` | `CouiChipTabDefaults.themeTextStyle()` | 文字排版样式（可选 M3 适配仅接入 `labelLarge` 字体族，保留 `14.sp` 字号与 `Medium` 字重；显式传入则完整覆盖）。 |
 | `contourGlowEnabled` | `LocalCouiContourGlowEnabled.current` | 是否启用边缘轮廓光效。 |
 | `renderers` | 自动按 `items.key` 创建 | 各个 `ChipTab` 对应的 `CouiFloatingRenderer` 列表；显式传入时数量须与 `items` 一致且实例不可重复。 |
-| `selectedColor` | `null` | 可选选中填充色。为 `null` 时保留中性玻璃材质；设置颜色后选中背景叠加该色，前景随选中进度向白色过渡。 |
+| `selectedColor` | `null` | 可选选中背景色；省略或传 `null` 时使用中性玻璃材质。 |
+| `selectedContentColor` | `contentColor` | 随选中进度过渡的前景色；传 `Color.Unspecified` 时继承当前内容色，禁用项统一取 `disabledContentColor`（内部图标与文字的显式着色优先）。 |
+| `themeTint` | `CouiTheme.materialTintFor(dark)` | 中性透明玻璃底层的染色基准色（强度由库内统一控制，传 `Color.Transparent` 关闭）；仅作用于玻璃材质，不干扰 `selectedColor` 叠色与前景色。 |
+
+- **选中配色定制**：`ChipTab` 与 `ChipTabRow` 均可分别设置 `selectedColor` 与 `selectedContentColor`。需要跟随强调色时，可传入 `CouiTheme.colorScheme.accent` 与 `onAccent`，Material 3 宿主可传入 `primary` 与 `onPrimary`。
 
 ## 装配注意事项
 

@@ -3,12 +3,12 @@
 在已有的 Jetpack Compose Android 项目中添加 COUI 依赖，即可使用滑条、开关、弹窗、顶栏等组件。本页使用 Gradle Kotlin DSL 说明接入步骤。
 
 - **最低运行系统**：Android 12（API 31），部分高级效果与浮动组件需要 API 33 或 API 34+。
-- **编译环境基线**：`compileSdk` 37、AGP `9.1.0` 及以上，并启用 Jetpack Compose。完整环境要求见[兼容要求](compatibility.md)。
+- **编译环境基线**。使用 `compileSdk` 37.1、AGP `9.1.0` 及以上，并启用 Jetpack Compose。完整环境要求见[兼容要求](compatibility.md)。
 - **预览阶段说明**：当前版本处于早期预览期，API 可能发生不兼容调整。
 
 ## 引入 COUI
 
-同一模块请仅选择以下**一种**依赖来源，避免重复定义类。
+同一个项目的 COUI 模块使用同一依赖来源和版本，避免重复定义类。
 
 ### Maven Central
 
@@ -23,7 +23,7 @@
    }
    ~~~
 
-2. 在使用组件的模块 `build.gradle.kts` 中启用 Compose 并添加依赖：
+2. 在使用组件的模块 `build.gradle.kts` 中启用 Compose 并添加依赖（将 `<version>` 替换为 [Maven Central](https://central.sonatype.com/artifact/io.github.itoseo/coui) 上可下载的版本）：
 
    ~~~kotlin
    android {
@@ -31,13 +31,35 @@
    }
 
    dependencies {
-       implementation("io.github.itoseo:coui:0.0.1-alpha12")
+       implementation("io.github.itoseo:coui:<version>")
    }
    ~~~
 
-   需要自动跟随宿主 `MaterialTheme` 时，可改为引入同版本的 `io.github.itoseo:coui-material3:0.0.1-alpha12`，详见[接入 Material 3](../../README.md#接入-material-3)；需要 `CouiIcons` 时可额外添加同版本的 `io.github.itoseo:coui-icons:0.0.1-alpha12`，见[图标用法](../components/icons.md)。
+   需要自动跟随宿主 `MaterialTheme` 时，可改为引入同版本的 `io.github.itoseo:coui-material3:<version>`，详见[接入 Material 3](../../README.md#接入-material-3)；需要 `CouiIcons` 时可额外添加同版本的 `io.github.itoseo:coui-icons:<version>`，见[图标用法](../components/icons.md)。
 
-### GitHub Packages 预览版
+### JitPack
+
+通过 JitPack 接入 `0.0.1-alpha18` 或更新版本时，在 `settings.gradle.kts` 的 `dependencyResolutionManagement.repositories` 中添加：
+
+~~~kotlin
+maven {
+    url = uri("https://jitpack.io")
+    content { includeGroup("com.github.itoseo.coui-kit") }
+}
+~~~
+
+启用 Compose 后，按需要添加模块。`<version>` 使用[发布工作流](https://github.com/ItosEO/COUI-Kit/actions/workflows/publish-central.yml)的 JitPack 摘要中的版本号。
+
+~~~kotlin
+implementation("com.github.itoseo.coui-kit:coui:<version>")
+// 按需加入 Material 3 适配和图标
+// implementation("com.github.itoseo.coui-kit:coui-material3:<version>")
+// implementation("com.github.itoseo.coui-kit:coui-icons:<version>")
+~~~
+
+继续使用 JitPack 的 `0.0.1-alpha17` 或更早版本时，仓库的 `includeGroup` 和模块依赖都使用该版本原有的 `com.github.ItosEO.COUI-Kit`。
+
+### GitHub Packages 开发快照
 
 需要验证开发快照时，按 [GitHub Packages 指南](github-packages.md)配置凭据、仓库与快照坐标。
 
@@ -153,7 +175,7 @@ fun PageContent(
 
 | 问题现象 | 排查要点 |
 | --- | --- |
-| 依赖解析失败或 Compose 编译失败 | 检查 `settings.gradle.kts` 是否配置 `mavenCentral()` 及模块是否启用 `buildFeatures.compose`；源码接入时检查版本目录依赖、插件别名与 `DynamicAnimation` 解析版本。 |
+| 依赖解析失败或 Compose 编译失败 | 检查 `settings.gradle.kts` 是否配置所选渠道的仓库、对应版本是否可下载，以及模块是否启用 `buildFeatures.compose`。源码接入时检查版本目录依赖、插件别名与 `DynamicAnimation` 解析版本。 |
 | 组件显示了，但背景材质不对或无模糊 | 核对设备系统版本（API 33+/34+）；确认背景源覆盖不透明内容且组件位于源节点**之外**；材质弹窗还须传入 `material` 与宿主窗口背景源。 |
 | 低版本设备调用高版本组件崩溃 | 确认调用 `Fab`、`NavigationBar`、`TopAppBarButton`、`ChipTab`、`SegmentedControl` 等 `@RequiresApi(34)` 入口前已判断 `Build.VERSION.SDK_INT >= 34`。 |
 

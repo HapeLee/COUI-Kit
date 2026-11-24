@@ -212,6 +212,7 @@ body {
 .nav-link:focus-visible,
 .home-button:focus-visible,
 .home-footer a:focus-visible,
+.icon-guide-link:focus-visible,
 .search-clear-btn:focus-visible,
 .icon-card:focus-visible,
 .detail-close-btn:focus-visible,
@@ -416,10 +417,67 @@ body {
   letter-spacing: -0.02em;
 }
 
-.page-subtitle {
-  margin: 4px 0 0;
-  font-size: 1rem;
+.icon-guide {
+  margin-bottom: 20px;
+}
+
+.icon-guide h2 {
+  margin: 0 16px 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--text-secondary);
+}
+
+.icon-guide-card,
+.grid-panel {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.icon-guide-copy {
+  padding: 16px 20px;
+  color: var(--text-secondary);
+}
+
+.icon-guide-copy p {
+  margin: 0;
+}
+
+.icon-guide-copy h3 {
+  margin: 12px 0 4px;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.icon-guide-copy ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding-inline-start: 1.25em;
+}
+
+.icon-guide-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-subtle);
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.icon-guide-link strong {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.icon-guide-link:hover {
+  background-color: var(--bg-hover);
 }
 
 /* 搜索栏与计数 */
@@ -498,10 +556,7 @@ body {
 }
 
 .grid-panel {
-  background-color: var(--bg-card);
-  border-radius: var(--radius-card);
   padding: 24px;
-  box-shadow: var(--shadow-card);
   min-height: 520px;
 }
 

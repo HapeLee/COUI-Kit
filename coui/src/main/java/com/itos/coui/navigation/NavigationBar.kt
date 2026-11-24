@@ -1,6 +1,5 @@
 package com.itos.coui.navigation
 
-import android.graphics.BlendMode
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -44,7 +43,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.layer.GraphicsLayer
@@ -78,7 +76,6 @@ import com.itos.coui.backdrop.CouiBackdrop
 import com.itos.coui.backdrop.LocalCouiBackdrop
 import com.itos.coui.effect.CouiFloatingMaterial
 import com.itos.coui.effect.CouiFloatingRenderer
-import com.itos.coui.effect.CouiFloatingShadow
 import com.itos.coui.effect.CouiFloatingSurface
 import com.itos.coui.effect.LocalCouiContourGlowEnabled
 import com.itos.coui.effect.SpotlightPreset
@@ -86,7 +83,6 @@ import com.itos.coui.effect.couiFabFeedback
 import com.itos.coui.effect.couiFloatingSurfaces
 import com.itos.coui.effect.couiNavigationFeedback
 import com.itos.coui.effect.rememberCouiSpotlight
-import com.itos.coui.floatingactionbutton.CouiFabDefaults
 import com.itos.coui.input.isCouiTouchCancelled
 import com.itos.coui.motion.CouiPressMotion
 import com.itos.coui.motion.CouiTouchMotion
@@ -96,7 +92,6 @@ import com.itos.coui.motion.rememberCouiPressMotion
 import com.itos.coui.motion.rememberCouiTouchMotion
 import com.itos.coui.theme.CouiTheme
 import com.itos.coui.theme.ProvideCouiContent
-import com.itos.coui.topappbar.CouiTopAppBarButtonDefaults
 import com.itos.coui.shape.CouiCapsuleShape
 
 /** [selectedIcon] 用于选中和拖动预选，省略时两种状态共用 [icon]。 */
@@ -106,6 +101,9 @@ data class CouiNavigationItem(val title: String, val icon: ImageVector, val sele
  * 只负责底栏装配，页面状态和导航提交仍由宿主持有。
  * 附件点击回调为空时只显示图标并保留拖拽，不创建点击或 Button 语义。
  * 省略 [renderer] 时创建独立的三主体绘制器。宿主可先创建绘制器并处理失败，再显式传入。
+ * 中间胶囊使用 [CouiCapsuleShape]，[material] 只作用于该胶囊。左右附件分别由 [leftAction] 和 [rightAction] 配置。
+ * [lightColor] 和 [themeTint] 默认沿用材质中的值，显式传入时优先。透明 [themeTint] 关闭额外染色。
+ * 附件配置为空时直接移除该附件。保留配置并将其 visible 设为 false 时播放收起动画。
  */
 @RequiresApi(34)
 @Composable
@@ -117,88 +115,53 @@ fun NavigationBar(
     renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer() },
     items: List<CouiNavigationItem>,
     selectedIndex: Int,
-    leftIcon: ImageVector? = null,
-    leftDescription: String? = null,
-    rightIcon: ImageVector? = null,
-    rightDescription: String? = null,
-    leftVisible: Boolean = false,
-    rightVisible: Boolean = false,
-    onLeftClick: (() -> Unit)? = null,
-    onRightClick: (() -> Unit)? = null,
-    rightContainerColor: Color = Color.Unspecified,
+    leftAction: CouiNavigationBarAction? = null,
+    rightAction: CouiNavigationBarAction? = null,
     dark: Boolean = CouiTheme.isDark,
-    lightColor: Color = Color.White,
-    themeTint: Color = CouiTheme.materialTintFor(dark),
-    circleShape: Shape = CouiTopAppBarButtonDefaults.circleShape,
-    capsuleShape: Shape = CouiCapsuleShape,
+    material: CouiFloatingMaterial = CouiNavigationBarDefaults.material(dark),
+    lightColor: Color = material.lightColor,
+    themeTint: Color = material.themeTint,
     selectedColor: Color = (if (dark) Color.White else Color.Black).copy(alpha = 230f / 255f),
     unselectedColor: Color = (if (dark) Color.White else Color.Black).copy(alpha = 184f / 255f),
     onSelection: (Int) -> Unit,
 ) {
     require(items.isNotEmpty() && selectedIndex in items.indices)
-    require(!leftVisible || (leftIcon != null && leftDescription != null)) {
-        "显示左附件时必须提供图标和描述"
-    }
-    require(!rightVisible || (rightIcon != null && rightDescription != null)) {
-        "显示右附件时必须提供图标和描述"
-    }
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
-    val leftExpansion = remember(density, layoutDirection) { CouiFabExpansion(leftVisible) }
-    val rightExpansion = remember(density, layoutDirection) { CouiFabExpansion(rightVisible) }
+    val leftVisible = leftAction?.visible == true
+    val rightVisible = rightAction?.visible == true
+    val leftExpansion = remember(density, layoutDirection, leftAction != null) { CouiFabExpansion(leftVisible) }
+    val rightExpansion = remember(density, layoutDirection, rightAction != null) { CouiFabExpansion(rightVisible) }
     // 融合完成会先隐藏附件, 点击不能继续等待缩放弹簧结束。
-    val leftInteractive = leftExpansion.present && leftExpansion.interactive && leftIcon != null
-    val rightInteractive = rightExpansion.present && rightExpansion.interactive && rightIcon != null
-    DisposableEffect(leftExpansion, rightExpansion) {
-        onDispose {
-            leftExpansion.dispose()
-            rightExpansion.dispose()
-        }
+    val leftInteractive = leftExpansion.present && leftExpansion.interactive
+    val rightInteractive = rightExpansion.present && rightExpansion.interactive
+    DisposableEffect(leftExpansion) {
+        onDispose { leftExpansion.dispose() }
+    }
+    DisposableEffect(rightExpansion) {
+        onDispose { rightExpansion.dispose() }
     }
     val contour = LocalCouiContourGlowEnabled.current
-    val material = remember(dark, lightColor, themeTint) {
-        CouiFloatingMaterial(
-            firstColor = if (dark) Color(0x80666666) else Color(0xA3666666),
-            firstBlendMode = if (dark) BlendMode.OVERLAY else BlendMode.COLOR_DODGE,
-            secondColor = if (dark) Color(0xB3262626) else Color(0x80F0F0F0),
-            edgeAlpha = if (dark) 0.8f else 0.25f,
-            innerGlowAlpha = if (dark) 0.03f else 0.1f,
-            lightColor = lightColor,
-            themeTint = themeTint,
-        )
-    }
-    val foreground = if (dark) Color.White else Color.Black
-    val coloredFab = if (rightContainerColor.isSpecified) rightContainerColor else CouiTheme.colorSchemeFor(dark).accent
-    val materials = remember(material, coloredFab, dark, density) {
-        val extension = with(density) { 4.dp.roundToPx() }
-        listOf(material.copy(index = 2, extension = extension), material.copy(index = 1, extension = extension),
-            CouiFabDefaults.material(coloredFab, dark, extension))
-    }
-    val shadows = remember(coloredFab, density, lightColor, dark, contour) {
-        fun pixelOffset(dp: Float): Float = (dp * density.density).toInt().toFloat()
-        fun pixelSize(dp: Float): Float {
-            val px = dp * density.density
-            return (if (px >= 0f) px + 0.5f else px - 0.5f).toInt().toFloat()
-        }
-        val projectionColor = when {
-            contour -> Color(0x2D000000)
-            dark -> Color(0x78000000)
-            else -> Color(0x28000000)
-        }
-        val accessoryShadow = CouiFloatingShadow(
-            elevation = pixelSize(if (contour) 24f else 350f), color = projectionColor,
-            lightY = pixelSize(if (contour) -320f else -160f),
-            lightZ = if (contour) 0f else pixelSize(10000f),
-            lightRadius = pixelSize(if (contour) 1600f else 2000f),
-            causticColor = lightColor.copy(alpha = 0x42 / 255f),
-            layout = Rect(0f, 0f, 0f, pixelOffset(11.2f)), sdf = pixelOffset(20f))
+    val defaultActionStyle = CouiNavigationBarDefaults.transparentActionStyle(dark)
+    val leftStyle = leftAction?.style ?: defaultActionStyle
+    val rightStyle = rightAction?.style ?: defaultActionStyle
+    val extension = with(density) { 4.dp.roundToPx() }
+    val materials = remember(material, lightColor, themeTint, leftStyle.material, rightStyle.material, extension) {
         listOf(
-            accessoryShadow.copy(color = if (contour) Color(0x23000000) else projectionColor),
-            accessoryShadow.copy(layout = Rect(0f, 0f, 0f, pixelOffset(4.9f)), sdf = pixelOffset(10.4f), smoothCorner = true),
-            CouiFabDefaults.shadow(coloredFab, density.density, contour),
+            leftStyle.material.copy(index = 2, extension = extension),
+            material.copy(index = 1, extension = extension, lightColor = lightColor, themeTint = themeTint),
+            rightStyle.material.copy(index = 2, extension = extension),
         )
     }
-    val shapes = remember(circleShape, capsuleShape) { listOf(circleShape, capsuleShape, circleShape) }
+    val capsuleShadow = remember(density, lightColor, dark, contour) {
+        CouiNavigationBarDefaults.transparentShadow(dark, density.density, contour, lightColor, capsule = true)
+    }
+    val shadows = remember(leftStyle.shadow, capsuleShadow, rightStyle.shadow) {
+        listOf(leftStyle.shadow, capsuleShadow, rightStyle.shadow)
+    }
+    val shapes = remember(leftStyle.shape, rightStyle.shape) {
+        listOf(leftStyle.shape, CouiCapsuleShape, rightStyle.shape)
+    }
     val contentLayers = List(3) { rememberGraphicsLayer() }
     val menuMotion = rememberCouiTouchMotion(true)
     val leftMotion = rememberCouiTouchMotion(leftExpansion.touchMotionEnabled)
@@ -212,12 +175,20 @@ fun NavigationBar(
     var rightBounds by remember { mutableStateOf(Rect.Zero) }
     fun menuSurface(): CouiFloatingSurface = surface(menuBounds, menuMotion, menuPress)
     fun leftSurface(): CouiFloatingSurface = leftExpansion.surface(
-        surface(leftBounds, leftMotion, leftPress, cornerWeight = 2f,
-            touchMotionEnabled = leftExpansion.touchMotionEnabled),
+        surface(
+            leftBounds, leftMotion, leftPress,
+            cornerWeight = leftStyle.shape.cornerWeight,
+            cornerRadius = with(density) { leftStyle.shape.radius.toPx() },
+            touchMotionEnabled = leftExpansion.touchMotionEnabled,
+        ),
     )
     fun rightSurface(): CouiFloatingSurface = rightExpansion.surface(
-        surface(rightBounds, rightMotion, rightPress, cornerWeight = 2f,
-            touchMotionEnabled = rightExpansion.touchMotionEnabled),
+        surface(
+            rightBounds, rightMotion, rightPress,
+            cornerWeight = rightStyle.shape.cornerWeight,
+            cornerRadius = with(density) { rightStyle.shape.radius.toPx() },
+            touchMotionEnabled = rightExpansion.touchMotionEnabled,
+        ),
     )
     LaunchedEffect(leftExpansion, leftVisible, menuBounds, leftBounds) {
         leftExpansion.updateTarget(leftVisible, menuBounds, leftBounds,
@@ -269,25 +240,20 @@ fun NavigationBar(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                FloatingNode(
-                    width = 56.dp, motion = leftMotion, press = leftPress, dark = dark,
-                    shape = circleShape,
-                    lightColor = lightColor,
+                NavigationActionNode(
+                    action = leftAction,
+                    style = leftStyle,
+                    motion = leftMotion,
+                    press = leftPress,
+                    dark = dark,
                     contentLayer = contentLayers[0],
                     interactive = leftInteractive,
                     expansion = leftExpansion,
                     onBounds = { node -> rowCoordinates?.let { leftBounds = it.localBoundingBoxOf(node, false) } },
-                ) {
-                    val interactionSource = remember { MutableInteractionSource() }
-                    if (leftIcon != null) Icon(imageVector = leftIcon, contentDescription = if (leftInteractive) leftDescription else null, modifier = Modifier.fillMaxSize()
-                        .then(if (leftInteractive && onLeftClick != null) Modifier.clickable(
-                            interactionSource = interactionSource, indication = null, role = Role.Button,
-                            onClick = onLeftClick,
-                        ) else Modifier).padding(16.dp), tint = foreground)
-                }
+                )
                 FloatingNode(
                     width = menuWidth, motion = menuMotion, press = menuPress, dark = dark,
-                    shape = capsuleShape,
+                    shape = CouiCapsuleShape,
                     lightColor = lightColor,
                     contentLayer = contentLayers[1],
                     onBounds = { node -> rowCoordinates?.let { menuBounds = it.localBoundingBoxOf(node, false) } },
@@ -387,23 +353,56 @@ fun NavigationBar(
                         }
                     }
                 }
-                FloatingNode(
-                    width = 56.dp, motion = rightMotion, press = rightPress, dark = dark,
-                    shape = circleShape,
+                NavigationActionNode(
+                    action = rightAction,
+                    style = rightStyle,
+                    motion = rightMotion,
+                    press = rightPress,
+                    dark = dark,
                     contentLayer = contentLayers[2],
-                    coloredFab = true,
                     interactive = rightInteractive,
                     expansion = rightExpansion,
                     onBounds = { node -> rowCoordinates?.let { rightBounds = it.localBoundingBoxOf(node, false) } },
-                ) {
-                    val interactionSource = remember { MutableInteractionSource() }
-                    if (rightIcon != null) Icon(imageVector = rightIcon, contentDescription = if (rightInteractive) rightDescription else null, modifier = Modifier.fillMaxSize()
-                        .then(if (rightInteractive && onRightClick != null) Modifier.couiFabFeedback(dark, interactionSource).clickable(
-                            interactionSource = interactionSource, indication = null, role = Role.Button,
-                            onClick = onRightClick,
-                        ) else Modifier).padding(16.dp), tint = Color.White)
-                }
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun NavigationActionNode(
+    action: CouiNavigationBarAction?,
+    style: CouiNavigationBarActionStyle,
+    motion: CouiTouchMotion,
+    press: CouiPressMotion,
+    dark: Boolean,
+    contentLayer: GraphicsLayer,
+    interactive: Boolean,
+    expansion: CouiFabExpansion,
+    onBounds: (LayoutCoordinates) -> Unit,
+) {
+    FloatingNode(
+        width = 56.dp, motion = motion, press = press, dark = dark,
+        shape = style.shape, contentLayer = contentLayer, spotlight = style.spotlight,
+        lightColor = style.material.lightColor, interactive = interactive,
+        expansion = expansion, onBounds = onBounds,
+    ) {
+        if (action != null) {
+            val interactionSource = remember { MutableInteractionSource() }
+            val onClick = action.onClick
+            val click = if (interactive && onClick != null) {
+                val feedback = if (style.hoverFeedback) Modifier.couiFabFeedback(dark, interactionSource)
+                    else Modifier
+                feedback.clickable(
+                    interactionSource = interactionSource, indication = null, role = Role.Button, onClick = onClick,
+                )
+            } else Modifier
+            Icon(
+                imageVector = action.icon,
+                contentDescription = if (interactive) action.contentDescription else null,
+                modifier = Modifier.fillMaxSize().then(click).padding(16.dp),
+                tint = style.contentColor,
+            )
         }
     }
 }
@@ -416,7 +415,7 @@ private fun FloatingNode(
     dark: Boolean,
     shape: Shape,
     contentLayer: GraphicsLayer,
-    coloredFab: Boolean = false,
+    spotlight: SpotlightPreset = SpotlightPreset.OpaqueSmall2,
     lightColor: Color = Color.White,
     interactive: Boolean = true,
     expansion: CouiFabExpansion? = null,
@@ -429,9 +428,9 @@ private fun FloatingNode(
     }
     val (lightInput, drawLight) = rememberCouiSpotlight(
         interactive = interactive,
-        preset = if (coloredFab) SpotlightPreset.OpaqueSmall1 else SpotlightPreset.OpaqueSmall2,
+        preset = spotlight,
         dark = dark,
-        color = if (coloredFab) Color.White else lightColor,
+        color = lightColor,
     )
     Box(Modifier.width(width).height(56.dp).onGloballyPositioned(onBounds)) {
         Box(
@@ -459,9 +458,11 @@ private fun FloatingNode(
 private fun surface(
     bounds: Rect, motion: CouiTouchMotion, press: CouiPressMotion,
     cornerWeight: Float = 1f,
+    cornerRadius: Float? = null,
     touchMotionEnabled: Boolean = true,
 ): CouiFloatingSurface = CouiFloatingSurface(
     bounds.translate(Offset(motion.translationX.value, motion.translationY.value)),
     if (touchMotionEnabled) motion.scaleX.value + press.scale.value - 1f else 1f,
     if (touchMotionEnabled) motion.scaleY.value + press.scale.value - 1f else 1f, cornerWeight,
+    cornerRadius = cornerRadius,
 )

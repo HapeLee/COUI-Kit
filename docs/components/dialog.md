@@ -1,8 +1,8 @@
 # 弹窗
 
-`Dialog` 提供底部或居中显示的确认与警告弹窗，`InputDialog` 提供内置单行输入区的输入型弹窗，`LoadingDialog` 在任务执行期间显示居中的加载圆弧与提示文案。这些组件位于 `com.itos.coui.dialog`，显隐状态、文案、输入校验与业务提交均由宿主持有。
+`Dialog` 用于确认与警告，`SingleChoiceDialog` 用于从列表选择一项，`InputDialog` 用于单行输入，`LoadingDialog` 在任务执行时显示加载提示。这些组件位于 `com.itos.coui.dialog`，显隐状态、文案、输入校验与业务提交均由宿主持有。
 
-- **基础不透明弹窗（`Dialog`、`InputDialog`、`LoadingDialog`）**：支持库的最低系统版本（API 31+）。
+- **基础不透明弹窗**支持库的最低系统版本（API 31+）。
 - **半透明模糊材质与轮廓光**：要求 Android 13（API 33）及以上，并需要宿主提供不包含本弹窗的窗口背景源（`backdrop`）。
 
 ## 基本用法
@@ -104,6 +104,63 @@ fun MultiActionDialogExample(
 - **按钮排布规则**：两个短按钮自动横排（`dismissAction` 在左、`confirmAction` 在右）；单个按钮、三个按钮，或任意按钮文案在均分宽度下放不下时，自动转为竖排（自上而下依次为 `neutralAction`、`confirmAction`、`dismissAction`）。
 - **主操作与破坏性配色**：设置 `CouiDialogActionStyle.Primary` 时**必须**传入 `colors`（可通过 `CouiDialogDefaults.primaryActionColors(accent)` 创建），否则会抛出异常。`neutralAction` 默认使用破坏性文字色（`colors.destructive`），`enabled = false` 仅禁用对应按钮。
 - **正文滚动隔离**：`content` 位于正文可滚动区域内，操作按钮区独立固定在底部；正文较长时按钮仍保留在窗口内，不会滚出视口。若正文使用 Material 3 的 `Text` 等组件，宿主需自行声明 Material 3 依赖。
+
+### 自定义底部操作行
+
+需要一颗通栏按钮加两颗并排按钮时，使用 `actionRows` 重载。每行从布局起始侧开始排列，按钮均分该行可用宽度。受窗口宽度或字体大小影响时，放不下的行按声明顺序拆成竖排，操作区仍与正文滚动分开。
+
+~~~kotlin
+Dialog(
+    visible = visible,
+    onDismissRequest = onDismiss,
+    title = title,
+    message = message,
+    actionRows = listOf(
+        listOf(CouiDialogAction(
+            text = confirmLabel,
+            onClick = onConfirm,
+            style = CouiDialogActionStyle.Primary,
+            colors = CouiDialogDefaults.primaryActionColors(accent),
+        )),
+        listOf(
+            CouiDialogAction(cancelLabel, onDismiss),
+            CouiDialogAction(laterLabel, onLater),
+        ),
+    ),
+)
+~~~
+
+可声明 1 至 4 行，每行至少提供一个操作。宽度不足拆行后，实际显示的行数可能更多。按钮样式和配色由各自的 `CouiDialogAction` 指定，关闭弹窗由操作回调负责。`confirmAction`、`dismissAction` 与 `neutralAction` 属于自动排布重载。
+
+## 单选弹窗
+
+当设置项需要从多个候选值中选择时，可用 `SingleChoiceDialog` 保持标题和底部操作区固定，说明和选项共用滚动区。需要确认后再保存时，打开前将当前值复制到草稿，点选只更新草稿。
+
+~~~kotlin
+val close = { showChoices = false }
+SingleChoiceDialog(
+    visible = showChoices,
+    title = title,
+    message = description,
+    items = options,
+    selectedValue = draft,
+    onItemSelected = { draft = it },
+    onDismissRequest = close,
+    actionRows = listOf(listOf(
+        CouiDialogAction(cancelLabel, close),
+        CouiDialogAction(confirmLabel, {
+            currentValue = draft
+            close()
+        }),
+    )),
+)
+~~~
+
+- 用 `message` 在标题下、选项前补充说明。省略或传入空白文本时隐藏说明区。
+- 用 `CouiSingleChoiceItem(value, text)` 定义候选项。至少提供一项，选项值须唯一且稳定，文案须非空白。用 `icon` 添加行首图标，用 `enabled = false` 禁用该项。传 `selectedValue = null` 时初始无选中项。
+- `actionRows` 可声明 0 至 4 行操作，每行至少一个按钮。默认省略底部操作区。需要点选即保存时，可在 `onItemSelected` 中保存并关闭。
+- `onDismissRequest` 接收返回键和外点关闭请求。底部各按钮由自己的 `onClick` 决定行为，可复用同一个关闭回调。将组件留在组合中，用 `visible` 控制退场。
+- 默认在底部显示，宽屏宿主可传 `placement = CouiDialogPlacement.Center`。API 33+ 且有窗口背景源时默认启用模糊材质。传 `material = null` 可使用纯色表面。
 
 ## 输入型弹窗
 
@@ -242,7 +299,7 @@ fun HostPageWithDialogExample(
 
 - **版本与背景源校验**：当 `material != null` 时，系统低于 API 33 或未通过 `backdrop` / `ProvideCouiMenuBackdrop` 提供有效背景源会直接抛出异常。不支持材质时传入 `material = null`，使用不透明表面。`InputDialog` 与 `LoadingDialog` 使用相同的材质接入方式。
 - **背景源节点边界**：`Dialog` 必须放在 `windowSource` 修饰的页面内容节点之外，不能让弹窗自身进入背景源，也不要只在弹窗内部新建背景源来代替宿主背景。
-- **遮罩与采样压暗**：启用材质时，`colors.dimAmount` 同时控制窗口遮罩与面板采样的压暗强度（面板先压暗采样，再做模糊和混色）；窗口外遮罩由系统独立淡入淡出，不进入模糊采样。传入 `visible` 时，入场在窗口完成布局后开始，背景模糊采样与卡片当前帧位置、缩放实时同步。
+- 启用材质时，`colors.dimAmount` 同时控制窗口遮罩与面板采样的压暗强度。面板先压暗采样，再做模糊。底图恢复到面板尺寸后，先按 `mix` 的 alpha 逐通道混合 RGB，再执行 `blendMode`；若 `themeTint` 非透明，则在最后按库内固定强度执行保亮度染色（`Color.Transparent` 关闭，仅 `material != null` 时生效，不透明表面、白光轮廓及文字按钮不参与染色）。模糊等级为 `0` 时直接混色。窗口外遮罩由系统独立淡入淡出。传入 `visible` 时，入场在窗口完成布局后开始，背景模糊采样与卡片当前帧位置、缩放实时同步。参见[外观与预设](../guide/appearance.md#背景材质染色)。
 
 ## 位置、圆角与外观
 
@@ -260,6 +317,7 @@ fun HostPageWithDialogExample(
 | `dismissAction` / `neutralAction` | `null` | 可选取消与第三操作；`neutralAction` 默认使用破坏性文字色。 |
 | `placement` | `CouiDialogPlacement.Bottom` | 弹窗位置：底部（`Bottom`）或居中（`Center`）。 |
 | `material` / `backdrop` | `null` | API 33+ 背景材质配置与窗口背景源；`material` 非空时必须同时具备 API 33+ 与有效背景源。 |
+| `themeTint` | `CouiTheme.materialTintFor(dark)` | 模糊材质染色基准色，采用库内固定染色强度；传 `Color.Transparent` 关闭染色。仅 `material != null` 时生效，`material == null` 忽略。 |
 | `properties` | `usePlatformDefaultWidth = false` | `DialogProperties` 配置；`InputDialog` 额外要求保留 `decorFitsSystemWindows = true`。 |
 | `autoFocus` | `true` | 仅 `InputDialog` 可用；窗口获焦后自动请求输入焦点并弹出键盘。 |
 
@@ -272,5 +330,5 @@ fun HostPageWithDialogExample(
 
 ## 源码与完整示例
 
-- **公开入口与预设**：[Dialog.kt](../../coui/src/main/java/com/itos/coui/dialog/Dialog.kt)、[InputDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/InputDialog.kt)、[LoadingDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/LoadingDialog.kt)、[CouiDialogButton.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogButton.kt)、[CouiDialogDefaults.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogDefaults.kt)
+- **公开入口与预设** [Dialog.kt](../../coui/src/main/java/com/itos/coui/dialog/Dialog.kt)、[SingleChoiceDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/SingleChoiceDialog.kt)、[InputDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/InputDialog.kt)、[LoadingDialog.kt](../../coui/src/main/java/com/itos/coui/dialog/LoadingDialog.kt)、[CouiDialogButton.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogButton.kt)、[CouiDialogDefaults.kt](../../coui/src/main/java/com/itos/coui/dialog/CouiDialogDefaults.kt)
 - **Demo 完整示例**：[DemoDialogSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoDialogSamples.kt)、[DemoDialogInputSample.kt](../../demo/src/main/java/com/itos/coui/demo/DemoDialogInputSample.kt)

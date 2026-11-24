@@ -11,6 +11,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.itos.coui.menu.ProvideCouiMenuBackdrop
+import com.itos.coui.topappbar.ProvideCouiTopAppBarBlur
 
 class MainActivity : DemoHostActivity() {
     @androidx.compose.runtime.Composable
@@ -38,9 +39,11 @@ abstract class DemoHostActivity : ComponentActivity() {
                 }
             }
             DemoTheme(dark = dark, materialTheme = preferences.materialTheme) {
-                ProvideCouiMenuBackdrop(isolateContent = false) { windowSource ->
-                    Box(Modifier.fillMaxSize().then(windowSource)) {
-                        Page(dark, preferences)
+                ProvideCouiTopAppBarBlur(useComposeBlur = preferences.composeProgressiveBlur) {
+                    ProvideCouiMenuBackdrop(isolateContent = false) { windowSource ->
+                        Box(Modifier.fillMaxSize().then(windowSource)) {
+                            Page(dark, preferences)
+                        }
                     }
                 }
             }
