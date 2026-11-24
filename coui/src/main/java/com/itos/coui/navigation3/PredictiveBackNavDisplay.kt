@@ -2,6 +2,7 @@ package com.itos.coui.navigation3
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.view.RoundedCorner
 import android.view.View
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
@@ -352,6 +353,7 @@ private fun getDeviceCornerRadiusPx(
  * @return 系统公开 API 报告的圆角半径像素值, 不可用时返回 0。
  */
 private fun getWindowInsetsCornerRadiusPx(view: View): Int {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return 0
     val insets = view.rootWindowInsets ?: return 0
     return insets.getRoundedCorner(RoundedCorner.POSITION_TOP_LEFT)?.radius
         ?: insets.getRoundedCorner(RoundedCorner.POSITION_TOP_RIGHT)?.radius
