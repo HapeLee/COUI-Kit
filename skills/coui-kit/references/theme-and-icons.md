@@ -15,7 +15,7 @@ MaterialTheme(colorScheme = colors, typography = typography) {
 ### 角色映射与默认染色
 
 - `primary` → 强调色、菜单选中态；`Checkbox` 浅色 `primary`，深色 `inversePrimary`；`background` / `surfaceBright` → 页面底色 / 分组卡片底色。
-- M3 下 `Menu`、`NavigationBar`、`SearchBar`（API 34+）与材质 `BottomSheet` 默认用宿主 `surface` 做保亮度染色；传 `themeTint = Color.Transparent`（菜单用 `CouiMenuDefaults.style().copy(themeTint = Color.Transparent)`）关闭。`Fab` 取 `primary`，不叠加 `themeTint`。
+- M3 下 `Menu`、`NavigationBar`（胶囊与默认透明附件）、`SearchBar`（API 34+）与材质 `BottomSheet` 默认用宿主 `surface` 做保亮度染色；传 `themeTint = Color.Transparent`（菜单用 `CouiMenuDefaults.style().copy(themeTint = Color.Transparent)`）关闭。`NavigationBar` 顶层 `themeTint` 仅控制中间胶囊，透明附件染色由 `style.material.themeTint`（`transparentActionStyle(material = ...)`）控制；`Fab` 与有色附件 `coloredActionStyle()` 不叠加页面 `themeTint`。
 
 ## 配色排查
 

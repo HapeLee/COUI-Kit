@@ -18,7 +18,7 @@ TopAppBar 的 dark 默认同样读取 CouiTheme.isDark，防止只传 gradientCo
 
 TopAppBarButton 在原 Modifier 位置调用真正的 M3 minimumInteractiveComponentSize，恢复尺寸 Local 与 alignment lines；native 策略保留原规则。SearchButton 主线本就使用固定容器，因此保持固定尺寸，不受该 Local 控制。
 
-颜色映射由[适配器源码](../../../../coui-material3/src/main/java/com/itos/coui/material3/CouiMaterial3Style.kt)持有：菜单 selected 与 checkbox 角色分开，菜单模糊补底与无 Backdrop 容器分开。页面 background 与组件 surface 分开，分组卡片取 container，避免原生浅色页面与白色卡片混合，也避免为页面对比修改弹窗表面。菜单与 NavigationBar 仅把 host surface 送入既有页面色相层，透明显式关闭。默认 FAB 用 accent 材质与 onAccent 内容色，shadow 取最终 material.firstColor；显式 material 保留 ambient 内容色，不叠加页面 tint。NavigationBar 右附件仍固定白色。
+颜色映射由[适配器源码](../../../../coui-material3/src/main/java/com/itos/coui/material3/CouiMaterial3Style.kt)持有：菜单 selected 与 checkbox 角色分开，菜单模糊补底与无 Backdrop 容器分开。页面 background 与组件 surface 分开，分组卡片取 container，避免原生浅色页面与白色卡片混合，也避免为页面对比修改弹窗表面。菜单与 NavigationBar 的默认透明材质把 host surface 送入既有页面色相层，透明显式关闭。默认 FAB 用 accent 材质与 onAccent 内容色，shadow 取最终 material.firstColor；显式 material 保留 ambient 内容色，不叠加页面 tint。底栏附件独立从自身样式取图标颜色，有色样式默认白色，见[底栏独立附件](2026-11-24-navigation-bar-independent-actions.md)。
 
 菜单项与头部标签分别采用 M3 labelLarge 与 bodySmall，与用户指定的 Metric 菜单角色一致；普通内容继续采用 bodyLarge。原生菜单排版按同一基准调整，具体参数只由 CouiTypography 持有。
 

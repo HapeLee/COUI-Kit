@@ -60,4 +60,4 @@ Demo 二级页统一使用 `LargeTopAppBar`（参考的原厂设置二级页使�
 | `Switch` | 轨道和滑块采用平滑胶囊轮廓，滑块拉伸时保持平滑几何。 | 参考实现的滑块使用普通 `drawRoundRect`。见[开关依据](../../.agents/notes/implemented/feature/2026-10-27-coui-switch.md)。 |
 | `Switch` | 触摸取消（`CANCEL`）时不提交候选值，恢复宿主提供的 `checked`。 | 参考实现的 `CompoundButton` 在 `CANCEL` 后可能吸附并改变值；本库采用受控状态约定。见[开关依据](../../.agents/notes/implemented/feature/2026-10-27-coui-switch.md)。 |
 | `CalendarPicker` | 新选中日期的数字与选中圆同步放大，文字不额外淡入淡出。 | Calendar 17.3.70 的参考绘制仅改变圆半径和透明度，数字字号固定。见[月历依据](../../.agents/notes/implemented/feature/2026-11-01-coui-pickers.md)。 |
-| `NavigationBar` | 透明附件使用减弱后的投影强度。 | 仅针对底栏透明附件，不扩展到独立 `Fab`。见 [NavigationBar](../../coui/src/main/java/com/itos/coui/navigation/NavigationBar.kt) 与[投影依据](../../.agents/notes/implemented/bug-fix/2026-10-18-coui-native-shadow.md)。 |
+| `NavigationBar` | 透明附件使用减弱后的投影强度。 | 仅针对底栏透明附件，不扩展到独立 `Fab`。见 [CouiNavigationBarDefaults](../../coui/src/main/java/com/itos/coui/navigation/CouiNavigationBarDefaults.kt) 与[投影依据](../../.agents/notes/implemented/bug-fix/2026-10-18-coui-native-shadow.md)。 |

@@ -2,6 +2,10 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
+## 未发布
+
+- `NavigationBar` 使用 `leftAction`、`rightAction` 独立配置两侧按钮。将原来的图标、描述、显隐与点击参数移入各自的 `CouiNavigationBarAction`，将 `rightContainerColor` 传给 `coloredActionStyle(containerColor = …)`，将 `circleShape` 移入各侧的 `style.shape`。两侧默认透明。中间胶囊统一使用 `CouiCapsuleShape`，升级时删除 `capsuleShape` 实参。中间胶囊的 `material`、`lightColor` 和 `themeTint` 只作用于胶囊。 [底栏用法](docs/components/navigation-bar.md#左右附件)
+
 ## [0.0.1-alpha18] - 2026-11-24
 
 ### 新增与改进

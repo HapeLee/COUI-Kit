@@ -38,6 +38,8 @@ import com.itos.coui.effect.couiNavigationFeedback
 import com.itos.coui.floatingactionbutton.CouiFabColor
 import com.itos.coui.floatingactionbutton.CouiFabDefaults
 import com.itos.coui.navigation.NavigationBar
+import com.itos.coui.navigation.CouiNavigationBarAction
+import com.itos.coui.navigation.CouiNavigationBarDefaults
 import com.itos.coui.navigation.CouiNavigationItem
 import com.itos.coui.search.SearchBar
 import com.itos.coui.search.rememberCouiSearchBarState
@@ -140,12 +142,22 @@ private fun DemoHome(dark: Boolean, preferences: DemoPreferences, onToggleTheme:
                             items = titles.mapIndexed { index, title ->
                                 CouiNavigationItem(title = title, icon = navigation[index], selectedIcon = selectedNavigation[index])
                             },
-                            selectedIndex = page, leftIcon = CouiIcons.Filled.DarkLight, leftDescription = stringResource(R.string.toggle_theme),
-                            rightIcon = CouiIcons.Filled.Add, rightDescription = stringResource(R.string.catalog_fab),
-                            leftVisible = leftAccessory, rightVisible = rightAccessory,
-                            onLeftClick = onToggleTheme, onRightClick = { openPage("fab") }, rightContainerColor = color,
-                            dark = dark, lightColor = Color.White,
-                            circleShape = DemoShapes.couiCircle, capsuleShape = DemoShapes.couiCapsule, onSelection = selectPage,
+                            selectedIndex = page,
+                            leftAction = CouiNavigationBarAction(
+                                icon = CouiIcons.Filled.DarkLight,
+                                contentDescription = stringResource(R.string.toggle_theme),
+                                onClick = onToggleTheme,
+                                visible = leftAccessory,
+                            ),
+                            rightAction = CouiNavigationBarAction(
+                                icon = CouiIcons.Filled.Add,
+                                contentDescription = stringResource(R.string.catalog_fab),
+                                onClick = { openPage("fab") },
+                                visible = rightAccessory,
+                                style = CouiNavigationBarDefaults.coloredActionStyle(color, dark),
+                            ),
+                            dark = dark,
+                            onSelection = selectPage,
                         )
                     }
                 } else PlainDemoBottomBar(titles, navigation, selectedNavigation, page, selectPage, dark)

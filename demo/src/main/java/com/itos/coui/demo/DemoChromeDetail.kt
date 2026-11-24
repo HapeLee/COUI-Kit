@@ -28,6 +28,8 @@ import com.itos.coui.icons.CouiIcons
 import com.itos.coui.layout.CouiPageDefaults
 import com.itos.coui.layout.Divider
 import com.itos.coui.layout.Group
+import com.itos.coui.navigation.CouiNavigationBarAction
+import com.itos.coui.navigation.CouiNavigationBarDefaults
 import com.itos.coui.navigation.CouiNavigationItem
 import com.itos.coui.navigation.NavigationBar
 import com.itos.coui.text.CouiTextKind
@@ -69,12 +71,22 @@ private fun NavigationSample(dark: Boolean) {
                         CouiNavigationItem(title = titles[1], icon = DemoIcons.Effects, selectedIcon = DemoIcons.EffectsSelected),
                         CouiNavigationItem(title = titles[2], icon = DemoIcons.Settings, selectedIcon = DemoIcons.SettingsSelected)),
                     selectedIndex = selected, onSelection = { selected = it },
-                    leftIcon = CouiIcons.Filled.SettingDetail, leftDescription = stringResource(R.string.nav_left_description),
-                    rightIcon = CouiIcons.Filled.Add, rightDescription = stringResource(R.string.nav_right_description),
-                    leftVisible = left, rightVisible = right,
-                    rightContainerColor = CouiFabDefaults.containerColor(CouiFabColor.Notes, dark),
-                    dark = dark, lightColor = Color.White,
-                    circleShape = DemoShapes.couiCircle, capsuleShape = DemoShapes.couiCapsule)
+                    leftAction = CouiNavigationBarAction(
+                        icon = CouiIcons.Filled.SettingDetail,
+                        contentDescription = stringResource(R.string.nav_left_description),
+                        visible = left,
+                        style = CouiNavigationBarDefaults.coloredActionStyle(
+                            containerColor = CouiFabDefaults.containerColor(CouiFabColor.Notes, dark),
+                            dark = dark,
+                        ),
+                    ),
+                    rightAction = CouiNavigationBarAction(
+                        icon = CouiIcons.Filled.Add,
+                        contentDescription = stringResource(R.string.nav_right_description),
+                        visible = right,
+                    ),
+                    dark = dark,
+                )
             }
         }
         if (Build.VERSION.SDK_INT < 34) DemoPreference(title = stringResource(R.string.requires_api_34), enabled = false)

@@ -69,12 +69,27 @@ CollapsingTopAppBar(state = behavior.state, searchState = search, backdrop = bac
 
 ## NavigationBar
 
-**API 34+**。放入 COUI `Scaffold.bottomBar`，勿叠 `navigationBarsPadding()`：`NavigationBar(items = items, selectedIndex = index, onSelection = onNav)`（`CouiNavigationItem` 配对 `Outlined`/`Filled` 图标）。
+**API 34+**。放入 COUI `Scaffold.bottomBar`，勿叠 `navigationBarsPadding()`：
+
+```kotlin
+NavigationBar(
+    items = items, selectedIndex = index, onSelection = onNav,
+    leftAction = CouiNavigationBarAction(themeIcon, themeDesc, visible = showLeft, onClick = onToggleTheme),
+    rightAction = CouiNavigationBarAction(addIcon, addDesc, visible = showRight, onClick = onAdd,
+        style = CouiNavigationBarDefaults.coloredActionStyle()),
+)
+```
+
+- 省略 `style` 默认使用透明附件；`coloredActionStyle()` 省略 `containerColor` 即跟随主题强调色；`onClick` 可为 `null`（只保留拖拽与按压光效）。
+- 中间胶囊固定 `CouiCapsuleShape`，由顶层 `material` / `themeTint` / `lightColor` 控制；左右附件各自通过 `CouiNavigationBarAction.style` 控制。
 
 ### 避坑
 
-- API 31–33 或 `CouiFloatingRenderer()` 构造失败时，同槽位回退宿主普通底栏；切页保持底栏与 `renderer` 处于稳定组合位置。
-- `items` 非空且 `selectedIndex` 有效；`leftVisible`/`rightVisible` 为真时，对应图标和无障碍描述**须同时非空**。勿对图标预乘状态透明度。
+- **顶层 `material` / `themeTint` 不作用于透明附件**：它们只影响中间胶囊；透明附件需同步材质或关闭染色时，传 `style = CouiNavigationBarDefaults.transparentActionStyle(material = customMaterial)`。
+- **附件收起动画 vs 立即移除**：播收起动画须保留 `CouiNavigationBarAction` 实例并将 `visible = false`；传 `null` 会立即移除并释放动画。
+- **自定义附件样式**：`CouiNavigationBarActionStyle.shape` 须使用 `CouiShape`，`shadow` 须同步读取 `LocalCouiContourGlowEnabled.current`。
+- **门槛与稳定位置**：API 31–33 或 `CouiFloatingRenderer()`（**不可用 `standalone()`**）创建失败时同槽位回退宿主普通底栏；切页保持底栏与 `renderer` 处于稳定组合位置。
+- `items` 非空且 `selectedIndex` 有效；勿对图标预乘状态透明度。
 
 ## Fab
 

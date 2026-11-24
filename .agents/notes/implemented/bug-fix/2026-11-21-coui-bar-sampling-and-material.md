@@ -10,7 +10,7 @@ Status: implemented
 
 完整顶栏使用 AppBarBlurHelper 的固定像素半径和全高曲线。背景遮罩使用[独立的透明度曲线](2026-10-18-coui-topbar-gradient-blur.md#decision)。低层 TopAppBarSurface 继续通过公开参数配置固定长度或全高模糊。浮动顶栏按钮和顶栏搜索的默认 Style 使用 ToolbarMaterialEffectResolver 的 TOP_BAR 材质，采样已完成渐进处理的背景。宿主显式使用的旧混色预设仍由 CouiTopAppBarButtonDefaults.material 提供。
 
-底栏主体与无色附件使用 FRAMEWORK_BOTTOM_BAR。深浅色各用自己的两层滤镜。独立 FAB 和项目的右侧有色附件使用 FRAMEWORK_FAB。COUIFloatingButton 将默认主题色的 alpha 与显式 ColorStateList 分开处理，库同样只在默认主题色入口应用主题 alpha。项目右侧保留有色附件的装配及白色图标。
+底栏主体与默认透明附件使用 FRAMEWORK_BOTTOM_BAR。深浅色各用自己的两层滤镜。独立 FAB 和底栏有色附件样式使用 FRAMEWORK_FAB。COUIFloatingButton 将默认主题色的 alpha 与显式 ColorStateList 分开处理，库同样只在默认主题色入口应用主题 alpha。有色附件样式默认用白色图标，可以装配到任一侧，见[底栏独立附件](../architecture/2026-11-24-navigation-bar-independent-actions.md)。
 
 设置式搜索使用零半径 TOP_BAR 材质。与零半径顶栏按钮一样，背景采样和混色仍有可见输出。显式 backdrop 覆盖作用域默认源。搜索的转场前景模糊继续由前景内容层承载。共享绘制节点的双胶囊按现有顺序读取前面已绘制的图层，输出继续使用前景 SrcOver。这样可读取下层胶囊，又可避免输出矩形覆盖兄弟节点。
 
