@@ -686,7 +686,7 @@ private fun <T> CouiMenuRow(
     val selectedColor = LocalCouiMenuStyle.current.colors.primary
     val onSurfaceColor = LocalCouiMenuStyle.current.colors.onSurface
     val textColor = when {
-        !item.enabled -> onSurfaceColor.copy(alpha = 0.38f)
+        !item.enabled -> onSurfaceColor.copy(alpha = CouiMenuDefaults.disabledContentAlpha)
         item.selected -> selectedColor
         else -> onSurfaceColor
     }

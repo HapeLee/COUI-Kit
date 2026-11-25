@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ import com.itos.coui.backdrop.CouiBackdrop
 import com.itos.coui.backdrop.LocalCouiBackdrop
 import com.itos.coui.effect.CouiFloatingRenderer
 import com.itos.coui.menu.CouiMenuAnchor
+import com.itos.coui.menu.CouiMenuDefaults
 import com.itos.coui.menu.CouiMenuItem
 import com.itos.coui.menu.Menu
 import com.itos.coui.menu.ProvideCouiMenuBackdrop
@@ -50,6 +53,8 @@ data class CouiFloatingToolbarItem<T : Any>(
 )
 
 private object OverflowKey
+
+private class ToolbarAction(val item: State<CouiFloatingToolbarItem<*>>, val onClick: () -> Unit)
 
 /** COUIResponsiveUtils 的工具组外边距。宽屏横置手机和较窄的竖屏折叠设备仍走中屏分支。 */
 internal fun toolbarMarginDp(width: Float, height: Float): Int = when {
@@ -100,33 +105,33 @@ fun <T : Any> FloatingToolbar(
             toolbarDirectCount(items.size, available, CouiFloatingToolbarDefaults.itemSize.roundToPx(),
                 CouiFloatingToolbarDefaults.itemSpacing.roundToPx())
         }
-        val directItems = items.take(direct).associateBy { it.value }
+        val currentOnClick by rememberUpdatedState(onItemClick)
+        // 连续显示的同一动作可更新内容。移除再添加会创建新绑定，退出批次仍持有旧绑定。
+        val directItems = items.take(direct).map { item ->
+            key(item.value) {
+                val currentItem = rememberUpdatedState(item)
+                remember { ToolbarAction(currentItem) { currentOnClick(currentItem.value.value) } }
+            }
+        }
         val overflow = items.drop(direct)
         val group = ToolbarGroup(buildList {
-            addAll(directItems.keys)
+            addAll(directItems)
             if (overflow.isNotEmpty()) add(OverflowKey)
         }, items.size > 1)
         val animation = rememberToolbarAnimation()
         val batch = animation.batch
-        // 退出项和排队中的项保留业务数据。可组合的图标节点只在稳定 ID 的作用域内创建。
-        val retained = remember { mutableMapOf<Any, CouiFloatingToolbarItem<T>>() }
-        val bindings = retained + directItems
-        SideEffect {
-            retained.putAll(directItems)
-            animation.submit(group)
-            if (animation.batch.from == animation.batch.to) retained.keys.retainAll(directItems.keys)
-        }
+        SideEffect { animation.submit(group) }
         ToolbarSurface(Modifier.fillMaxWidth(), visible, backdrop, renderer, style, animation, batch) {
             for (id in batch.order) key(id) {
                 val active = visible && id in batch.target && id in group.ids
-                if (id === OverflowKey) {
-                    ToolbarOverflowButton(overflow, active, backdrop, onItemClick)
-                } else {
-                    val item = bindings.getValue(id)
-                    ToolbarButton(Modifier.toolbarItem(id, true), { onItemClick(item.value) }, item.enabled, active) {
+                if (id is ToolbarAction) {
+                    val item = id.item.value
+                    ToolbarButton(Modifier.toolbarItem(id, true), id.onClick, item.enabled, active) {
                         CouiIcon(Modifier.size(CouiFloatingToolbarDefaults.iconSize), item.icon, item.label,
-                            tint = item.iconTint ?: CouiTheme.contentColor)
+                            tint = if (item.enabled) item.iconTint ?: CouiTheme.contentColor else CouiTheme.contentColor)
                     }
+                } else {
+                    ToolbarOverflowButton(overflow, active, backdrop, onItemClick)
                 }
             }
         }
@@ -160,6 +165,7 @@ private fun <T : Any> ToolbarOverflowButton(
             ProvideCouiMenuBackdrop(rememberCouiWindowBackdrop() ?: backdrop) {
                 Menu(
                     expanded = open,
+                    style = CouiMenuDefaults.style(LocalCouiFloatingToolbarStyle.current.dark),
                     anchor = anchor,
                     onDismissRequest = { open = false },
                     items = items.map {

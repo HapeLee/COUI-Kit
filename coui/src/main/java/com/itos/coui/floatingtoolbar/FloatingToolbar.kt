@@ -14,19 +14,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.isSpecified
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
@@ -46,6 +50,7 @@ import com.itos.coui.effect.SpotlightPreset
 import com.itos.coui.effect.couiFloatingSurface
 import com.itos.coui.effect.couiToolbarFeedback
 import com.itos.coui.effect.rememberCouiSpotlight
+import com.itos.coui.menu.CouiMenuDefaults
 import com.itos.coui.motion.couiPressMotion
 import com.itos.coui.motion.couiTouchMotion
 import com.itos.coui.motion.rememberCouiPressMotion
@@ -109,6 +114,20 @@ internal fun ToolbarSurface(
     } else style.shape
     val cornerRadius = with(LocalDensity.current) { (shape as? CouiShape)?.radius?.toPx() }
     val visibility = rememberCouiScaleVisibility(visible)
+    val inputSession by rememberUpdatedState(if (visible) remember { Any() } else null)
+    // 手势从按下所属的显示周期开始，期间收起过，即使已经重显也不能提交旧手势。
+    val input = Modifier.pointerInput(Unit) {
+        awaitPointerEventScope {
+            var pressed = false
+            var session: Any? = null
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                if (!pressed) session = inputSession
+                if (session == null || session !== inputSession) event.changes.forEach { it.consume() }
+                pressed = event.changes.any { it.pressed }
+            }
+        }
+    }
     val motion = rememberCouiTouchMotion(visible)
     val press = rememberCouiPressMotion()
     val (lightInput, drawLight) = rememberCouiSpotlight(interactive = visible,
@@ -122,7 +141,9 @@ internal fun ToolbarSurface(
     }
     // 编辑器负责导航栏和 IME 的避让。此处只保留工具区自身的高度。
     Layout(modifier = modifier.height(76.dp), content = {
-        Box(Modifier.couiFloatingSurface(backdrop, renderer, style.material, style.shadow, shape,
+        Box(Modifier.then(input).then(if (visible) Modifier else Modifier.clearAndSetSemantics {}
+            .focusProperties { canFocus = false }.onPreviewKeyEvent { true })
+            .couiFloatingSurface(backdrop, renderer, style.material, style.shadow, shape,
             contentLayer, style.contourGlowEnabled) {
             val x = motion.translationX.value
             val y = motion.translationY.value
@@ -160,7 +181,6 @@ internal fun ToolbarSurface(
                         .clip(shape).drawBehind { drawLight?.invoke(this) },
                     animation = animation,
                     listBatch = listBatch,
-                    present = visibility.isPresent,
                     onGeometry = { w, h, n ->
                         width = w
                         height = h
@@ -175,6 +195,7 @@ internal fun ToolbarSurface(
         val hostWidth = constraints.constrainWidth(capsule.width)
         val hostHeight = constraints.constrainHeight(capsule.height)
         layout(hostWidth, hostHeight) {
+            if (!visibility.isPresent) return@layout
             // 原厂居中对齐的是当帧背景的浮点边界，整数布局坐标只在最后一次摆放时量化。
             val left = (hostWidth - width) / 2f
             val integerLeft = left.roundToInt()
@@ -218,7 +239,8 @@ internal fun ToolbarButton(
         else Modifier.clearAndSetSemantics {}
     Box(modifier.height(CouiFloatingToolbarDefaults.itemHeight).widthIn(min = CouiFloatingToolbarDefaults.itemSize)
         .then(input), contentAlignment = Alignment.Center) {
-        val color = if (enabled) style.contentColor else Color(if (style.dark) 0x4DFFFFFF else 0x42000000)
+        val color = if (enabled) style.contentColor else
+            CouiTheme.colorSchemeFor(style.dark).onSurface.copy(alpha = CouiMenuDefaults.disabledContentAlpha)
         if (color.isSpecified) ProvideCouiContent(color = color) { content() }
         else content()
     }

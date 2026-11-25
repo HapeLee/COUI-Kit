@@ -115,6 +115,7 @@ Fab(onClick = onAdd, material = CouiFabDefaults.material(c, dark),
 ## TopAppBarSearch 与 SearchBar
 
 - `TopAppBarSearch`（**API 34+**）：放 `TopAppBar` `title` 槽 + `actions` 槽放 `TopAppBarSearchButton`，共用 `rememberCouiTopAppBarSearchState(expanded)`；`BackHandler(expanded)` 与取消按钮共用关闭逻辑（清查询、收键盘）。低版本改用 `SearchBar` 或宿主入口。
+- **顶栏操作间距**由宿主设置，`TopAppBarButtonGroup` 将按钮向末端排列。需要等距时，以按钮的可见表面为准。搜索按钮占宽 `48.dp`，圆形表面宽 `40.dp`。用 `TopAppBarSearchAction(visibleWhileSearching = true)` 保留分类按钮时，可用 `Modifier.padding(start = if (expanded) 0.dp else 4.dp)` 补齐收起态中搜索与分类的间距，展开搜索时收回这段留白。`4.dp` 为宿主示例值。
 - `SearchBar`（API 31–33 填色，API 34+ 浮动材质）：结果层盖原列表时保留底层滚动并停用底层交互与无障碍焦点。
 - **避坑**：两者内置搜索图标，勿再放放大镜。
 

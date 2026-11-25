@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import kotlin.math.roundToInt
 
 private data class ToolbarSlot(
@@ -48,17 +49,30 @@ private object ToolbarRowScope : RowScope {
     override fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int) = slot { copy(line = alignmentLineBlock) }
 }
 
+private class ToolbarWidths {
+    val measured = mutableMapOf<Any, Int>()
+    var before: Map<Any, Int> = emptyMap()
+        private set
+    private var batch: ToolbarItems? = null
+
+    fun begin(next: ToolbarItems) {
+        if (batch === next) return
+        batch = next
+        // 同一批的起点保持不变，后续帧只更新当帧测量值。
+        before = if (next.from == next.to) emptyMap() else measured.toMap()
+    }
+}
+
 @Composable
 internal fun ToolbarLayout(
     modifier: Modifier,
     animation: ToolbarAnimation,
     listBatch: ToolbarItems?,
-    present: Boolean,
     onGeometry: (Float, Int, Int) -> Unit,
     content: @Composable RowScope.() -> Unit,
 ) {
     // 直接移走的自定义槽位可能已经离开组合，保留其上次测得的宽度直到本批结算。
-    val widths = remember { mutableMapOf<Any, Int>() }
+    val widths = remember { ToolbarWidths() }
     Layout(modifier = modifier, content = { ToolbarRowScope.content() }) { measurables, constraints ->
         val slots = measurables.map { it.parentData as? ToolbarSlot ?: ToolbarSlot() }
         val ids = measurables.mapIndexed { index, measurable -> slots[index].id ?: measurable }
@@ -66,6 +80,8 @@ internal fun ToolbarLayout(
         val itemCount = slots.count { it.visible && it.id != null }
         if (listBatch == null) animation.submit(ToolbarGroup(target, itemCount > 1))
         val batch = listBatch ?: animation.batch
+        widths.begin(batch)
+        val progress = animation.fraction(batch)
         val defaults = CouiFloatingToolbarDefaults
         val spacing = defaults.itemSpacing.roundToPx()
         val inset = defaults.edgeInset.roundToPx()
@@ -75,43 +91,51 @@ internal fun ToolbarLayout(
         val hasButtons = slots.any { it.id != null }
         val rowSpacing = if (hasButtons) spacing else 0
         val rowInset = if (hasButtons) inset else 0
-        var remaining = (constraints.maxWidth - (itemCount - 1).coerceAtLeast(0) * rowSpacing -
-            (if (itemCount > 1) 2 * rowInset else 0)).coerceAtLeast(0)
-        var weight = 0f
+        val targetButtons = slots.indices.count { slots[it].id != null && ids[it] in batch.target }
+        var remaining = (constraints.maxWidth - (targetButtons - 1).coerceAtLeast(0) * rowSpacing -
+            (if (batch.to.hasInset) 2 * rowInset else 0)).coerceAtLeast(0)
+        var totalWeight = 0.0
         for ((i, measurable) in measurables.withIndex()) {
-            if (slots[i].weight > 0f && constraints.hasBoundedWidth && ids[i] in target) {
-                weight += slots[i].weight
-            } else {
-                val maxWidth = if (listBatch == null && slots[i].visible && constraints.hasBoundedWidth) remaining
-                    else childConstraints.maxWidth
-                val child = measurable.measure(childConstraints.copy(maxWidth = maxWidth))
-                children[i] = child
-                if (slots[i].visible) remaining = (remaining - child.width).coerceAtLeast(0)
+            val id = ids[i]
+            val inTarget = id in batch.target
+            if (slots[i].weight > 0f && constraints.hasBoundedWidth && inTarget) {
+                totalWeight += slots[i].weight
+                continue
             }
+            val previous = if (!inTarget && id in batch.old) widths.before[id]?.coerceAtMost(constraints.maxWidth) else null
+            val maxWidth = if (listBatch == null && inTarget && constraints.hasBoundedWidth) remaining else constraints.maxWidth
+            val child = measurable.measure(childConstraints.copy(minWidth = previous ?: 0, maxWidth = previous ?: maxWidth))
+            children[i] = child
+            if (inTarget) remaining = (remaining - child.width).coerceAtLeast(0)
         }
+        var cumulativeWeight = 0.0
+        var allocated = 0
         for (i in ids.indices) {
             if (children[i] == null) {
-                val share = (remaining * (slots[i].weight / weight)).roundToInt().coerceIn(0, remaining)
-                remaining -= share
-                weight -= slots[i].weight
+                cumulativeWeight += slots[i].weight
+                val end = (remaining * (cumulativeWeight / totalWeight)).roundToInt()
+                val share = end - allocated
+                allocated = end
+                val start = if (ids[i] in batch.old) widths.before[ids[i]] else null
+                val width = if (start == null) share else
+                    lerp(start, share, progress.coerceIn(0f, 1f)).coerceAtMost(constraints.maxWidth)
                 children[i] = measurables[i].measure(childConstraints.copy(
-                    minWidth = if (slots[i].fill) share else 0, maxWidth = share,
+                    minWidth = if (slots[i].fill) width else 0, maxWidth = width,
                 ))
             }
-            widths[ids[i]] = checkNotNull(children[i]).width
+            widths.measured[ids[i]] = checkNotNull(children[i]).width
         }
         // 排队中的自定义槽位可能先离开组合，待整条队列结算后再释放其测量值。
-        if (batch.from == batch.to) widths.keys.retainAll(ids.toSet())
+        if (batch.from == batch.to) widths.measured.keys.retainAll(ids.toSet())
         val plain = measurables.indices.filter { slots[it].id == null }.mapTo(mutableSetOf()) { ids[it] }
         val buttons = if (plain.isEmpty()) null else batch.order.toSet() - plain
-        val frame = batch.frame(widths, rowSpacing, rowInset, animation.fraction(batch), animation.gapFraction(batch),
+        val frame = batch.frame(widths.measured, rowSpacing, rowInset, progress, animation.gapFraction(batch),
             layoutDirection == LayoutDirection.Rtl, buttons, 16.dp.roundToPx())
         val width = constraints.constrainWidth(frame.width.roundToInt())
         onGeometry(frame.width, height, batch.target.size)
         val lines = slots.mapIndexed { i, slot -> slot.line?.invoke(checkNotNull(children[i])) }
         val baseline = lines.filterNotNull().filter { it != AlignmentLine.Unspecified }.maxOrNull() ?: 0
         layout(width, height) {
-            if (!present) return@layout
             for ((i, id) in ids.withIndex()) {
                 val position = frame.items[id] ?: continue
                 if (position.scale <= 0f) continue
