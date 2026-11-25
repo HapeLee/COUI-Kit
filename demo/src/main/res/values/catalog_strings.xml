@@ -92,12 +92,13 @@
     <string name="catalog_fab">Floating action button</string>
     <string name="catalog_floating_toolbar">Floating toolbar</string>
     <string name="intro_floating_toolbar">Host any number of actions on one glass capsule; icons keep their own colors and can be disabled.</string>
+    <string name="floating_toolbar_favorite">Favorite</string>
+    <string name="floating_toolbar_share">Share</string>
+    <string name="floating_toolbar_visible">Show toolbar</string>
     <string name="floating_toolbar_enabled">Enable actions</string>
     <string name="floating_toolbar_actions_count">%1$d actions</string>
-    <string name="floating_toolbar_multi_select">Multi-select group</string>
-    <string name="floating_toolbar_group_count">%1$d selected</string>
-    <string name="floating_toolbar_controls_hint">The checklist opens below its row and stays open after each tap, keeping the preview above it; use the switch below to see the capsule shrink and grow.</string>
-    <string name="floating_toolbar_multi_visible">Show selected actions</string>
+    <string name="floating_toolbar_visible_icons">Choose visible icons</string>
+    <string name="floating_toolbar_selected_count">%1$d / %2$d</string>
     <string name="floating_toolbar_edit">AI edit</string>
     <string name="floating_toolbar_check">Mark as done</string>
     <string name="floating_toolbar_voice">Voice input</string>

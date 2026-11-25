@@ -91,6 +91,10 @@ NavigationBar(
 - **门槛与稳定位置**：API 31–33 或 `CouiFloatingRenderer()`（**不可用 `standalone()`**）创建失败时同槽位回退宿主普通底栏；切页保持底栏与 `renderer` 处于稳定组合位置。
 - `items` 非空且 `selectedIndex` 有效；勿对图标预乘状态透明度。
 
+## FloatingToolbar
+
+编辑页底部的悬浮操作可放在 Scaffold 的 bottomBar 中。调用 `FloatingToolbar(items = actions, onItemClick = onAction, visible = showBar)`，各项使用稳定的 `CouiFloatingToolbarItem.value`。收起时保留组合，列表增删和宽度不足时的“更多操作”由组件处理。[悬浮操作栏](../../../docs/components/floating-toolbar.md)
+
 ## Fab
 
 **API 34+**。放 `Scaffold.floatingActionButton`；默认强调色省略 `material`/`shadow`。指定颜色时须用同一 `color` 配对传入：

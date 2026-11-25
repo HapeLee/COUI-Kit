@@ -117,7 +117,7 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 
 ## 内容插槽与最小交互尺寸
 
-- **M3 插槽 Local 桥接**：启用 `CouiMaterial3Style` 后，`TopAppBarButton`、搜索表面、`ChipTab`、`Fab` 与 `FloatingToolbar` 操作项的内容插槽会自动提供 M3 内容 Local，直接放置 M3 `Text`、`Icon` 即可继承颜色与文字样式。`FloatingToolbar` 的内容色默认取 `onSurface` 的 80%，显式传入 `Color.Unspecified` 时不提供。
+- **M3 插槽 Local 桥接**：启用 `CouiMaterial3Style` 后，`TopAppBarButton`、搜索表面、`ChipTab`、`Fab` 与 `FloatingToolbar` 操作项的内容插槽会自动提供 M3 内容 Local，直接放置 M3 `Text`、`Icon` 即可继承颜色与文字样式。
   - 组件局部 `TextStyle` 按 M3 `ProvideTextStyle` 顺序与宿主 ambient 样式合并；`CouiTheme` 的完整基线则会替换外层样式。
   - 子 `Text` 的显式颜色/样式、子 `Icon` 的 `tint` 以及内层 Local 始终优先。
   - 未启用 `coui-material3` 却在纯原生插槽中使用 M3 `Text`/`Icon` 时，需由宿主自行桥接 M3 内容 Local。

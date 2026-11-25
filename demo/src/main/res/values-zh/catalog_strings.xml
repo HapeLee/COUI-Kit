@@ -89,12 +89,13 @@
     <string name="catalog_fab">浮动操作按钮</string>
     <string name="catalog_floating_toolbar">悬浮操作栏</string>
     <string name="intro_floating_toolbar">同一条玻璃胶囊可放置任意数量的操作，图标保持自身配色，并可切换不可用状态。</string>
+    <string name="floating_toolbar_favorite">收藏</string>
+    <string name="floating_toolbar_share">分享</string>
+    <string name="floating_toolbar_visible">显示工具栏</string>
     <string name="floating_toolbar_enabled">启用操作</string>
     <string name="floating_toolbar_actions_count">%1$d 个操作</string>
-    <string name="floating_toolbar_multi_select">多选分组</string>
-    <string name="floating_toolbar_group_count">已选 %1$d 项</string>
-    <string name="floating_toolbar_controls_hint">勾选菜单固定在入口行下方展开、提交后保持展开，预览始终留在上方；配合下方开关可看到胶囊按列数收放。</string>
-    <string name="floating_toolbar_multi_visible">显示已选操作</string>
+    <string name="floating_toolbar_visible_icons">选择显示的图标</string>
+    <string name="floating_toolbar_selected_count">%1$d / %2$d</string>
     <string name="floating_toolbar_edit">AI 编辑</string>
     <string name="floating_toolbar_check">标记完成</string>
     <string name="floating_toolbar_voice">语音输入</string>

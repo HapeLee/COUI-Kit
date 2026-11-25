@@ -126,6 +126,7 @@ fun <T : Any> SingleChoiceDialog(
                     colors = colors,
                     dark = dark,
                     material = material != null,
+                    themeTint = themeTint,
                     interactive = visible,
                 )
             }

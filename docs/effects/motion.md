@@ -1,12 +1,28 @@
 # 运动与跟随回弹
 
-需要在自定义绘制中复用 COUI 动效时，使用运动状态工厂及输入 Modifier。它们只观察触摸或位移状态并输出只读 `State<Float>`，不接管业务点击、滚动或提交。
+使用运动状态工厂及输入 Modifier，可以在自定义绘制中复用 COUI 动效。宿主负责显示目标、业务点击、滚动和提交。
 
 - **平台门槛**：支持库最低系统版本（**API 31+**）。
 - **公开入口**：
+  - **缩放显隐**：`rememberCouiScaleVisibility` + `Modifier.couiScaleVisibility`。
   - **双主体跟随回弹**：`rememberCouiMetaballFollowingTranslation`（预设来自 `CouiSwipeRevealDefaults`）。
   - **触摸形变与拉伸**：`rememberCouiTouchMotion` + `Modifier.couiTouchMotion`（底层手动类 `CouiTouchMotion`）。
   - **普通按压缩放**：`rememberCouiPressMotion` + `Modifier.couiPressMotion`（底层手动类 `CouiPressMotion`）。
+
+## 缩放显隐
+
+工具栏或浮动内容出现时从较小的尺寸放大并回弹，收起时向中心缩小并淡出。宿主改变 `visible` 即可触发动画。在绘制阶段读取倍率和透明度，让整个主体一起变化。
+
+~~~kotlin
+val motion = rememberCouiScaleVisibility(visible = showBar)
+if (motion.isPresent) {
+    Box(Modifier.couiScaleVisibility(motion)) {
+        BarContent(enabled = showBar)
+    }
+}
+~~~
+
+首次组合直接显示对应的稳定状态。收起后，`isPresent` 保持到淡出完成，让宿主保留退场内容。宿主可以用 `showBar` 当即禁用按钮等交互。需要固定占位时，将动画内容放在尺寸固定的外层容器中。带模糊或投影的自绘组件可以在自己的绘制链直接读取 `motion.scale.value` 和 `motion.alpha.value`。
 
 ## 双主体跟随
 
@@ -90,6 +106,7 @@ fun TouchAndPressSurface(
 
 ## 公开入口
 
+- **缩放显隐**：[CouiScaleVisibility.kt](../../coui/src/main/java/com/itos/coui/motion/CouiScaleVisibility.kt)及[底栏缩放示例](../../demo/src/main/java/com/itos/coui/demo/DemoChromeDetail.kt)
 - **双主体跟随**：[CouiMetaballFollowing.kt](../../coui/src/main/java/com/itos/coui/motion/CouiMetaballFollowing.kt)、[CouiSwipeRevealDefaults.kt](../../coui/src/main/java/com/itos/coui/swipereveal/CouiSwipeRevealDefaults.kt)
 - **触摸与按压输入**：[CouiTouchInput.kt](../../coui/src/main/java/com/itos/coui/motion/CouiTouchInput.kt)、[CouiTouchMotion.kt](../../coui/src/main/java/com/itos/coui/motion/CouiTouchMotion.kt)、[CouiPressMotion.kt](../../coui/src/main/java/com/itos/coui/motion/CouiPressMotion.kt)
 - **侧滑跟随装配示例**：[DemoRecordSwipeRow.kt](../../demo/src/main/java/com/itos/coui/demo/DemoRecordSwipeRow.kt)

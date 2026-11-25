@@ -113,6 +113,7 @@ internal class CouiMenuMotionPositionProvider(
     private val visibleWindowBounds: () -> IntRect?,
     private val touchOffsetY: Int,
     private val contentBounds: (() -> IntRect?)? = null,
+    private val editorButton: Boolean = false,
 ) : PopupPositionProvider {
     var menuSize by mutableStateOf<IntSize?>(null)
     var popupOriginInHostWindow by mutableStateOf<IntOffset?>(null)
@@ -135,9 +136,12 @@ internal class CouiMenuMotionPositionProvider(
         val contentSize = menuSize ?: return IntOffset.Zero
         val popupOrigin = popupOriginInHostWindow ?: return IntOffset.Zero
         val touchPosition = anchorPosition()
-        val candidate = if (touchPosition != null) {
+        val frame = contentBounds?.invoke()
+        val candidate = if (editorButton) {
+            delegate.calculateEditorButtonPosition(anchorBounds, frame ?: IntRect(IntOffset.Zero, windowSize), contentSize)
+        } else if (touchPosition != null) {
             val touch = touchPosition.round()
-            val visibleBounds = visibleWindowBounds() ?: IntRect(IntOffset.Zero, windowSize)
+            val visibleBounds = frame ?: visibleWindowBounds() ?: IntRect(IntOffset.Zero, windowSize)
             val x = delegate.calculateTouchX(
                 touch.x, windowSize.width, visibleBounds, layoutDirection, contentSize.width,
             )
@@ -154,10 +158,10 @@ internal class CouiMenuMotionPositionProvider(
         } else {
             delegate.calculatePosition(anchorBounds, windowSize, layoutDirection, contentSize)
         }
-        val position = contentBounds?.invoke()?.let { frame ->
+        val position = if (frame != null && !editorButton) {
             IntOffset(candidate.x.coerceIn(frame.left, (frame.right - contentSize.width).coerceAtLeast(frame.left)),
                 candidate.y.coerceIn(frame.top, (frame.bottom - contentSize.height).coerceAtLeast(frame.top)))
-        } ?: candidate
+        } else candidate
         val menuCenter = Offset(
             position.x + contentSize.width / 2f,
             position.y + contentSize.height / 2f,

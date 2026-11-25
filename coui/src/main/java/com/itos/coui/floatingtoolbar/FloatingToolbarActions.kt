@@ -1,0 +1,177 @@
+package com.itos.coui.floatingtoolbar
+
+import android.util.DisplayMetrics
+import android.view.WindowManager
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import com.itos.coui.R
+import com.itos.coui.backdrop.CouiBackdrop
+import com.itos.coui.backdrop.LocalCouiBackdrop
+import com.itos.coui.effect.CouiFloatingRenderer
+import com.itos.coui.menu.CouiMenuAnchor
+import com.itos.coui.menu.CouiMenuItem
+import com.itos.coui.menu.Menu
+import com.itos.coui.menu.ProvideCouiMenuBackdrop
+import com.itos.coui.menu.rememberCouiWindowBackdrop
+import com.itos.coui.theme.CouiIcon
+import com.itos.coui.theme.CouiTheme
+
+/** value 是重排、进出场及点击共用的稳定业务标识。多色图标可指定 Color.Unspecified。 */
+data class CouiFloatingToolbarItem<T : Any>(
+    val value: T,
+    val label: String,
+    val icon: ImageVector,
+    val enabled: Boolean = true,
+    val iconTint: Color? = null,
+)
+
+private object OverflowKey
+
+/** COUIResponsiveUtils 的工具组外边距。宽屏横置手机和较窄的竖屏折叠设备仍走中屏分支。 */
+internal fun toolbarMarginDp(width: Float, height: Float): Int = when {
+    width < 600f -> 16
+    width < 840f || height < 480f -> 24
+    height >= 900f && height > width && width < 960f -> 24
+    else -> 40
+}
+
+internal fun toolbarDirectCount(count: Int, available: Int, itemWidth: Int, gap: Int): Int {
+    var remaining = available
+    for (index in 0 until count) {
+        val preceding = if (index == 0) 0 else gap
+        val needed = preceding + itemWidth
+        if (index == count - 1) return if (needed <= remaining) count else index
+        if (index >= 6 || needed + gap + itemWidth > remaining) return index
+        remaining -= needed
+    }
+    return count
+}
+
+/** 按窗口可用宽度排列操作，剩余操作收进同一个“更多”菜单。 */
+@RequiresApi(34)
+@Composable
+fun <T : Any> FloatingToolbar(
+    modifier: Modifier = Modifier,
+    items: List<CouiFloatingToolbarItem<T>>,
+    onItemClick: (T) -> Unit,
+    visible: Boolean = true,
+    backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) { "悬浮操作栏需要页面背景源" },
+    renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
+    style: CouiFloatingToolbarStyle = CouiFloatingToolbarDefaults.style(),
+) {
+    require(items.distinctBy { it.value }.size == items.size) { "悬浮操作栏的 value 必须唯一" }
+    val context = LocalContext.current
+    val screenHeight = remember(context, LocalConfiguration.current) {
+        val metrics = DisplayMetrics()
+        @Suppress("DEPRECATION")
+        context.getSystemService(WindowManager::class.java).defaultDisplay.getMetrics(metrics)
+        metrics.heightPixels
+    }
+    BoxWithConstraints(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        val direct = with(LocalDensity.current) {
+            val margin = toolbarMarginDp(maxWidth.value, screenHeight / density).dp
+            val inset = if (items.size > 1) CouiFloatingToolbarDefaults.edgeInset.roundToPx() else 0
+            // 外层测量菜单时先加回菜单自身的透明 padding，两处相抵。
+            val available = constraints.maxWidth - 2 * (margin.toPx().toInt() + inset)
+            toolbarDirectCount(items.size, available, CouiFloatingToolbarDefaults.itemSize.roundToPx(),
+                CouiFloatingToolbarDefaults.itemSpacing.roundToPx())
+        }
+        val directItems = items.take(direct).associateBy { it.value }
+        val overflow = items.drop(direct)
+        val group = ToolbarGroup(buildList {
+            addAll(directItems.keys)
+            if (overflow.isNotEmpty()) add(OverflowKey)
+        }, items.size > 1)
+        val animation = rememberToolbarAnimation()
+        val batch = animation.batch
+        // 退出项和排队中的项保留业务数据。可组合的图标节点只在稳定 ID 的作用域内创建。
+        val retained = remember { mutableMapOf<Any, CouiFloatingToolbarItem<T>>() }
+        val bindings = retained + directItems
+        SideEffect {
+            retained.putAll(directItems)
+            animation.submit(group)
+            if (animation.batch.from == animation.batch.to) retained.keys.retainAll(directItems.keys)
+        }
+        ToolbarSurface(Modifier.fillMaxWidth(), visible, backdrop, renderer, style, animation, batch) {
+            for (id in batch.order) key(id) {
+                val active = visible && id in batch.target && id in group.ids
+                if (id === OverflowKey) {
+                    ToolbarOverflowButton(overflow, active, backdrop, onItemClick)
+                } else {
+                    val item = bindings.getValue(id)
+                    ToolbarButton(Modifier.toolbarItem(id, true), { onItemClick(item.value) }, item.enabled, active) {
+                        CouiIcon(Modifier.size(CouiFloatingToolbarDefaults.iconSize), item.icon, item.label,
+                            tint = item.iconTint ?: CouiTheme.contentColor)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun <T : Any> ToolbarOverflowButton(
+    items: List<CouiFloatingToolbarItem<T>>,
+    active: Boolean,
+    backdrop: CouiBackdrop,
+    onItemClick: (T) -> Unit,
+) {
+    var open by remember { mutableStateOf(false) }
+    val label = stringResource(R.string.coui_toolbar_more)
+    ToolbarButton(Modifier.toolbarItem(OverflowKey, true), { open = true }, true, active) {
+        val color = CouiTheme.contentColor
+        Canvas(Modifier.size(CouiFloatingToolbarDefaults.iconSize).semantics { contentDescription = label }) {
+            val unit = size.width / 24f
+            repeat(3) { index ->
+                drawCircle(color, 1.75f * unit, Offset(12f * unit, (4.875f + index * 7.125f) * unit))
+            }
+        }
+        if (active) {
+            val view = LocalView.current
+            val window = LocalWindowInfo.current.containerDpSize
+            val margin = with(LocalDensity.current) {
+                toolbarMarginDp(window.width.value, window.height.value).dp.roundToPx()
+            }
+            val anchor = remember(view, margin) { CouiMenuAnchor(view, editorButtonMarginPx = margin) }
+            ProvideCouiMenuBackdrop(rememberCouiWindowBackdrop() ?: backdrop) {
+                Menu(
+                    expanded = open,
+                    anchor = anchor,
+                    onDismissRequest = { open = false },
+                    items = items.map {
+                        CouiMenuItem(it.value, it.label, it.icon, enabled = it.enabled, iconTint = it.iconTint)
+                    },
+                    onItemClick = {
+                        open = false
+                        onItemClick(it.value)
+                    },
+                )
+            }
+        }
+    }
+    if (!active && open) SideEffect { open = false }
+}

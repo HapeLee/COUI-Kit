@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,25 +18,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.itos.coui.dialog.CouiDialogAction
+import com.itos.coui.dialog.Dialog
 import com.itos.coui.effect.CouiFloatingRenderer
-import com.itos.coui.floatingtoolbar.CouiFloatingToolbarDefaults
+import com.itos.coui.floatingtoolbar.CouiFloatingToolbarItem
 import com.itos.coui.floatingtoolbar.FloatingToolbar
-import com.itos.coui.floatingtoolbar.FloatingToolbarItem
 import com.itos.coui.icons.CouiIcons
 import com.itos.coui.layout.Divider
 import com.itos.coui.layout.Group
-import com.itos.coui.menu.CouiMenuItem
 
 /** 操作栏只关心「一排同级操作」；数量、宽度和图标配色都由调用方决定。 */
 private class ToolbarAction(val icon: ImageVector, val label: String, val tint: Color? = null)
-
-/** 菜单里只有显式画得出颜色的图标沿用自身配色，其余跟随菜单项文字色。 */
-private fun ToolbarAction.menuIconTint(): Color? = tint?.takeIf { it.isSpecified }
 
 @Composable
 internal fun FloatingToolbarSample(dark: Boolean) {
@@ -48,6 +43,7 @@ internal fun FloatingToolbarSample(dark: Boolean) {
 @RequiresApi(34)
 @Composable
 private fun FloatingToolbarContent(dark: Boolean) {
+    var toolbarVisible by rememberSaveable { mutableStateOf(true) }
     var enabled by rememberSaveable { mutableStateOf(true) }
     var lastAction by rememberSaveable { mutableStateOf("") }
     val actions = listOf(
@@ -58,48 +54,33 @@ private fun FloatingToolbarContent(dark: Boolean) {
         ToolbarAction(CouiIcons.Filled.Add, stringResource(R.string.floating_toolbar_add)),
         ToolbarAction(CouiIcons.Filled.Photo, stringResource(R.string.floating_toolbar_photo)),
         ToolbarAction(CouiIcons.Filled.Setting, stringResource(R.string.floating_toolbar_settings)),
+        ToolbarAction(CouiIcons.Filled.Favorite, stringResource(R.string.floating_toolbar_favorite)),
+        ToolbarAction(CouiIcons.Filled.Share, stringResource(R.string.floating_toolbar_share)),
     )
-    // 多选分组：先勾选若干操作，再用一个开关整组显隐，用来观察多个图标同时进出场。
-    var selectedFlags by rememberSaveable { mutableStateOf(List(actions.size) { it == 1 || it == 3 }) }
-    var selectionVisible by rememberSaveable { mutableStateOf(true) }
-    var groupMenuExpanded by rememberSaveable { mutableStateOf(false) }
-    val selected = List(actions.size) { selectedFlags.getOrElse(it) { false } }
-    // 最终显隐 = 未勾选多选，或整组开关打开。
-    val flags = List(actions.size) { selectionVisible || !selected[it] }
-    val menuStyle = demoMenuStyle(dark)
-    Group(title = stringResource(R.string.floating_toolbar_actions_count, flags.count { it })) {
-        ToolbarPreview(actions, flags, dark, enabled) { lastAction = actions[it].label }
-    }
-    // 长列表收进行内菜单：菜单固定在入口行下方展开，预览始终留在视野上方，
-    // 勾选时能直接看到胶囊收放；菜单不随提交关闭，可以连续切换。
-    Group(footer = stringResource(R.string.floating_toolbar_controls_hint)) {
-        DemoPopupPreference(
-            title = stringResource(R.string.floating_toolbar_multi_select),
-            value = stringResource(R.string.floating_toolbar_group_count, selected.count { it }),
-            expanded = groupMenuExpanded,
-            onExpandedChange = { groupMenuExpanded = it },
-            items = actions.mapIndexed { index, action ->
-                CouiMenuItem(index, action.label, icon = action.icon, iconTint = action.menuIconTint(), checked = selected[index])
-            },
-            onItemClick = { item ->
-                selectedFlags = selected.toMutableList().also { it[item.value] = !it[item.value] }
-            },
-            menuStyle = menuStyle,
-            closeOnItemClick = { false },
-        )
-        Divider()
-        DemoSwitchPreference(
-            title = stringResource(R.string.floating_toolbar_multi_visible),
-            checked = selectionVisible,
-            enabled = selected.any { it },
-            onCheckedChange = { selectionVisible = it },
-        )
+    var visibleItems by rememberSaveable { mutableStateOf(BooleanArray(actions.size) { it < 4 }) }
+    var editingIcons by rememberSaveable { mutableStateOf(false) }
+    var draft by rememberSaveable { mutableStateOf(visibleItems) }
+    val visibleCount = visibleItems.count { it }
+    Group(title = stringResource(R.string.floating_toolbar_actions_count, visibleCount)) {
+        ToolbarPreview(actions, visibleItems, dark, enabled, toolbarVisible) { lastAction = actions[it].label }
     }
     Group {
+        DemoPreference(
+            title = stringResource(R.string.floating_toolbar_visible_icons),
+            value = stringResource(R.string.floating_toolbar_selected_count, visibleCount, actions.size),
+            onClick = { draft = visibleItems.copyOf(); editingIcons = true },
+        )
+        Divider()
         DemoPreference(
             title = stringResource(R.string.floating_toolbar_last_action),
             summary = stringResource(R.string.floating_toolbar_hint),
             value = if (lastAction.isEmpty()) stringResource(R.string.floating_toolbar_none) else lastAction,
+        )
+        Divider()
+        DemoSwitchPreference(
+            title = stringResource(R.string.floating_toolbar_visible),
+            checked = toolbarVisible,
+            onCheckedChange = { toolbarVisible = it },
         )
         Divider()
         DemoSwitchPreference(
@@ -108,15 +89,37 @@ private fun FloatingToolbarContent(dark: Boolean) {
             onCheckedChange = { enabled = it },
         )
     }
+    Dialog(
+        visible = editingIcons,
+        title = stringResource(R.string.floating_toolbar_visible_icons),
+        onDismissRequest = { editingIcons = false },
+        confirmAction = CouiDialogAction(stringResource(R.string.dialog_confirm), {
+            if (editingIcons) visibleItems = draft
+            editingIcons = false
+        }),
+        dismissAction = CouiDialogAction(stringResource(R.string.dialog_cancel), { editingIcons = false }),
+        material = demoDialogMaterial(),
+    ) {
+        actions.forEachIndexed { index, action ->
+            DemoCheckboxPreference(
+                title = action.label,
+                checked = draft[index],
+                icon = { Icon(action.icon, null, Modifier.size(24.dp),
+                    tint = action.tint ?: MaterialTheme.colorScheme.onSurface) },
+                onCheckedChange = { checked -> draft = draft.copyOf().also { it[index] = checked } },
+            )
+        }
+    }
 }
 
 @RequiresApi(34)
 @Composable
 private fun ToolbarPreview(
     actions: List<ToolbarAction>,
-    visibleFlags: List<Boolean>,
+    visibleFlags: BooleanArray,
     dark: Boolean,
     enabled: Boolean,
+    toolbarVisible: Boolean,
     onAction: (Int) -> Unit,
 ) {
     val rendering = remember { runCatching { CouiFloatingRenderer.standalone() } }
@@ -138,22 +141,15 @@ private fun ToolbarPreview(
         if (renderer != null) {
             FloatingToolbar(
                 modifier = Modifier.align(Alignment.Center),
+                items = actions.mapIndexedNotNull { index, action ->
+                    if (visibleFlags[index]) CouiFloatingToolbarItem(index, action.label, action.icon, enabled, action.tint)
+                    else null
+                },
+                onItemClick = onAction,
+                visible = toolbarVisible,
                 backdrop = backdrop,
-                dark = dark,
                 renderer = renderer,
-            ) {
-                actions.forEachIndexed { index, action ->
-                    // 操作项始终保留，靠 visible 做进出场，胶囊宽度随槽位一起收放。
-                    FloatingToolbarItem(
-                        onClick = { onAction(index) },
-                        enabled = enabled,
-                        visible = visibleFlags.getOrElse(index) { true },
-                    ) {
-                        Icon(action.icon, action.label, Modifier.size(CouiFloatingToolbarDefaults.iconSize),
-                            tint = action.tint ?: LocalContentColor.current)
-                    }
-                }
-            }
+            )
         } else {
             val failure = checkNotNull(rendering.exceptionOrNull())
             Text(stringResource(R.string.renderer_error, failure.message ?: failure.javaClass.simpleName),
