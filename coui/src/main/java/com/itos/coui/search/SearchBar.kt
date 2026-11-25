@@ -90,6 +90,7 @@ import kotlin.math.roundToInt
  * 设置式常驻搜索与分裂取消胶囊；在所属页面的浮层使用，backdrop 不包含当前搜索。
  * 宿主持有查询、展开和结果；取消只请求关闭，清空只提交空查询，不持有导航。
  * enabled 为 false 时停止输入、点击和交互反馈，释放自身焦点；查询和展开目标仍由宿主持有。
+ * themeTint 为浮动材质染色基准色（仅 API 34+ 生效，强度由库统一控制，透明关闭）。
  */
 @Composable
 fun SearchBar(
@@ -109,10 +110,9 @@ fun SearchBar(
     shadowProgress: Float = 0f,
     colors: CouiSearchBarColors = CouiSearchBarDefaults.colors(dark),
     enabled: Boolean = true,
+    themeTint: Color = CouiTheme.materialTintFor(dark),
 ) {
     val density = LocalDensity.current
-    // 设置的搜索位于 AppBarBlurOverlay 之后；采样完成渐进处理的背景，不包含标题/搜索。
-    val surfaceBackdrop = LocalCouiToolbarBackdrop.current ?: backdrop
     val layoutDirection = LocalLayoutDirection.current
     val rtl = layoutDirection == LayoutDirection.Rtl
     val textStyle = rememberCouiTextStyle(CouiTextKind.Search)
@@ -189,7 +189,6 @@ fun SearchBar(
             alpha = (f / .2f).coerceIn(0f, 1f), visible = state.active)
     }
     val contour = LocalCouiContourGlowEnabled.current
-    val themeTint = CouiTheme.materialTintFor(dark)
     var normalShadow by remember { mutableFloatStateOf(shadowProgress) }
     if (!state.active) SideEffect { normalShadow = shadowProgress }
     // 首页在搜索弹簧期间暂停滚动投影回调；不能用搜索主动折叠产生的 offset 提前点亮投影。
@@ -200,26 +199,27 @@ fun SearchBar(
         else ((state.widthProgress - .8f) / .2f).coerceIn(0f, 1f)
     val baseShadow = CouiTopAppBarButtonDefaults.shadow(dark, true, density.density, contour, search = true, alphaScale = drop)
     val shadow = baseShadow.copy(causticColor = baseShadow.causticColor.copy(alpha = baseShadow.causticColor.alpha * drop))
-    val surfaceModifier = if (Build.VERSION.SDK_INT >= 34 && renderer != null) Modifier.couiFloatingPair(
-        surfaceBackdrop, renderer, listOf(CouiTopAppBarButtonDefaults.systemMaterial(dark, true).copy(index = 1,
-            blurRadius = CouiSearchBarDefaults.blurRadius, extension = with(density) { 4.dp.roundToPx() }, themeTint = themeTint),
-            CouiTopAppBarButtonDefaults.systemMaterial(dark, true).copy(index = 2,
-                blurRadius = CouiSearchBarDefaults.blurRadius, extension = with(density) { 4.dp.roundToPx() }, themeTint = themeTint)),
-        listOf(shadow, shadow), listOf(shape, shape), listOf(bodyLayer, cancelLayer), contour,
-        // 原厂 bringChildToFront(functional) 后再提升 searchBarBackgroundView。
-        // 调整整层材质与内容的顺序，不能只把透明文字层放到上面。
-        drawOrder = listOf(1, 0),
-        // 双胶囊只叠前景，不以整块 Src 回填擦掉下方渐进背景或兄弟投影。
-        foregroundComposition = true,
-        beforeContent = { index, path ->
-            val node = if (index == 0) bodySurface() else cancelSurface()
-            val draw = if (index == 0) bodyLight else cancelLight
-            if (draw != null && node.visible) inset(node.bounds.left, node.bounds.top,
-                size.width - node.bounds.right, size.height - node.bounds.bottom) {
-                withTransform({ scale(node.scaleX, node.scaleY, center) }) { clipPath(path) { draw() } }
-            }
-        }, surfaces = { listOf(bodySurface(), cancelSurface()) })
-        else Modifier
+    val surfaceModifier = if (Build.VERSION.SDK_INT >= 34 && renderer != null) {
+        val material = CouiTopAppBarButtonDefaults.systemMaterial(dark, true).copy(
+            extension = with(density) { 4.dp.roundToPx() }, themeTint = themeTint,
+        )
+        Modifier.couiFloatingPair(
+            backdrop, renderer, listOf(material.copy(index = 1), material),
+            listOf(shadow, shadow), listOf(shape, shape), listOf(bodyLayer, cancelLayer), contour,
+            // 原厂 bringChildToFront(functional) 后再提升 searchBarBackgroundView。
+            // 调整整层材质与内容的顺序，不能只把透明文字层放到上面。
+            drawOrder = listOf(1, 0),
+            // 双胶囊只叠前景，不以整块 Src 回填擦掉下方渐进背景或兄弟投影。
+            foregroundComposition = true,
+            beforeContent = { index, path ->
+                val node = if (index == 0) bodySurface() else cancelSurface()
+                val draw = if (index == 0) bodyLight else cancelLight
+                if (draw != null && node.visible) inset(node.bounds.left, node.bounds.top,
+                    size.width - node.bounds.right, size.height - node.bounds.bottom) {
+                    withTransform({ scale(node.scaleX, node.scaleY, center) }) { clipPath(path) { draw() } }
+                }
+            }, surfaces = { listOf(bodySurface(), cancelSurface()) })
+    } else Modifier
     Layout(modifier = modifier.fillMaxWidth().height(CouiSearchBarDefaults.height)
         .padding(horizontal = CouiSearchBarDefaults.horizontalMargin).onSizeChanged { boundsSize = it }
         .then(CouiSearchRelocationBoundary)

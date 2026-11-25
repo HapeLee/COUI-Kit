@@ -38,13 +38,15 @@ internal val DemoComponentGroups = listOf(
         DemoCatalogEntry("message_input", R.string.message_input_title) { CouiIcons.Outlined.Keyboard },
         DemoCatalogEntry("checkbox", R.string.checkbox_title) { DemoIcons.Checkbox },
         DemoCatalogEntry("textfield", R.string.catalog_text_field) { CouiIcons.Filled.BookOpen }),
-    listOf(DemoCatalogEntry("dialogs", R.string.dialog_title) { DemoIcons.Dialogs },
+    listOf(DemoCatalogEntry("sheets", R.string.sheet_title) { DemoIcons.Dialogs },
+        DemoCatalogEntry("dialogs", R.string.dialog_title) { DemoIcons.Dialogs },
         DemoCatalogEntry("menu", R.string.menu_title) { CouiIcons.Outlined.Popup }),
     listOf(DemoCatalogEntry("appbar", R.string.catalog_appbar) { DemoIcons.Title },
         DemoCatalogEntry("search", R.string.catalog_search) { CouiIcons.Outlined.Search },
         DemoCatalogEntry("navigation", R.string.catalog_navigation) { CouiIcons.Filled.Lab },
         DemoCatalogEntry("chip", R.string.chip_tab_title) { CouiIcons.Filled.Grid },
-        DemoCatalogEntry("fab", R.string.catalog_fab) { CouiIcons.Filled.Add }),
+        DemoCatalogEntry("fab", R.string.catalog_fab) { CouiIcons.Filled.Add },
+        DemoCatalogEntry("floatingtoolbar", R.string.catalog_floating_toolbar) { CouiIcons.Filled.AI }),
     listOf(DemoCatalogEntry("wheel", R.string.catalog_wheel) { DemoIcons.Tune },
         DemoCatalogEntry("calendar", R.string.picker_calendar_title) { CouiIcons.Filled.Health }),
 )
@@ -100,6 +102,7 @@ private fun catalogSearchMatches(entry: DemoCatalogEntry, needle: String): Boole
         (entry.page == "wheel" && stringResource(R.string.picker_number_title).contains(needle, ignoreCase = true))
 
 internal fun catalogDescription(page: String): Int = when (page) {
+    "sheets" -> R.string.intro_sheets
     "chip" -> R.string.intro_chip
     "switch" -> R.string.intro_switch
     "sliders" -> R.string.intro_sliders
@@ -113,6 +116,7 @@ internal fun catalogDescription(page: String): Int = when (page) {
     "navigation" -> R.string.intro_navigation
     "fab" -> R.string.intro_fab
     "textfield" -> R.string.intro_text_field
+    "floatingtoolbar" -> R.string.intro_floating_toolbar
     "wheel" -> R.string.intro_wheel
     "timepicker" -> R.string.intro_timepicker
     "countdownpicker" -> R.string.intro_countdownpicker

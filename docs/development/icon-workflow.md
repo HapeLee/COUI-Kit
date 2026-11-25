@@ -1,6 +1,6 @@
 # 新增图标
 
-新增图标时，先确认目标应用和页面实际使用的资源，再将图形接入 `CouiIcons`。矢量保存在 VectorDrawable XML 中，供 Compose 加载 `ImageVector` 和网页生成预览。位图保留原始资源，通过 `CouiIcons.Bitmap` 提供 `Painter`。
+先按[图标选用建议](../components/icons.md#怎么选图标)确认场景。需要接入 ColorOS 图标时，确认目标应用和页面实际使用的资源，再将图形接入 `CouiIcons`。矢量保存在 VectorDrawable XML 中，供 Compose 加载 `ImageVector` 和网页生成预览。位图保留原始资源，通过 `CouiIcons.Bitmap` 提供 `Painter`。
 
 ## 确认目标和资源
 

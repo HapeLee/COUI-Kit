@@ -2,7 +2,7 @@
 
 `LargeTopAppBar` 用于二级页的大标题滚动折叠（展开大标题沿弧线收起为固定小标题）；`CollapsingTopAppBar` 用于首页等需要大标题与常驻搜索框联动的场景（带常驻搜索的标题沿用 `LargeTopAppBar` 的默认展开样式，随滚动缩放并淡出，搜索栏停靠顶部）。
 
-- **最低系统版本**：顶栏容器本身支持库最低版本（**API 31+**）；API 33+ 使用 `RuntimeShader` 渐进模糊，API 31–32 使用分层模糊。
+- **最低系统版本**：顶栏容器支持 **API 31+**。API 33+ 默认使用 Compose 渐进模糊，传入 `useCouiBlur = true` 可选用 COUI 实现。API 31–32 使用分层模糊。
 - **内部子控件门槛**：内部放入 `TopAppBarButton` 需 **API 34+**；搭配 `SearchBar` 时，API 31–33 渲染普通填色胶囊，API 34+ 启用浮动模糊融合材质。
 - **前置依赖**：放入 COUI `Scaffold` 的 `topBar` 时自动获取正文 `backdrop`；放在 Material 3 `Scaffold` 等第三方容器时，需手动创建并挂载 `.couiBackdrop(backdrop)`。
 

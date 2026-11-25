@@ -127,6 +127,7 @@ fun ScheduleRangeExample(
 | `containerColor` | `CouiSegmentedControlDefaults.containerColor(dark)` | 普通填色（`backdrop == null`）时的胶囊容器底色。 |
 | `indicatorColor` | `CouiSegmentedControlDefaults.indicatorColor(dark)` | 两种模式共用的选中指示器底色。 |
 | `renderer` | 透明模式自动创建 / 普通模式为 `null` | `backdrop != null` 时须为非空单主体 `CouiFloatingRenderer.standalone()`，不可跨节点共享；可省略由组件自动创建，或自行 `runCatching` 创建后传入以处理失败界面。 |
+| `themeTint` | `CouiTheme.materialTintFor(dark)` | 透明模糊模式（`backdrop != null`）下的材质染色基准色，采用库内统一固定强度；传 `Color.Transparent` 关闭染色。普通填色模式与选中指示器不受影响。 |
 
 ## 交互职责与装配注意事项
 

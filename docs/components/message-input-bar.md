@@ -106,11 +106,11 @@ placeholderOverflow = TextOverflow.Ellipsis,
 
 ## 外观与装配
 
-- **主题与材质**：默认读取 `CouiTheme`，通常无需传入 `dark`。`colors` 和 `material` 可覆盖预设；阴影按当前主题和有效光晕状态自动选择。
+- **主题与材质**：默认读取 `CouiTheme`，通常无需传入 `dark`。`colors` 和 `material` 可覆盖预设；阴影按当前主题和有效光晕状态自动选择。默认 `material` 自动注入 `CouiTheme.materialTintFor(dark)`，自定义 `material` 会保留其自身的 `themeTint`；`themeTint` 参数默认取 `material.themeTint`，显式传入时按库内统一固定强度覆盖胶囊模糊材质的染色基准色（传 `Color.Transparent` 关闭），不会影响底部渐变遮罩。
 - **形状**：`shape` 接收 `CouiShape`，只控制胶囊的裁剪与材质几何，两者共用半径和权重。
 - **布局范围**：`modifier` 作用于包含遮罩、留白和剩余导航栏占位的整个底部区域。`onGloballyPositioned` 取得完整区域的边界，外部 `padding` 则作用于该区域之外。胶囊周围的预设留白由组件内部提供，高度随文字增长并服从父级约束。
 
-模糊与描边跟随系统材质设置。关闭模糊时，胶囊使用对应深浅色背景填充；省电模式同时关闭模糊、描边和外光晕。`contourGlowEnabled = false` 可额外关闭描边与光晕。没有 Oplus 材质设置的系统默认开启这些效果。
+模糊与描边跟随系统材质设置。关闭模糊时，胶囊使用对应深浅色不透明背景填充并关闭 `themeTint` 染色（确保不透明底色不被染色）；省电模式同时关闭模糊、描边和外光晕。`contourGlowEnabled = false` 可额外关闭描边与光晕。没有 Oplus 材质设置的系统默认开启这些效果。
 
 ### 底部渐变遮罩
 

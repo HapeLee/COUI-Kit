@@ -24,8 +24,8 @@ Menu(
 
 `Menu` 支持两种常见的锚点定位方式：
 
-- **方式一：按触点弹出（`rememberCouiMenuAnchor()`）**：适合列表项、设置行或大面积按钮，菜单会根据手指按下的位置与窗口可见范围自适应弹出。
-- **方式二：顶栏按钮同 `Box` 定位（省略 `anchor`）**：适合顶栏更多按钮等紧凑图标，只需用 `Box` 包住触发按钮与 `Menu`，菜单会按父级 `Box` 的位置和 `offset` 定位。
+- **方式一：按触点弹出（`rememberCouiMenuAnchor()`）**：适合列表项、设置行或大面积按钮。默认将菜单的横向中线对准手指按下的位置，靠近窗口边缘时向内移。下方放不下时优先移到触点上方。
+- **方式二：相对按钮固定弹出**：适合[顶栏按钮](#顶栏按钮菜单)，菜单位置以按钮的布局范围为基准。
 
 下面展示带触点锚点的菜单按钮，选择菜单项后回调 `onSelect` 并收起菜单：
 
@@ -63,39 +63,33 @@ fun TouchAnchorMenuButton(
 }
 ~~~
 
-若使用顶栏按钮同 `Box` 定位，直接省略 `anchor` 即可：
+`Modifier.couiMenuAnchor(anchor)` 只记录按下的位置。键盘和无障碍操作会按触发按钮的容器定位。
+
+### 顶栏按钮菜单
+
+在 [TopAppBar](top-app-bar.md) 的 `actions` 中，为触发按钮单独放一个 `Box`，把按钮和 `Menu` 作为它的两个子项。省略 `anchor`，菜单就会按整个按钮所在容器定位。建议传 `DpOffset(0.dp, 4.dp)`，下方空间足够时在按钮底边留出 `4.dp`。
+
+下面的片段用于支持 `TopAppBarButton` 的 API 34+ 顶栏。`moreIcon`、`items` 和 `onSelect` 由页面提供。
 
 ~~~kotlin
-@Composable
-fun ToolbarMenuButton(
-    modifier: Modifier = Modifier,
-    label: String,
-    items: List<CouiMenuItem<Int>>,
-    onSelect: (Int) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
+var expanded by remember { mutableStateOf(false) }
 
-    Box(modifier) {
-        Button(onClick = { expanded = true }) {
-            Text(label)
-        }
-        Menu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            items = items,
-            onItemClick = { item ->
-                onSelect(item.value)
-                expanded = false
-            },
-        )
+Box {
+    TopAppBarButton(onClick = { expanded = true }) {
+        moreIcon()
     }
+    Menu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        items = items,
+        onItemClick = { item ->
+            expanded = false
+            onSelect(item.value)
+        },
+        offset = DpOffset(0.dp, 4.dp),
+    )
 }
 ~~~
-
-定位时注意以下两点：
-
-1. **只包裹触发按钮**：省略 `anchor` 时，菜单按 `Popup` 父布局的范围定位，因此外层 `Box` 应只包住触发按钮本身，不要包住整行或整个顶栏。
-2. **触点观察与无障碍回退**：`Modifier.couiMenuAnchor(anchor)` 只观察按下坐标，不会消费点击事件；通过键盘或无障碍服务触发 `anchor.open { ... }` 时没有触点坐标，菜单自动回退到默认锚点定位。示例中的 `Button` 和 `Text` 来自 Material 3，宿主需自行声明该依赖（最小调用不依赖 Material 3）。
 
 ### 菜单选择行的图标
 
@@ -174,7 +168,24 @@ fun HostPageWithMenuExample(
 ~~~
 
 - **菜单放在背景源之外**：`Menu` 自身运行在 `Popup` 中且触发容器位于 `windowSource` 之外，弹窗和页面遮罩也不要放入 `windowSource` 节点树内。
-- **页面色相叠加（`themeTint`）**：`CouiMenuStyle.themeTint` 会在采样材质上叠加页面色相（原生默认透明，M3 适配默认取 host surface）；将 `themeTint` 显式设为 `Color.Transparent` 可关闭色相叠加。
+- **页面色相叠加（`themeTint`）**：通过 `Menu(..., themeTint = ...)` 或 `CouiMenuStyle.themeTint` 传入染色基准色（原生默认透明，M3 适配默认取宿主 `surface`）；仅在有背景源的模糊材质分支按库内固定强度执行保亮度染色，传入 `Color.Transparent` 可关闭染色（不透明容器分支忽略）。参见[外观与预设](../guide/appearance.md#背景材质染色)。
+
+### 切换采样与纯色背景
+
+窗口已经提供采样源时，可以读取它并只为一组菜单切换背景。将开关的状态传给这一组菜单的内容范围：
+
+~~~kotlin
+val windowBackdrop = rememberCouiWindowBackdrop()
+ProvideCouiMenuBackdrop(backdrop = if (blurEnabled) windowBackdrop else null) {
+    TouchAnchorMenuButton(
+        label = buttonLabel,
+        items = items,
+        onSelect = onSelect,
+    )
+}
+~~~
+
+窗口继续使用原有的背景录制节点。开关关闭时，范围内的菜单使用 `CouiMenuStyle.colors.container`。
 
 ### 空闲时按需离屏
 
@@ -242,14 +253,15 @@ fun rememberMenuStyle(
 - **圆角与轮廓（`shape` 与 `radius`）**：默认 `shape` 为 `CouiShape(28.dp)`，`radius` 为 `Dp.Unspecified`（自动从 `CouiShape` 读取半径与权重）。更换为非 `CouiShape` 的自定义 `Shape` 时，须显式提供有限非负的 `radius`，轮廓权重使用菜单预设；`itemShape`、`checkboxShape`、`checkboxBorderShape` 分别控制菜单项与内置复选框圆角。
 - **顶部提示文本（`headerText`）**：通过 `Menu(..., headerText = ...)` 显示顶部不可选提示文案（最多两行）。修改 `CouiTheme.typography.label` 或 `CouiMenuStyle.headerTextStyle` 可调整字体、字号、字重与行距，文字颜色由菜单按深浅色控制。
 - **菜单限高与滚动**：`Menu` 默认不设固定最大高度；长菜单可在 `Menu` 的 `modifier` 中传入 `Modifier.heightIn(max = 320.dp)`，使其在限定高度内纵向滚动（子菜单会自动受可用窗口高度约束）。
+- **Sheet 面板内定位**：在 [Sheet 面板](bottom-sheet.md)内弹出时，主菜单与子菜单均在面板当前可见区域内定位与滚动，主菜单的缩放与平移也受该区域约束；窄面板中的子菜单改为上下展开，而面板内另行打开的独立 `Dialog` 中的菜单仍按各自窗口定位。
 
 ## 装配注意事项
 
-- **系统版本差异**：API 33+ 使用 Fast Kawase 模糊、RuntimeShader 轮廓光与跟手光；API 31–32 使用普通 Gaussian 模糊分支且不提供跟手光，详见[兼容要求](../guide/compatibility.md#效果门槛)。
-- **宽度范围**：菜单面板宽度限制在 `128.dp` 至 `280.dp` 之间，内容按最大固有宽度测量。
+- API 33+ 使用 Fast Kawase。底图恢复到面板尺寸后，在 `CouiEdge` 着色器内统一执行亮度混色、Overlay、轻微抖动、轮廓光与保亮度染色。API 31–32 使用普通 Gaussian 模糊并执行 Canvas 混色。各版本的光效见[兼容要求](../guide/compatibility.md#效果门槛)。
+- **宽度范围**：普通菜单面板宽度限制在 `160.dp` 至 `256.dp` 之间，含子菜单项时最小宽度为 `196.dp`（子面板跟随主菜单实测宽度），内容按最大固有宽度测量。
 - **诊断回调**：`onSpotlightDiagnostic` 仅用于调试跟手光状态，常规业务接入无需传入。
 
 ## 源码与完整示例
 
 - **公开入口与预设**：[Menu.kt](../../coui/src/main/java/com/itos/coui/menu/Menu.kt)、[CouiMenuStyle.kt](../../coui/src/main/java/com/itos/coui/menu/CouiMenuStyle.kt)、[CouiMenuAnchor.kt](../../coui/src/main/java/com/itos/coui/menu/CouiMenuAnchor.kt)、[CouiMenuBackdrop.kt](../../coui/src/main/java/com/itos/coui/menu/CouiMenuBackdrop.kt)
-- **Demo 完整示例**：[DemoSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoSamples.kt)、[DemoPopupSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoPopupSamples.kt)
+- **Demo 完整示例**：[DemoPopupSamples.kt](../../demo/src/main/java/com/itos/coui/demo/DemoPopupSamples.kt)

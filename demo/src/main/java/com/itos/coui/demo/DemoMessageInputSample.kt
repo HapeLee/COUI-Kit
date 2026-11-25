@@ -143,7 +143,7 @@ internal fun MessageInputSample(dark: Boolean, preferences: DemoPreferences, bac
                         stringResource(R.string.message_input_more_description),
                         onClick = { event = R.string.message_input_more_event }) else null,
                     primaryAction = if (preferences.messageInputSend && hasText) CouiMessageInputAction(
-                        rememberVectorPainter(CouiIcons.Outlined.Send),
+                        rememberVectorPainter(CouiIcons.Filled.Send),
                         stringResource(R.string.message_input_send_description), onClick = submit,
                         enabled = state.text.isNotBlank()) else null)
             }

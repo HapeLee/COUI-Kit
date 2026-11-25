@@ -1,58 +1,69 @@
 # 公开 API 设计
 
-默认使用 `internal` 或 `private`。公开入口应能解释使用场景、状态 owner、平台门槛、单位、失败行为和资源生命周期。组件通过受控值与回调接入，不接管宿主业务。`Modifier` 为第一个参数并默认 `Modifier`。
+本规范面向库维护者，用于约束新增或评审公开接口时的调用设计、参数契约与失败语义。
 
-公开 UI 组件使用无 Coui 前缀的名称，如 `Text`、`Switch`、`Menu` 和 `Scaffold`，通过包名区分来源。类型、Defaults、Style、状态、`CouiTheme`、`rememberCoui…` 工厂及 `coui…` 效果入口保留前缀。同文件混用其他设计体系的同名组件时，用 import 别名区分。
+## 可见性与命名
 
-保留高自定义程度的底层算法接口；常用入口复用同一后端，不再造效果。普通阴影保留 `couiShadow` 与 `CouiShadowRenderer`，双主体融合只公开算法和跟随回弹，不加入侧滑容器。预设集中在所属组件族 Defaults，宿主不复制固定参数。
+- 默认声明为 `internal` 或 `private`，仅为真实外部需求公开接口。
+- 公开 UI 组件不带 `Coui` 前缀（如 `Text`、`Switch`、`Menu`、`Scaffold`），通过包名区分来源。配置类型、Defaults、Style、状态、`CouiTheme`、`rememberCoui…` 工厂与 `coui…` 效果保留前缀；同文件混用同名组件时用 `import as`。
+- 不为测试或 Demo 暴露内部装配（菜单滚动条坐标、Popup 定位、动效帧、搜索运动、底栏附件控制器）。
+- 变更公开声明前先检索库、Demo 与已知消费者；改名、改参或改生命周期时，同步更新使用文档、调用方及迁移说明。
 
-菜单滚动条坐标、拖动状态、Popup 定位、菜单动效帧、搜索运动实现和底栏附件控制器属于内部装配。不要为了测试或 Demo 暴露它们。公开预设弹簧仍可直接引用。菜单模糊从 `rememberCouiMenuBlur` 获取，不让宿主组装固定数量的 GraphicsLayer。
+## 零配置优先与默认外观
 
-修改公开声明前检索库、Demo 和已知消费者。改变可见性、参数、单位或生命周期时，同步调用与接入文档，并在 PR 写明迁移方式。
+- 省略 `dark`、`colors`、`style`、`material`、`backdrop` 等外观参数时，组件必须直接呈现当前主题（原生或 Material 3）下的推荐默认外观。
+- 禁止要求调用方自行拼装系统版本判断、窗口背景源读取或 Defaults 工厂才能获得默认样式。
+  > [!NOTE]
+  > 现状特例：`Dialog` 系列当前 `material` 默认为 `null`（开启材质需显式传入），属于历史遗留；新增浮层组件须默认读取可用窗口源与系统能力，不要复制该特例。
+- 主操作、强调色等主题角色必须默认读取当前主题，不得因调用方省略配色而抛出异常；显式传入的外观覆盖始终优先。
+- 固定预设集中归属对应组件族 Defaults（`CouiXxxDefaults`），宿主不复制内部算法参数。
 
-## 参数归属与 Modifier 顺序
+## 受控状态、显隐与交互归属
 
-添加配置时，先确认它修改哪个节点、是否需要组件内部信息，再选择入口：
+- 业务状态统一采用「只读值 `T` + 回调 `(T) -> Unit`」或显式受控状态对象（`CouiXxxState`）。**禁止新增接收 `MutableState<T>` 由组件内部直接改写的公开参数**（`BottomSheet` 为历史特例，新组件不得效仿）。
+- 需要退场动画或采样同步的浮层与展开组件，统一常驻组合，通过 `visible: Boolean` / `expanded: Boolean` + `onDismissRequest: () -> Unit` 控制；不设“传 `null` 切换另一套窗口动画”的双模分支。
+- 禁用态、加载态的交互拦截应完整收敛在组件内部；组合型行组件须清楚界定“外层承担交互时子控件仅负责绘制”的契约，避免把交互源与防连点样板推给每个调用方。
 
-| 职责 | 入口 | 例子 |
+## 标准参数排序与参数归属
+
+公开 Composable 遵循统一参数顺序，保留既有顺序不变：
+
+1. `modifier: Modifier = Modifier`（首位且默认 `Modifier`）
+2. 必填业务状态或数据（如 `value`、`checked`、`items`）
+3. 必填事件回调（如 `onValueChange`、`onDismissRequest`）
+4. 行为开关（`enabled`、`loading` 等）
+5. 环境依赖（`backdrop`、`renderer` 等；需要时支持自动解析或显式降级）
+6. 外观覆盖（`dark`、`colors`、`style`、`shape`、`material` 等；超过 3 个同类参数收敛为 `CouiXxxColors` 或 `CouiXxxStyle`）
+7. 尾随内容槽位（`content`、`title` 等）
+
+需要后置参数参与自动解析时，仅对相关配置使用 `Unspecified` 或可空默认值，不批量改成 `null`。
+
+| 职责 | 承载方式 | 示例 |
 | --- | --- | --- |
-| 当前节点的外部布局与独立装饰 | 标准 Modifier；COUI 特有绘制复用已有效果 | Wheel 高度、外部留白、整组选择线 |
-| 内部多个区域共同使用的状态与样式 | 组件参数或已有 Defaults | enabled、日期范围、字号、状态颜色、面板形状 |
-| 多个子节点的排列与业务联动 | 组件组合或内容槽位 | 小时与分钟、确认草稿、日期列联动 |
+| 当前节点的外部布局与独立装饰 | 标准 Modifier 或 COUI 效果入口 | 外部留白、固定尺寸、整组选择线 |
+| 内部多区域共享的状态与样式 | 组件参数或 Defaults | `enabled`、数值范围、字号、状态配色、面板形状 |
+| 多子节点排列与业务联动 | 组件组合或内容槽位 | 小时与分钟联动、确认草稿、自定义行内容 |
 
-`enabled` 和 `onClick` 属于交互组件的核心职责，不能只因多个组件都有它们就改成 Modifier。Wheel 的字号、diffusion 和 wrap 影响内部测量或运动，仍由参数协调。不要增加 `couiWidth` 等标准 API 包装，也不要用 Modifier 隐藏组件配置。内部去重不要求新增公开类型；只有实际跨模块消费者需要时，才公开最小入口。
+- `enabled` 和 `onClick` 属于交互组件核心参数，不改为 Modifier；影响内部测量或运动的字号、范围、`wrap` 等保持参数形式。不新增 `couiWidth` 等标准 API 包装层，也不新增仅转发参数的包装组件。
+- 调用方 `Modifier` 仅在根布局应用一次，内部默认尺寸随后追加并服从父级约束；背景、阴影、裁剪与内边距顺序按实际绘制层级设计。
+- 同一几何应同时提供裁剪与效果所需参数：`CouiShape` 自动提供圆角半径与权重，任意 `Shape` 无法反推时保留明确的高级配置参数。
+- Compose Modifier 顺序与自定义节点原则见 [Compose Modifier 规范](https://developer.android.com/develop/ui/compose/modifiers)。
 
-调用者的 Modifier 在根布局应用一次，内部默认尺寸随后追加，并服从父级约束。布局、绘制和命中使用同一实际尺寸。修改已有内区留白前，先追踪其测量和动画用途，不能机械替换为根 padding。
+## 平台门槛、资源所有权与失败语义
 
-顺序是调用契约，不是“后写覆盖”或“全部累加”：
+- 区分两类错误并在 KDoc 写明边界：
+  - **开发期契约错误**（空列表、越界下标、必填无障碍描述缺失、非法数值范围、未实现组合如 `RoundRect` 开启 `clipping = true`）：在入口处通过 `require` / `check` 立即失败，并附简体中文上下文。
+  - **运行时环境能力**（系统版本、采样源、GPU/Shader 编译）：高版本入口标 `@RequiresApi`；同族组件统一“无采样源回退纯色 vs 必须有源”策略；可变 `renderer` 构造失败必须向宿主暴露，禁止吞错或静默换算法。
+- 常规入口与底层自定义（如 `couiShadow` 与 `CouiShadowRenderer`、`CouiMetaballRenderer`、单主体 `CouiFloatingRenderer.standalone()` 与三主体 `CouiFloatingRenderer()`）共用同一后端，不拆简单版与高级版两套组件。
+- 可变 `renderer`、图层与采样坐标归具体节点独立持有，禁止跨节点复用或通过复制返回的 Modifier 隐式共享。开发诊断入口 `CouiRenderDiagnostics` / `renderDiagnosticProbe` 仅在主线程按需启停，不作为业务状态。
 
-~~~kotlin
-Modifier.background(color).padding(16.dp) // 背景包含留白。
-Modifier.padding(16.dp).background(color) // 留白位于背景外。
-Modifier.clickable(onClick = onClick).padding(16.dp) // 留白可点击。
-Modifier.padding(16.dp).clickable(onClick = onClick) // 留白不参与点击。
-~~~
+## API 评审自查清单
 
-`background(shape)` 只画背景，`clip(shape)` 裁剪其内侧绘制；尺寸 Modifier 依次收紧约束，不相加。效果入口须说明背景/内容范围、测量影响、坐标、裁剪和 padding 顺序。阴影通常放在主体裁剪外，背景滤镜只处理采样层，不能顺带模糊文字。
+1. 未被真实外部场景需要的符号是否均收窄为 `internal` / `private`？
+2. 省略所有外观可选参数时，是否直接呈现出推荐的主题外观（原生或 M3）？
+3. 状态是否遵循「值 + 回调」或受控 State，且未新增 `MutableState<T>` 传参？
+4. 参数顺序是否对齐标准模板，且未出现重复参数、包装层或错误的 Modifier 归属？
+5. `require` / `check`、API 门槛注解、无采样源策略与 `renderer` 失败处理是否清晰且与同族一致？
+6. 公开变更是否同步了库内调用方、Demo、使用文档与迁移说明？
 
-配置可以复用，可变 renderer、采样坐标和图层归具体节点。通用效果内部需要这些资源时使用节点生命周期；简单无状态装饰直接组合已有 Modifier。显式接收 renderer、内容层或锚点的低层接口保留其单节点 owner，不能复制返回的 Modifier 来隐式复制资源。主题在组件消费位置解析；显式传入的颜色不因节点移动而变成另一套主题。
-
-同一几何应提供裁剪与效果所需的参数。Dialog/Menu 从 `CouiShape` 读取半径和权重；任意 Shape 无法反推这些数值，保留明确的高级配置。不同几何（例如 Checkbox 填充与边框）分别保留。
-
-依据：[Compose Modifier 顺序](https://developer.android.com/develop/ui/compose/modifiers)、[自定义 Modifier 与节点](https://developer.android.com/develop/ui/compose/custom-modifiers)。
-
-## 常规入口与底层自定义
-
-[组件目录](../components/README.md)面向直接装配，[效果目录](../effects/README.md)面向独立绘制。在原组件参数上提供合理默认值，不新增简单版与高级版两套组件。默认值使用初始化策略、局部主题与所属 Defaults，未初始化时使用原生预设；显式配置继续优先。深浅色、内容插槽及染色规则统一见[外观与预设](../guide/appearance.md)。高自定义接口继续支持真实的坐标、几何和合成需求。
-
-保留公开参数顺序。需要后置参数参与自动解析时，仅对相关配置使用可空默认值或原类型的 Unspecified；不批量改成 null。Backdrop、Renderer 的默认策略以实际窗口和单/多主体所有权为准，不随颜色参数一起隐藏。
-
-公开参数应说明单位、本地或窗口坐标、有效范围、输入错误、版本分支，以及状态和资源由谁持有。构造失败要向调用方暴露；需要错误 UI 的宿主在工厂创建阶段捕获结果，再决定是否进入组件。
-
-诊断入口 CouiRenderDiagnostics / renderDiagnosticProbe 只在主线程按需启停，不作为业务状态。单主体和固定三主体浮动装配能力不同；说明见[浮动表面](../effects/floating-surfaces.md)。
-
-## 文档与迁移
-
-公开签名和 KDoc 是参数声明的来源；使用页解释当前语义和正确装配，不复制另一份默认数值。变更公开 API 时同步调用方与对应页面；迁移方式在 PR 中说明，发行时记入 CHANGELOG。
-
-公开边界的历史决定见[API 收口](../../.agents/notes/implemented/architecture/2026-10-23-public-api-boundary.md)。
+历史收口决策见[API 收口 Note](../../.agents/notes/implemented/architecture/2026-10-23-public-api-boundary.md)。

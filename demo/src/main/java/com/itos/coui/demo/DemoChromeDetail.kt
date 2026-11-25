@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -28,10 +29,13 @@ import com.itos.coui.icons.CouiIcons
 import com.itos.coui.layout.CouiPageDefaults
 import com.itos.coui.layout.Divider
 import com.itos.coui.layout.Group
+import com.itos.coui.navigation.CouiNavigationBarAction
+import com.itos.coui.navigation.CouiNavigationBarDefaults
 import com.itos.coui.navigation.CouiNavigationItem
 import com.itos.coui.navigation.NavigationBar
 import com.itos.coui.text.CouiTextKind
 import com.itos.coui.text.rememberCouiTextStyle
+import com.itos.coui.theme.CouiTheme
 
 @Composable
 internal fun ChromeDetail(page: String, dark: Boolean) {
@@ -69,12 +73,22 @@ private fun NavigationSample(dark: Boolean) {
                         CouiNavigationItem(title = titles[1], icon = DemoIcons.Effects, selectedIcon = DemoIcons.EffectsSelected),
                         CouiNavigationItem(title = titles[2], icon = DemoIcons.Settings, selectedIcon = DemoIcons.SettingsSelected)),
                     selectedIndex = selected, onSelection = { selected = it },
-                    leftIcon = CouiIcons.Filled.SettingDetail, leftDescription = stringResource(R.string.nav_left_description),
-                    rightIcon = CouiIcons.Filled.Add, rightDescription = stringResource(R.string.nav_right_description),
-                    leftVisible = left, rightVisible = right,
-                    rightContainerColor = CouiFabDefaults.containerColor(CouiFabColor.Notes, dark),
-                    dark = dark, lightColor = Color.White,
-                    circleShape = DemoShapes.couiCircle, capsuleShape = DemoShapes.couiCapsule)
+                    leftAction = CouiNavigationBarAction(
+                        icon = CouiIcons.Filled.SettingDetail,
+                        contentDescription = stringResource(R.string.nav_left_description),
+                        visible = left,
+                        style = CouiNavigationBarDefaults.coloredActionStyle(
+                            containerColor = CouiFabDefaults.containerColor(CouiFabColor.Notes, dark),
+                            dark = dark,
+                        ),
+                    ),
+                    rightAction = CouiNavigationBarAction(
+                        icon = CouiIcons.Filled.Add,
+                        contentDescription = stringResource(R.string.nav_right_description),
+                        visible = right,
+                    ),
+                    dark = dark,
+                )
             }
         }
         if (Build.VERSION.SDK_INT < 34) DemoPreference(title = stringResource(R.string.requires_api_34), enabled = false)
@@ -134,6 +148,22 @@ internal fun FabSampleButton(modifier: Modifier = Modifier, dark: Boolean, prese
                 modifier, color = MaterialTheme.colorScheme.error)
         }
     }
+}
+
+/** 浮动组件的多彩预览背景, 让玻璃材质有可采样的内容；传入 [backdrop] 时同时录入采样源。 */
+@Composable
+internal fun BoxScope.ChromePreviewGradient(
+    dark: Boolean = CouiTheme.isDark,
+    backdrop: CouiBackdrop? = null,
+) {
+    Box(
+        Modifier.matchParentSize()
+            .then(if (backdrop != null) Modifier.couiBackdrop(backdrop) else Modifier)
+            .background(Brush.linearGradient(
+                if (dark) listOf(Color(0xFF152D40), Color(0xFF49313D), Color(0xFF343B2B))
+                else listOf(Color(0xFFD7EDF9), Color(0xFFF9DFDC), Color(0xFFEAF1D2)),
+            )),
+    )
 }
 
 /** 预览背景独立录入采样源；浮动组件不被录入自己的 Backdrop。 */

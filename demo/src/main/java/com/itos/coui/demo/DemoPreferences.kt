@@ -1,6 +1,7 @@
 package com.itos.coui.demo
 
 import android.content.Context
+import com.itos.coui.navigation3.CouiBackPreset
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +17,12 @@ internal class DemoPreferences private constructor(context: Context) {
         private set
     fun materialTheme(value: Boolean) { materialTheme = value; store.edit().putBoolean("materialTheme", value).apply() }
     var contour by mutableStateOf(store.getBoolean("contour", true))
+        private set
+    var composeProgressiveBlur by mutableStateOf(store.getBoolean("composeProgressiveBlur", true))
+        private set
+    var backPreset by mutableStateOf(
+        if (store.getBoolean("aospBackPreview", false)) CouiBackPreset.AOSP else CouiBackPreset.CHATGPT
+    )
         private set
     var messageInputCamera by mutableStateOf(store.getBoolean("messageInputCamera", true))
         private set
@@ -41,7 +48,15 @@ internal class DemoPreferences private constructor(context: Context) {
 
     fun dark(value: Boolean) { darkOverride = value; store.edit().putBoolean("dark", value).apply() }
     fun contour(value: Boolean) { contour = value; store.edit().putBoolean("contour", value).apply() }
-    fun reset() { materialTheme(false); contour(true) }
+    fun composeProgressiveBlur(value: Boolean) {
+        composeProgressiveBlur = value
+        store.edit().putBoolean("composeProgressiveBlur", value).apply()
+    }
+    fun setTransitionPreset(value: CouiBackPreset) {
+        backPreset = value
+        store.edit().putBoolean("aospBackPreview", value == CouiBackPreset.AOSP).apply()
+    }
+    fun reset() { materialTheme(false); contour(true); composeProgressiveBlur(true); setTransitionPreset(CouiBackPreset.CHATGPT) }
 
     companion object {
         private var instance: DemoPreferences? = null

@@ -2,6 +2,105 @@
 
 COUI-Kit 处于早期预览阶段。本文记录公开 API、行为、接入和兼容要求的变化。日期以提交合并时间为准；版本归档以真实 Git Tag 和发行产物为准。
 
+## [0.0.1-alpha19] - 2026-11-24
+
+### 新增与改进
+
+- 重构 `NavigationBar` 左右附件配置，新增 `CouiNavigationBarAction`、`CouiNavigationBarActionStyle` 与 `CouiNavigationBarDefaults`（`material`、`transparentActionStyle`、`coloredActionStyle`）。两侧附件均支持独立选用默认透明、主题强调色或自定义外观（材质、投影、图标颜色、形状、光斑与悬停反馈），`visible` 控制融合收起动画，省略 `onClick` 时仅保留拖拽与光效。[底栏用法](docs/components/navigation-bar.md#左右附件)
+- `NavigationBar` 新增 `material` 参数用于定制中间胶囊材质（与 `lightColor`、`themeTint` 共同仅作用于中间胶囊）；同步更新底栏组件文档、外观染色说明与 `coui-kit` 外部接入 Skill。
+
+### 升级说明
+
+- 升级时将 `NavigationBar` 原有的 `leftIcon`、`rightIcon`、`leftDescription`、`rightDescription`、`leftVisible`、`rightVisible`、`onLeftClick`、`onRightClick` 迁入 `leftAction` / `rightAction`（`CouiNavigationBarAction`）；将 `rightContainerColor` 传给 `CouiNavigationBarDefaults.coloredActionStyle(containerColor = …)`；将 `circleShape` 移入各侧的 `style.shape`。中间胶囊统一使用 `CouiCapsuleShape`，升级时删除 `capsuleShape` 实参。保留附件配置并将其 `visible` 设为 `false` 可播放收起动画，传 `null` 会直接移除附件。
+- Alpha19 通过 JitPack 发布，坐标为 `com.github.itoseo.coui-kit:coui:0.0.1-alpha19`；使用 `coui-material3` 或 `coui-icons` 时请同步升级至 `0.0.1-alpha19`。
+
+## [0.0.1-alpha18] - 2026-11-24
+
+### 新增与改进
+
+- 为单选弹窗 `SingleChoiceDialog` 新增可选的 `message` 参数。说明文字显示在标题下方，与选项一起滚动，标题和底部操作区保持固定。[弹窗](docs/components/dialog.md#单选弹窗)
+- 修复 Nav3 预测性返回的窗口圆角读取兼容性。窗口圆角 API 不可用时，沿用系统圆角资源。
+
+### 升级说明
+
+- Alpha18 通过 JitPack 发布。升级时，在 `settings.gradle.kts` 中添加 JitPack 仓库，将已使用的 COUI 模块统一切换到 `com.github.itoseo.coui-kit`，版本设为 `0.0.1-alpha18`。[快速开始](docs/guide/getting-started.md#jitpack)
+- 核心库坐标为 `com.github.itoseo.coui-kit:coui:0.0.1-alpha18`。如使用 `coui-material3` 或 `coui-icons`，请同步切换到同一渠道和版本。
+
+## [0.0.1-alpha17] - 2026-11-24
+
+### 新增与改进
+
+- 新增单选弹窗 `SingleChoiceDialog`，保持标题与底部操作区固定，中间列表独立滚动。支持通过 `CouiSingleChoiceItem` 配置行首图标与禁用态，并支持 0 至 4 行底部操作按钮。[弹窗](docs/components/dialog.md#单选弹窗)
+- 新增 Nav3 预测性返回转场 `PredictiveBackNavDisplay` 与 `CouiBackPreset` 预设，支持 `AOSP` 跟手圆角卡片缩放和 `CHATGPT` 水平共享轴转场，兼容多标签与分栏场景。[Nav3 页面转场](docs/components/predictive-back.md)
+- 统一全库中性模糊材质的主题染色管道，所有组件共用保亮度染色算法与库内固定强度。为 `Dialog` 系列、`Menu`、`SearchBar`、`MessageInputBar`、`SegmentedControl`、`ChipTab` 系列、顶栏组件及 `rememberCouiMaterialEffect` 统一补全或规范 `themeTint` 参数；菜单染色收敛至 AGSL 内部执行。[外观与预设](docs/guide/appearance.md#背景材质染色)
+- 修复 `CouiGradientBlur` 的渐变模糊边界问题，避免屏幕外透明外沿拉低边界 alpha，防止顶边透出未模糊正文或产生外溢不透明边，并优化全高渐隐曲线的边界过渡。
+- 新增 `coui-kit` 外部接入 Agent Skill，并在 README 补充安装指令与推荐工具，方便外部项目通过 AI 辅助接入组件。[SKILL.md](skills/coui-kit/SKILL.md)
+
+### 升级说明
+
+- 如果在调用括号内按位置传入 `Dialog` 的 `content`、`ChipTabButton` 的 `icon`、`TopAppBarButton` 的 `content`、`TopAppBarSearch` 的 `title` 或 `Menu` 的 `onSpotlightDiagnostic`，请改用命名参数或尾随 lambda。
+- 开启 Material 3 适配后，弹窗、顶栏按钮、搜索栏、消息输入栏、分段选择器、分类栏、菜单、底栏和底部面板默认使用宿主 `surface` 作为材质染色基准色。传入 `themeTint = Color.Transparent` 或使用 `CouiTheme(materialTint = Color.Transparent)` 可关闭染色；自定义 `themeTint` 时，库会忽略颜色自身的 alpha 并应用统一强度。
+- 核心库 `coui` 新增 `androidx.navigation3:navigation3-ui:1.2.1` 的 API 依赖。`coui`、`coui-material3` 和 `coui-icons` 继续使用同一版本，升级后重新编译宿主模块。
+
+## [0.0.1-alpha16] - 2026-11-23
+
+### 新增与改进
+
+- 新增 `Dialog` 的 `actionRows` 重载，支持自定义 1 至 4 行底部按钮，例如上方一个通栏按钮、下方两个并排按钮。宽度不足时自动拆成竖排，操作区独立于正文滚动。[弹窗](docs/components/dialog.md#自定义底部操作行)
+- 优化顶栏渐进模糊，带来更好的效果，传入 `useCouiBlur = true` 可切回旧实现。[顶栏](docs/components/top-app-bar.md)
+- 新增 HCT 颜色增强函数 `enhanceHctColor(seed, tone)`，可从种子色生成指定色调的增强色，适合用于 FAB 等需要强调的控件。中性灰保持中性。[外观与预设](docs/guide/appearance.md)
+- 新增删除、收藏、信息、编辑和分享图标，均提供 Filled 与 Outlined 两种样式。补充实心 AddCircle、实心 Send、文档扫描和翻译图标，调整描边 Send 的圆环与箭头样式。[图标](docs/components/icons.md)
+
+### 升级说明
+
+- 现有 `Dialog` 调用可直接沿用。需要自定义按钮排布时，改用 `actionRows` 重载。
+- 如果在调用括号内按位置传入 `TopAppBarSurface` 的 `content` 或 `CollapsingTopAppBar` 的 `searchBar`，请改用命名参数或尾随 lambda。
+- 如果希望保留 Alpha 15 的实心发送图标，请把 `CouiIcons.Outlined.Send` 改为 `CouiIcons.Filled.Send`。
+
+## [0.0.1-alpha15] - 2026-11-22
+
+### 新增与改进
+
+- 优化顶栏渐变模糊，减轻浅色模式下的中段亮带和色阶分层。遮罩默认跟随页面底色。
+- 修复顶栏搜索收起时的锚点错位。操作区布局变化后，搜索框会回到入口的当前位置。
+- 优化触点菜单定位。菜单横向居中对准按下位置，靠近窗口边缘时向内移动。普通菜单最小宽度从 `168dp` 调整为 `160dp`。
+- 新增局部菜单背景采样控制，可让指定范围内的菜单在模糊材质与纯色背景之间切换。
+- 为 `BottomSheet` 新增 `themeTint` 参数。启用 Material 3 适配后，面板的模糊底图默认采用宿主的 `surface` 色染色。
+
+### 升级说明
+
+- 如果在 `BottomSheet(...)` 括号内按位置传入内容 lambda，改用 `content = { … }` 或移到括号外。原本用这两种方式的调用可直接升级。
+- 如果启用了 Material 3 适配，且希望底部面板保持原来的未染色外观，传入 `themeTint = Color.Transparent`。
+- 如果顶栏依赖原先的浅色白、深色黑遮罩，请在 `CouiTopAppBarDefaults.colors(backgroundColor = …)` 中显式指定颜色。直接使用 `TopAppBarSurface` 时，设置 `gradientColor`。
+
+### 编译要求
+
+宿主最低 `compileSdk` 提升至 `37.1`，运行最低版本仍为 API 31。
+
+## [0.0.1-alpha14] - 2026-11-22
+
+### 新增与改进
+
+- 优化顶栏、底栏、FAB、搜索栏、菜单和弹窗的背景模糊与材质效果，修复部分场景下的马赛克和色阶分层。
+- 调整 Popup 菜单的默认宽度。普通菜单为 `168–256dp`，含子菜单项时最小宽度为 `196dp`。 [PR #33](https://github.com/ItosEO/COUI-Kit/pull/33)
+
+### 升级说明
+
+- `coui`、`coui-material3` 和 `coui-icons` 使用同一版本。升级后重新编译宿主模块。
+
+## [0.0.1-alpha13] - 2026-11-21
+
+### 新增与改进
+
+- 新增底部面板 `BottomSheet`，通过 `MutableState<Boolean>` 控制显隐，支持居中标题、两侧操作按钮、正文滚动回弹及下拉关闭。面板支持 API 31+，有宿主窗口背景源时可在 API 33+ 启用模糊材质，顶部按钮的浮动材质要求 API 34+。[底部面板](docs/components/bottom-sheet.md)
+- 对齐底部面板 Fast Kawase 的降采样网格与放大后的混色顺序，减轻底图的色阶块。面板内的菜单和子菜单按面板可见范围定位，顶部按钮可用 `CouiSheetButton.popupContent` 挂载固定位置的菜单。[菜单](docs/components/menu.md)
+- `ChipTabRow` 可继承容器提供的背景源，并支持分别设置选中底色与前景色。新增默认单行省略的 `CouiTextKind.SheetTitle`。[分类栏](docs/components/chip-tab.md)
+- `WheelPicker` 支持单独设置滚轮文字的可见宽度和对齐方式，整列仍可触摸拖动。[选择器](docs/components/pickers.md)
+
+### 升级说明
+
+- `coui`、`coui-material3` 和 `coui-icons` 使用同一版本。升级后重新编译宿主模块。
+
 ## [0.0.1-alpha12] - 2026-11-18
 
 ### 新增与改进

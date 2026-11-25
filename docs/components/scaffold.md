@@ -58,7 +58,7 @@ fun BasicScaffoldPageExample(
 | --- | --- | --- |
 | `topBar` | `{}` | 顶部栏位，自动获得默认正文 `backdrop` |
 | `bottomBar` | `{}` | 底部栏位，自动获得默认正文 `backdrop` |
-| `containerColor` | `CouiTheme.colorScheme.background` | 正文底层背景色，会录入正文 `backdrop` 供浮动栏位采样，不修改内容槽局部主题 |
+| `containerColor` | `CouiTheme.colorScheme.background` | 正文底层背景色，录入正文 `backdrop`。不透明时也作为 [顶栏遮罩](top-app-bar.md#背景参数) 的默认颜色 |
 | `windowInsets` | `WindowInsets.systemBars.union(WindowInsets.displayCutout)` | 系统安全区与屏幕缺口；传入 `WindowInsets(0, 0, 0, 0)` 可关闭默认安全区处理 |
 | `floatingActionButton` | `null` | 位于 `BoxScope` 的浮动操作槽位，自动获得默认正文 `backdrop` 与安全留白 |
 
@@ -72,7 +72,7 @@ fun BasicScaffoldPageExample(
 | 存在非零高度的底栏 | `padding.bottom` 等于底栏实测高度 | 底栏内部负责底部安全区 |
 | 栏位为空或高度为 `0` | 对应边直接使用剩余系统 `Insets` | 无 |
 
-- **内置栏位已处理纵向安全区**：`TopAppBar`、`LargeTopAppBar` 和 `CollapsingTopAppBar` 内部已处理顶部安全区；`NavigationBar` 内部已处理底部安全区与浮动边距。不要再给内置栏位内容叠加 `statusBarsPadding()` 或 `navigationBarsPadding()`，也不要把同一纵向 Insets 再次加到正文 `padding` 上。
+- **内置栏位已处理纵向安全区**：`TopAppBar`、`LargeTopAppBar` 和 `CollapsingTopAppBar` 内部已处理顶部安全区；`NavigationBar` 与 `FloatingToolbar` 内部已处理底部安全区（`WindowInsets.tappableElement`）与浮动边距。不要再给内置栏位内容叠加 `statusBarsPadding()` 或 `navigationBarsPadding()`，也不要把同一纵向 Insets 再次加到正文 `padding` 上。
 - **自定义栏位需自行处理**：`TopAppBarSurface` 只提供背景，内部自定义内容需自行处理一次顶部安全区；自定义底栏应按自身布局使用 `navigationBarsPadding()` 等 Modifier。
 - **不同正文容器的写法**：
   - `LazyColumn`：传 `contentPadding = padding` 并配合 `Modifier.consumeWindowInsets(padding)`。

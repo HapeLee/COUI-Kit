@@ -34,6 +34,6 @@ internal fun DemoPickerDialog(
             style = CouiDialogActionStyle.Primary, colors = CouiDialogDefaults.primaryActionColors(CouiTheme.colorScheme.accent)),
         dismissAction = CouiDialogAction(cancelText, onDismissRequest),
         title = title, placement = placement,
-        material = if (CouiDialogDefaults.isMaterialSupported()) CouiDialogDefaults.material(CouiTheme.isDark) else null,
+        material = demoDialogMaterial(backdrop),
         backdrop = backdrop, content = content)
 }

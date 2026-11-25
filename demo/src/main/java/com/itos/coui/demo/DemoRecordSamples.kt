@@ -119,6 +119,7 @@ internal fun RecordSwipeSamples(dark: Boolean) {
     SampleRecords.firstOrNull { it.id == viewedId }?.let { record ->
         Dialog(visible = previewVisible, onDismissRequest = { previewVisible = false }, dark = dark,
             title = stringResource(R.string.record_preview),
+            material = demoDialogMaterial(),
             confirmAction = CouiDialogAction(stringResource(R.string.dialog_confirm), { previewVisible = false })) {
             RecordHistoryContent(record = record)
         }

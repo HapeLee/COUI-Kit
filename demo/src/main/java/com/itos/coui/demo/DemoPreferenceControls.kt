@@ -34,7 +34,7 @@ import com.itos.coui.shape.CouiCapsuleShape
 internal fun <T> DemoPopupPreference(
     modifier: Modifier = Modifier,
     title: String,
-    value: String,
+    value: String?,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     items: List<CouiMenuItem<T>>,
@@ -43,6 +43,10 @@ internal fun <T> DemoPopupPreference(
     summary: String? = null,
     enabled: Boolean = true,
     icon: (@Composable () -> Unit)? = null,
+    menuModifier: Modifier = Modifier,
+    headerText: String? = null,
+    headerTextAlign: TextAlign = TextAlign.Center,
+    closeOnItemClick: (CouiMenuItem<T>) -> Boolean = { true },
 ) {
     val dark = CouiTheme.isDark
     val colors = CouiPageDefaults.themeColors(dark)
@@ -53,8 +57,10 @@ internal fun <T> DemoPopupPreference(
             .couiButtonFeedback(dark, source, enabled, list = true, hoverLocked = expanded)
             .clickable(source, null, enabled, role = Role.Button) { anchor.open { onExpandedChange(true) } },
             title, summary, enabled, icon) {
-            BasicText(value, Modifier.padding(start = 16.dp), maxLines = 2,
-                style = rememberCouiTextStyle(CouiTextKind.ItemValue).copy(color = colors.summary, textAlign = TextAlign.End))
+            if (value != null) {
+                BasicText(value, Modifier.padding(start = 16.dp), maxLines = 2,
+                    style = rememberCouiTextStyle(CouiTextKind.ItemValue).copy(color = colors.summary, textAlign = TextAlign.End))
+            }
             Icon(
                 imageVector = CouiIcons.Outlined.Popup,
                 contentDescription = null,
@@ -62,8 +68,11 @@ internal fun <T> DemoPopupPreference(
                 tint = Color(if (dark) 0x4DFFFFFF else 0x42000000),
             )
         }
-        Menu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }, items = items,
-            onItemClick = { item -> onItemClick(item); onExpandedChange(false) }, style = menuStyle, anchor = anchor)
+        Menu(modifier = menuModifier, expanded = expanded, onDismissRequest = { onExpandedChange(false) }, items = items,
+            onItemClick = { item ->
+                onItemClick(item)
+                if (closeOnItemClick(item)) onExpandedChange(false)
+            }, style = menuStyle, anchor = anchor, headerText = headerText, headerTextAlign = headerTextAlign)
     }
 }
 

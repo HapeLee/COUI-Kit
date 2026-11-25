@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.TextStyle
+import com.itos.coui.layout.LocalScaffoldTopBarContainerColor
 import com.itos.coui.text.CouiTextKind
 import com.itos.coui.text.rememberCouiSystemTextStyle
 import com.itos.coui.theme.CouiTheme
@@ -47,15 +48,20 @@ object CouiTopAppBarDefaults {
     internal fun expandedTitleTextStyle(): TextStyle =
         rememberCouiSystemTextStyle(CouiTextKind.HomeTitle)
 
+    /** 背景色未指定时取 Scaffold 的不透明页面底色，其次取当前主题的页面底色。 */
     @Composable
     fun colors(backgroundColor: Color = Color.Unspecified, titleColor: Color = Color.Unspecified,
         navigationIconColor: Color = Color.Unspecified, actionIconColor: Color = Color.Unspecified,
         dark: Boolean = CouiTheme.isDark): CouiTopAppBarColors {
         val scheme = CouiTheme.colorSchemeFor(dark)
-        return CouiTopAppBarColors(backgroundColor.takeOrElse { if (dark) Color.Black else Color.White },
+        return CouiTopAppBarColors(backgroundColor.takeOrElse { defaultBackgroundColor(scheme.background) },
             titleColor.takeOrElse { scheme.onSurface }, navigationIconColor.takeOrElse { scheme.onSurface },
             actionIconColor.takeOrElse { scheme.onSurface })
     }
+
+    @Composable
+    internal fun defaultBackgroundColor(themeBackground: Color): Color =
+        LocalScaffoldTopBarContainerColor.current.takeOrElse { themeBackground }
 
     /** 记住可恢复的折叠状态；canScroll 读取正文实际滚动范围。 */
     @Composable
@@ -67,6 +73,8 @@ object CouiTopAppBarDefaults {
     val fadeHeight = 96.dp
     val referenceBlurRadius = 10.8.dp
     val bottomExtension = 12.dp
+    internal const val systemBlurRadiusPx = 30f
+    internal const val systemGradientSpeed = 3f
     internal val searchActionGap = 12.dp
     internal val searchActionMinWidth = 40.dp
     internal val searchActionMaxWidth = 152.dp

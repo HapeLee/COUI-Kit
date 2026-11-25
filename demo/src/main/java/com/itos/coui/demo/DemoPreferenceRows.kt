@@ -97,12 +97,13 @@ internal fun DemoCheckboxPreference(
     enabled: Boolean = true,
     contentPadding: androidx.compose.foundation.layout.PaddingValues = androidx.compose.foundation.layout.PaddingValues(
         horizontal = CouiPageDefaults.rowPadding, vertical = CouiPageDefaults.contentPadding),
+    icon: (@Composable () -> Unit)? = null,
 ) {
     val dark = CouiTheme.isDark
     val colors = CouiPageDefaults.themeColors(dark)
     val source = remember { MutableInteractionSource() }
     DemoPreferenceRow(modifier.couiButtonFeedback(dark, source, enabled, list = true)
-        .toggleable(checked, source, null, enabled, Role.Checkbox, onCheckedChange), title, summary, enabled, null, contentPadding) {
+        .toggleable(checked, source, null, enabled, Role.Checkbox, onCheckedChange), title, summary, enabled, icon, contentPadding) {
         Checkbox(modifier = Modifier.padding(start = 16.dp).size(24.dp),
             checked = checked, enabled = enabled,
             colors = CouiCheckboxDefaults.colors(colors.accent, dark),

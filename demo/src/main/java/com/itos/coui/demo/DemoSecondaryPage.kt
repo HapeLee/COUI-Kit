@@ -43,6 +43,7 @@ internal fun DemoSecondaryPage(page: String, dark: Boolean, preferences: DemoPre
         DemoSettingsPage(title = stringResource(title), backDescription = stringResource(R.string.settings_back),
             onBack = back, dark = dark, colors = CouiPageDefaults.themeColors(dark), floatingAction = floatingAction) {
             when (page) {
+                "sheets" -> SheetSamples(dark)
                 "sliders", "switch", "checkbox", "dialogs", "menu" -> ComponentDetail(page, dark, toggleTheme)
                 "chip" -> ChipTabSample(dark)
                 "segment" -> SegmentedControlSample(dark)
@@ -61,12 +62,16 @@ internal fun DemoSecondaryPage(page: String, dark: Boolean, preferences: DemoPre
                 "fab" -> FabSample(preset = fabPreset, onPresetChange = { fabPreset = it },
                     rounded = roundedFab, onRoundedChange = { roundedFab = it })
                 "textfield" -> TextFieldSample(dark)
+                "floatingtoolbar" -> FloatingToolbarSample(dark)
                 "about" -> {
                     DemoAboutHero()
                     Group {
-                        DemoPreference(title = stringResource(R.string.app_name), value = "1.0")
+                        DemoPreference(title = stringResource(R.string.settings_coui_version), value = BuildConfig.VERSION_NAME)
                         Divider()
-                        DemoPreference(title = stringResource(R.string.settings_baseline), value = "ColorOS 17")
+                        DemoPreference(
+                            title = stringResource(R.string.settings_baseline),
+                            value = stringResource(R.string.settings_baseline_value, stringResource(R.string.style_reference_version)),
+                        )
                     }
                 }
             }

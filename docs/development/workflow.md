@@ -66,9 +66,9 @@ PR 按[模板](../../.github/pull_request_template.md)列出原厂依据、主�
 
 ## 同步使用文档
 
-实现完成后，按[文档维护规则](documentation.md)更新受影响的 component、effect、兼容要求和示例。使用文档与实现进入同一个 PR；Note 记录理由，Demo 展示装配，二者都不能替代使用说明。
+实现完成后，按[文档维护规范](documentation.md)同步受影响的 `docs/components/`、`docs/effects/`、`docs/guide/` 与 `skills/coui-kit/`。使用文档与实现进入同一个 PR；Note 记录理由，Demo 展示装配，二者均不能替代使用说明。
 
-新增或修改公共效果时，检查使用该效果的所有组件和 Demo；修复组件时，检查其共享算法与已知消费者。更新相关语义，不顺带扩展展示范围。
+新增或修改公共效果时，检查全部消费者与 Demo；修复组件时，检查共享算法与已知调用方。纯内部重构且使用契约不变时，不修改使用页与对外 Skill。
 
 ## 决定记录
 

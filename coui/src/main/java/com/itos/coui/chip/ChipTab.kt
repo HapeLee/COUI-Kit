@@ -35,7 +35,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
@@ -63,6 +65,9 @@ import kotlin.math.PI
 /**
  * 受控单选分类项。重复点击仍回调，由宿主决定选中值；组件不自行取消选中。
  * backdrop 必须来自不透明的兄弟源。每个节点独立持有 renderer，创建失败向上传播。
+ * selectedColor 只覆盖选中背景，null 保留中性材质；selectedContentColor 默认沿用 contentColor。
+ * 两种前景色均支持 Color.Unspecified，表示继承当前内容色。
+ * themeTint 为中性玻璃底层的染色基准色（强度由库统一控制，透明关闭，不干扰 selectedColor）。
  */
 @RequiresApi(34)
 @Composable
@@ -79,6 +84,9 @@ fun ChipTab(
     textStyle: TextStyle = CouiChipTabDefaults.themeTextStyle(),
     contourGlowEnabled: Boolean = LocalCouiContourGlowEnabled.current,
     renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
+    selectedColor: Color? = null,
+    selectedContentColor: Color = contentColor,
+    themeTint: Color = CouiTheme.materialTintFor(dark),
 ) {
     ChipSurface(
         modifier = modifier,
@@ -92,13 +100,16 @@ fun ChipTab(
         textStyle = textStyle,
         contour = contourGlowEnabled,
         renderer = renderer,
+        selectedColor = selectedColor,
+        selectedContentColor = selectedContentColor,
+        themeTint = themeTint,
     ) {
         if (icon != null) Box(Modifier.size(16.dp), contentAlignment = Alignment.Center) { icon() }
         Text(modifier = Modifier.widthIn(max = 200.dp), text = label, style = textStyle, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
-/** 分类栏的独立图标标签；不参与单选组，图标和动作由宿主提供。 */
+/** 分类栏的独立图标标签；不参与单选组，图标和动作由宿主提供；themeTint 为材质染色基准色。 */
 @RequiresApi(34)
 @Composable
 fun ChipTabButton(
@@ -111,6 +122,7 @@ fun ChipTabButton(
     contentColor: Color = CouiChipTabDefaults.contentColor(dark, enabled),
     contourGlowEnabled: Boolean = LocalCouiContourGlowEnabled.current,
     renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
+    themeTint: Color = CouiTheme.materialTintFor(dark),
     icon: @Composable () -> Unit,
 ) {
     ChipSurface(
@@ -124,6 +136,9 @@ fun ChipTabButton(
         contentColor = contentColor,
         contour = contourGlowEnabled,
         renderer = renderer,
+        selectedColor = null,
+        selectedContentColor = contentColor,
+        themeTint = themeTint,
     ) {
         Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) { icon() }
     }
@@ -143,6 +158,9 @@ private fun ChipSurface(
     textStyle: TextStyle? = null,
     contour: Boolean,
     renderer: CouiFloatingRenderer,
+    selectedColor: Color?,
+    selectedContentColor: Color,
+    themeTint: Color,
     content: @Composable RowScope.() -> Unit,
 ) {
     val alpha = remember { ChipSelectionAlpha(selected) }
@@ -189,16 +207,19 @@ private fun ChipSurface(
         .couiFloatingSurface(
             backdrop = backdrop,
             renderer = renderer,
-            material = CouiChipTabDefaults.material(dark = dark, checkedFraction = fraction),
+            material = CouiChipTabDefaults.material(dark = dark, checkedFraction = fraction).copy(themeTint = themeTint),
             shadow = CouiChipTabDefaults.shadow(dark = dark, density = density, checkedFraction = fraction, caustic = contour),
             shape = CouiCapsuleShape,
             contentLayer = contentLayer,
             contourGlowEnabled = contour,
             foregroundComposition = true,
             beforeContent = { lightClip ->
-                if (drawLight != null) {
+                if (drawLight != null || selectedColor != null) {
                     withTransform({ scale(press.scale.value, press.scale.value, center) }) {
-                        clipPath(lightClip) { drawLight.invoke(this) }
+                        clipPath(lightClip) {
+                            selectedColor?.let { drawRect(it.copy(alpha = it.alpha * fraction)) }
+                            drawLight?.invoke(this)
+                        }
                     }
                 }
             },
@@ -216,7 +237,15 @@ private fun ChipSurface(
             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ProvideCouiContent(color = contentColor, textStyle = textStyle) { content() }
+            ProvideCouiContent(textStyle = textStyle) {
+                val inheritedContentColor = CouiTheme.contentColor
+                val resolvedContent = if (selectedContentColor == contentColor) contentColor else lerp(
+                    contentColor.takeOrElse { inheritedContentColor },
+                    selectedContentColor.takeOrElse { inheritedContentColor },
+                    fraction,
+                )
+                ProvideCouiContent(color = resolvedContent) { content() }
+            }
         }
     }
 }

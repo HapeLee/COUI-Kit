@@ -7,7 +7,6 @@ import com.itos.coui.dialog.CouiDialogAction
 import com.itos.coui.dialog.Dialog
 import com.itos.coui.theme.CouiTheme
 import com.itos.coui.menu.rememberCouiWindowBackdrop
-import com.itos.coui.icons.CouiIcons
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.Box
@@ -21,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.Role
 import com.itos.coui.checkbox.Checkbox
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -33,10 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.itos.coui.menu.Menu
-import com.itos.coui.menu.CouiMenuItem
-import com.itos.coui.menu.couiMenuAnchor
-import com.itos.coui.menu.rememberCouiMenuAnchor
 import com.itos.coui.layout.Divider
 import com.itos.coui.layout.Group
 import kotlin.math.roundToInt
@@ -46,10 +40,7 @@ internal fun ComponentDetail(page: String, dark: Boolean, onToggleTheme: () -> U
     when (page) {
         "switch" -> SwitchSample(dark)
         "sliders" -> SliderSample()
-        "menu" -> {
-            PopupRowSample(dark)
-            Group(title = stringResource(R.string.menu_actions)) { MenuSample(dark) }
-        }
+        "menu" -> MenuSamples(dark)
         "dialogs" -> DialogSample(dark, onToggleTheme)
     }
     if (page == "checkbox") {
@@ -113,45 +104,6 @@ private fun SliderSample() {
 }
 
 @Composable
-private fun MenuSample(dark: Boolean) {
-    var expanded by remember { mutableStateOf(false) }
-    var selected by rememberSaveable { androidx.compose.runtime.mutableIntStateOf(0) }
-    var pinned by rememberSaveable { mutableStateOf(false) }
-    var longMenu by rememberSaveable { mutableStateOf(false) }
-    val anchor = rememberCouiMenuAnchor()
-    val first = stringResource(R.string.menu_first)
-    val second = stringResource(R.string.menu_second)
-    val longLabels = (1..12).map { stringResource(R.string.menu_item_number, it) }
-    DemoPreference(title = stringResource(R.string.menu_selection_label),
-        value = if (longMenu) longLabels[selected] else if (selected == 0) first else second)
-    Divider()
-    DemoSwitchPreference(title = stringResource(R.string.scroll_menu), checked = longMenu, onCheckedChange = { longMenu = it; selected = 0 })
-    Divider()
-    Box {
-        DemoPreference(modifier = Modifier.couiMenuAnchor(anchor),
-            title = stringResource(R.string.open_menu), summary = stringResource(R.string.menu_open_summary),
-            onClick = { anchor.open { expanded = true } })
-        Menu(expanded = expanded, onDismissRequest = { expanded = false }, anchor = anchor,
-            modifier = Modifier.heightIn(max = 320.dp),
-            style = demoMenuStyle(dark), headerText = stringResource(R.string.menu_header),
-            items = if (longMenu) longLabels.mapIndexed { index, label ->
-                CouiMenuItem(index, label, icon = CouiIcons.Filled.SettingDetail, selected = selected == index,
-                    dividerBefore = index > 0 && index % 3 == 0)
-            } else listOf(
-                CouiMenuItem(-1, stringResource(R.string.menu_pinned), checked = pinned),
-                CouiMenuItem(0, first, icon = CouiIcons.Filled.SettingDetail, selected = selected == 0, dividerBefore = true),
-                CouiMenuItem(-2, stringResource(R.string.menu_more),
-                    children = listOf(CouiMenuItem(1, second, selected = selected == 1),
-                        CouiMenuItem(-3, stringResource(R.string.menu_disabled), enabled = false))),
-            ),
-            onItemClick = { item ->
-                if (item.value == -1) pinned = !pinned else selected = item.value
-                expanded = false
-            })
-    }
-}
-
-@Composable
 internal fun SettingsDemo(dark: Boolean, preferences: DemoPreferences,
     leftAccessory: Boolean, onLeftAccessoryChange: (Boolean) -> Unit,
     rightAccessory: Boolean, onRightAccessoryChange: (Boolean) -> Unit,
@@ -171,6 +123,16 @@ internal fun SettingsDemo(dark: Boolean, preferences: DemoPreferences,
         DemoSwitchPreference(title = stringResource(R.string.right_accessory_toggle), checked = rightAccessory,
             onCheckedChange = onRightAccessoryChange)
     }
+    val progressiveBlurSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    Group(title = stringResource(R.string.progressive_blur_comparison)) {
+        DemoSwitchPreference(
+            title = stringResource(R.string.compose_progressive_blur),
+            summary = stringResource(if (progressiveBlurSupported) R.string.compose_progressive_blur_summary else R.string.requires_api_33),
+            checked = progressiveBlurSupported && preferences.composeProgressiveBlur,
+            onCheckedChange = preferences::composeProgressiveBlur,
+            enabled = progressiveBlurSupported,
+        )
+    }
     Group {
         DemoPreference(title = stringResource(R.string.settings_about), onClick = onAbout)
         Divider()
@@ -184,7 +146,6 @@ internal fun SettingsDemo(dark: Boolean, preferences: DemoPreferences,
             { onReset(); reset = false }, style = CouiDialogActionStyle.Primary,
             colors = CouiDialogDefaults.primaryActionColors(accent)),
         dismissAction = CouiDialogAction(stringResource(R.string.dialog_cancel), { reset = false }),
-        material = if (Build.VERSION.SDK_INT >= 33 && backdrop != null)
-            CouiDialogDefaults.material(dark) else null,
+        material = demoDialogMaterial(backdrop),
         backdrop = backdrop)
 }
