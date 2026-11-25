@@ -146,7 +146,6 @@ internal fun SettingsDemo(dark: Boolean, preferences: DemoPreferences,
             { onReset(); reset = false }, style = CouiDialogActionStyle.Primary,
             colors = CouiDialogDefaults.primaryActionColors(accent)),
         dismissAction = CouiDialogAction(stringResource(R.string.dialog_cancel), { reset = false }),
-        material = if (Build.VERSION.SDK_INT >= 33 && backdrop != null)
-            CouiDialogDefaults.material(dark) else null,
+        material = demoDialogMaterial(backdrop),
         backdrop = backdrop)
 }

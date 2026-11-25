@@ -1,6 +1,5 @@
 package com.itos.coui.demo
 
-import android.os.Build
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,20 +29,20 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
     var opened by rememberSaveable { mutableStateOf<String?>(null) }
     var visible by rememberSaveable { mutableStateOf(false) }
     var session by rememberSaveable { mutableStateOf(0) }
-    var material by rememberSaveable { mutableStateOf(Build.VERSION.SDK_INT >= 33) }
+    var materialEnabled by rememberSaveable { mutableStateOf(true) }
     val initialDeviceName = stringResource(R.string.dialog_device_name_initial)
     var deviceName by rememberSaveable { mutableStateOf(initialDeviceName) }
     var usbMode by rememberSaveable { mutableIntStateOf(R.string.dialog_usb_charge) }
     val windowBackdrop = rememberCouiWindowBackdrop()
-    val supported = Build.VERSION.SDK_INT >= 33 && windowBackdrop != null
+    val material = demoDialogMaterial(windowBackdrop)
     val variants = listOf("primary" to R.string.dialog_primary, "bottom" to R.string.dialog_bottom, "center" to R.string.dialog_center,
         "long" to R.string.dialog_long, "three" to R.string.dialog_three, "actionRows" to R.string.dialog_action_rows,
         "disabled" to R.string.dialog_disabled,
         "input" to R.string.dialog_input, "singleChoice" to R.string.dialog_single_choice,
         "loading" to R.string.dialog_loading) +
         if (onToggleTheme != null) listOf("theme" to R.string.dialog_theme_live) else emptyList()
-    if (supported) Group {
-        DemoSwitchPreference(title = stringResource(R.string.dialog_material), checked = material, onCheckedChange = { material = it })
+    if (material != null) Group {
+        DemoSwitchPreference(title = stringResource(R.string.dialog_material), checked = materialEnabled, onCheckedChange = { materialEnabled = it })
     }
     Group {
         variants.forEachIndexed { index, (key, label) ->
@@ -60,7 +59,7 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
         val dismiss = { visible = false }
         val regularMessage = stringResource(R.string.dialog_sample_message)
         val title = stringResource(R.string.dialog_sample_title)
-        val dialogMaterial = if (material && supported) CouiDialogDefaults.material(dark) else null
+        val dialogMaterial = if (materialEnabled) material else null
         if (variant == "loading") {
             LaunchedEffect(visible, session) {
                 if (visible) {
@@ -78,8 +77,8 @@ internal fun DialogSample(dark: Boolean, onToggleTheme: (() -> Unit)? = null) {
             )
         } else if (variant == "input") androidx.compose.runtime.key(session) {
             RenameDeviceDialogSample(dark = dark, initialName = deviceName, visible = visible,
-                material = dialogMaterial != null, backdrop = windowBackdrop, onDismissRequest = dismiss,
-            onSave = { deviceName = it; visible = false })
+                material = dialogMaterial, backdrop = windowBackdrop, onDismissRequest = dismiss,
+                onSave = { deviceName = it; visible = false })
         } else if (variant == "singleChoice") {
             SingleChoiceDialog(
                 visible = visible,

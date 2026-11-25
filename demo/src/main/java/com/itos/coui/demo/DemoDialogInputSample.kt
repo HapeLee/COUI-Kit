@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import com.itos.coui.dialog.CouiDialogAction
-import com.itos.coui.dialog.CouiDialogDefaults
+import com.itos.coui.dialog.CouiDialogMaterial
 import com.itos.coui.backdrop.CouiBackdrop
 import com.itos.coui.dialog.InputDialog
 import kotlinx.coroutines.flow.drop
@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.collect
 internal fun RenameDeviceDialogSample(
     dark: Boolean,
     initialName: String,
-    material: Boolean,
+    material: CouiDialogMaterial?,
     onDismissRequest: () -> Unit,
     onSave: (String) -> Unit,
     backdrop: CouiBackdrop? = null,
@@ -69,7 +69,7 @@ internal fun RenameDeviceDialogSample(
         counterIsError = count > DEVICE_NAME_MAX_BYTES,
         confirmAction = CouiDialogAction(stringResource(R.string.dialog_input_save), { if (canSave) onSave(name) }, enabled = canSave),
         dismissAction = CouiDialogAction(stringResource(R.string.dialog_cancel), onDismissRequest),
-        material = if (material) CouiDialogDefaults.material(dark) else null, backdrop = backdrop)
+        material = material, backdrop = backdrop)
 }
 
 private const val DEVICE_NAME_MAX_BYTES = 32

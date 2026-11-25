@@ -103,6 +103,7 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 | `BottomSheet`（API 33+ `material != null`） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint` 基准色，或传 `Color.Transparent` 关闭；顶部按钮采面板底图不二次染色 |
 | `Menu`（有 `backdrop` 时） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 直接传入 `Menu(..., themeTint = ...)` 或覆盖 `CouiMenuStyle.themeTint`；`Color.Transparent` 关闭 |
 | `NavigationBar`（API 34+） | 透明（不染色） | 中间胶囊和默认透明附件使用宿主 `surface` 基准色染色 | 中间胶囊显式传入 `themeTint`，附件各自通过 `style.material.themeTint` 设置 |
+| `FloatingToolbar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`（同步作用于溢出菜单）或通过 `CouiFloatingToolbarDefaults.style(themeTint = ...)` 设置；`Color.Transparent` 关闭 |
 | `SearchBar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；API 31–33 降级不透明背景不受影响 |
 | `TopAppBarButton` / `TopAppBarSearch` / `TopAppBarSearchButton`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 默认从 `CouiTopAppBarButtonDefaults.style()` 继承；传具体 `themeTint` 覆盖 `style`，传 `Color.Unspecified` 沿用 `style` |
 | `MessageInputBar`（API 34+ 且开启系统模糊） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；系统模糊关闭退回不透明底色时自动关闭染色 |

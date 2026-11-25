@@ -60,6 +60,7 @@ Dialog(visible = visible, onDismissRequest = { visible = false }, title = title,
 ```
 
 - 多行操作用 `Dialog(actionRows = ...)`（1–4 行，每行非空）。
+- 普通按钮跟随纯色面板或已染色模糊面板的底色。单独指定按钮配色可传 `CouiDialogAction.colors`。
 - **`SingleChoiceDialog`** 使用 `CouiSingleChoiceItem(value, text)` 描述选项。`actionRows` 为空时省略按钮区，各按钮执行自己的 `onClick`。返回和外点触发 `onDismissRequest`。
   - **说明文字**。可选参数 `message` 默认是 `null`。非空白时显示在标题下、选项前并随选项滚动，标题和底部操作区保持固定。
   - **图标颜色**。启用 `CouiMaterial3Style` 时，`icon` 槽里的 Material 3 `Icon` 省略 `tint` 会继承选项行的内容色。显式传 `tint` 可指定颜色，传 `tint = Color.Unspecified` 可保留多色图标原色。
