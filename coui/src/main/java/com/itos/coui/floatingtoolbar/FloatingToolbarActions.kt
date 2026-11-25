@@ -3,8 +3,14 @@ package com.itos.coui.floatingtoolbar
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.tappableElement
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
@@ -72,7 +78,11 @@ internal fun toolbarDirectCount(count: Int, available: Int, itemWidth: Int, gap:
     return count
 }
 
-/** 按窗口可用宽度排列操作，剩余操作收进同一个“更多”菜单。 */
+/**
+ * 悬浮操作栏：按窗口可用宽度排列同级操作，剩余操作收进同一个“更多”菜单。
+ * 组件内部已处理横向与底部 `WindowInsets.tappableElement` 安全区及悬浮留白；
+ * 切换 [visible] 时保留在组合中以播放整栏缩放显隐动画，键盘避让由宿主容器负责。
+ */
 @RequiresApi(34)
 @Composable
 fun <T : Any> FloatingToolbar(
@@ -82,12 +92,24 @@ fun <T : Any> FloatingToolbar(
     visible: Boolean = true,
     backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) { "悬浮操作栏需要页面背景源" },
     renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
-    style: CouiFloatingToolbarStyle = CouiFloatingToolbarDefaults.style(),
+    dark: Boolean = CouiTheme.isDark,
+    style: CouiFloatingToolbarStyle = CouiFloatingToolbarDefaults.style(dark),
+    themeTint: Color = style.material.themeTint,
 ) {
     require(items.distinctBy { it.value }.size == items.size) { "悬浮操作栏的 value 必须唯一" }
+    val resolvedStyle = if (style.material.blurRadius > 0f && themeTint != style.material.themeTint) {
+        style.copy(material = style.material.copy(themeTint = themeTint))
+    } else style
+    val density = LocalDensity.current
     val window = LocalWindowInfo.current.containerDpSize
-    BoxWithConstraints(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        val density = LocalDensity.current
+    val bottomMargin = if (WindowInsets.tappableElement.getBottom(density) > 0) 0.dp else 8.dp
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.tappableElement.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
+            .padding(top = 16.dp, bottom = 16.dp + bottomMargin),
+        contentAlignment = Alignment.Center,
+    ) {
         val marginPx = with(density) {
             toolbarMarginDp(window.width.value, window.height.value).dp.roundToPx()
         }
@@ -114,17 +136,17 @@ fun <T : Any> FloatingToolbar(
         val animation = rememberToolbarAnimation(group)
         val batch = animation.batch
         SideEffect { animation.submit(group) }
-        ToolbarSurface(Modifier.fillMaxWidth(), visible, backdrop, renderer, style, animation, batch) {
+        ToolbarSurface(Modifier.fillMaxWidth(), visible, backdrop, renderer, resolvedStyle, animation, batch) {
             for (id in batch.order) key(id) {
                 val active = visible && id in batch.target && id in group.ids
                 if (id is ToolbarAction) {
                     val item = id.item.value
-                    ToolbarButton(Modifier.toolbarItem(id, true), id.onClick, item.enabled, active) {
+                    ToolbarButton(Modifier.toolbarItem(id), id.onClick, item.enabled, active) {
                         CouiIcon(Modifier.size(CouiFloatingToolbarDefaults.iconSize), item.icon, item.label,
                             tint = if (item.enabled) item.iconTint ?: CouiTheme.contentColor else CouiTheme.contentColor)
                     }
                 } else {
-                    ToolbarOverflowButton(overflow, active, marginPx, backdrop, onItemClick)
+                    ToolbarOverflowButton(overflow, active, marginPx, backdrop, themeTint, onItemClick)
                 }
             }
         }
@@ -137,13 +159,14 @@ private fun <T : Any> ToolbarOverflowButton(
     active: Boolean,
     marginPx: Int,
     backdrop: CouiBackdrop,
+    themeTint: Color,
     onItemClick: (T) -> Unit,
 ) {
     var open by remember { mutableStateOf(false) }
     var menuItems by remember { mutableStateOf(items) }
     if (items.isNotEmpty()) menuItems = items
     val label = stringResource(R.string.coui_toolbar_more)
-    ToolbarButton(Modifier.toolbarItem(OverflowKey, true), { open = true }, true, active) {
+    ToolbarButton(Modifier.toolbarItem(OverflowKey), { open = true }, true, active) {
         val color = CouiTheme.contentColor
         Canvas(Modifier.size(CouiFloatingToolbarDefaults.iconSize).semantics { contentDescription = label }) {
             val unit = size.width / 24f
@@ -158,6 +181,7 @@ private fun <T : Any> ToolbarOverflowButton(
                 expanded = open && active,
                 style = CouiMenuDefaults.style(LocalCouiFloatingToolbarStyle.current.dark),
                 anchor = anchor,
+                themeTint = themeTint,
                 onDismissRequest = { open = false },
                 items = menuItems.map {
                     CouiMenuItem(it.value, it.label, it.icon, enabled = it.enabled, iconTint = it.iconTint)

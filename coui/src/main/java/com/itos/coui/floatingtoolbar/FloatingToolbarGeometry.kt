@@ -29,13 +29,11 @@ internal fun ToolbarItems.frame(
     progress: Float,
     gap: Float,
     rtl: Boolean,
-    buttons: Set<Any>? = null,
 ): ToolbarFrame {
     if (order.isEmpty()) return ToolbarFrame(0f, emptyMap())
     fun edge(group: ToolbarGroup) = if (group.hasInset) inset else 0
-    fun countButtons(ids: List<Any>) = if (buttons == null) ids.size else ids.count { it in buttons }
     fun width(group: ToolbarGroup) = group.ids.sumOf { widths.getValue(it) } +
-        (countButtons(group.ids) - 1).coerceAtLeast(0) * spacing + edge(group) * 2
+        (group.ids.size - 1).coerceAtLeast(0) * spacing + edge(group) * 2
     val signedGap = if (width(from) > width(to)) gap else -gap
     val step = spacing * (1f + signedGap)
     val bounded = progress.coerceIn(0f, 1f)
@@ -45,8 +43,6 @@ internal fun ToolbarItems.frame(
     val after = if (rtl) target.asReversed() else target
     val firstChanged = before.firstOrNull() != after.firstOrNull()
     val lastChanged = before.lastOrNull() != after.lastOrNull()
-    val firstButton = buttons?.let { ids -> ordered.firstOrNull { it in ids } }
-    val lastButton = buttons?.let { ids -> ordered.lastOrNull { it in ids } }
     var advance = edge - spacing * signedGap * (old.size - 1) / 2
     var left = 0f
     var right = 0f
@@ -68,10 +64,6 @@ internal fun ToolbarItems.frame(
         when {
             lastChanged && id == after.lastOrNull() -> trailing *= 1f - bounded
             lastChanged && id == before.lastOrNull() -> trailing *= bounded
-        }
-        if (buttons != null) {
-            if (id !in buttons || id == firstButton) leading = 0f
-            if (id !in buttons || id == lastButton) trailing = 0f
         }
         var visualX = advance + leading
         if (index == 0) visualX -= leading

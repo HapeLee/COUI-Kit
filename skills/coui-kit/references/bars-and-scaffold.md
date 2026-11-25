@@ -93,7 +93,7 @@ NavigationBar(
 
 ## FloatingToolbar
 
-编辑页底部的悬浮操作可放在 `Scaffold` 的 `bottomBar` 中，传入 `Modifier.navigationBarsPadding()` 避让底部系统栏（组件固定 `76.dp` 工具区高度且收起时保留占位，不自带安全区或 IME 避让）。调用 `FloatingToolbar(modifier = Modifier.navigationBarsPadding(), items = actions, onItemClick = onAction, visible = showBar)`，各项使用稳定的 `CouiFloatingToolbarItem.value`。收起时保留组合，列表增删和宽度不足时的“更多操作”由组件处理。[悬浮操作栏](../../../docs/components/floating-toolbar.md)
+**API 34+**。编辑页底部的悬浮操作放入 COUI `Scaffold.bottomBar`，勿外叠 `navigationBarsPadding()`（组件内置 `WindowInsets.tappableElement` 横向/底部安全区及悬浮边距，收起整栏时保留占位；IME 避让由宿主页处理）。调用 `FloatingToolbar(items = actions, onItemClick = onAction, visible = showBar)`，各项使用稳定的 `CouiFloatingToolbarItem.value`，可通过顶层 `dark`、`style` 与 `themeTint`（同步作用于“更多”菜单）定制外观。[悬浮操作栏](../../../docs/components/floating-toolbar.md)
 
 ## Fab
 

@@ -4,7 +4,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
@@ -22,12 +21,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.isSpecified
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.rememberGraphicsLayer
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -37,13 +36,10 @@ import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.constrainHeight
-import kotlin.math.roundToInt
+import androidx.compose.ui.unit.constrainWidth
 import com.itos.coui.backdrop.CouiBackdrop
-import com.itos.coui.backdrop.LocalCouiBackdrop
 import com.itos.coui.effect.CouiFloatingRenderer
 import com.itos.coui.effect.CouiFloatingSurface
 import com.itos.coui.effect.SpotlightPreset
@@ -56,28 +52,14 @@ import com.itos.coui.motion.couiTouchMotion
 import com.itos.coui.motion.rememberCouiPressMotion
 import com.itos.coui.motion.rememberCouiScaleVisibility
 import com.itos.coui.motion.rememberCouiTouchMotion
-import com.itos.coui.theme.CouiTheme
-import com.itos.coui.theme.ProvideCouiContent
 import com.itos.coui.shape.CouiCapsuleShape
 import com.itos.coui.shape.CouiShape
+import com.itos.coui.theme.CouiTheme
+import com.itos.coui.theme.ProvideCouiContent
+import kotlin.math.roundToInt
 
 private val LocalToolbarSingle = compositionLocalOf { false }
 private val LocalToolbarInteractive = compositionLocalOf { true }
-private val LocalToolbarAnimation = compositionLocalOf<ToolbarAnimation?> { null }
-
-/** 自定义内容槽。保持组合并切换 visible 时，整栏使用与导航底栏相同的缩放显隐效果；按动作 ID 增删和自动收纳请使用接收 items 的重载。 */
-@RequiresApi(34)
-@Composable
-fun FloatingToolbar(
-    modifier: Modifier = Modifier,
-    visible: Boolean = true,
-    backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) { "悬浮操作栏需要页面背景源" },
-    renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
-    style: CouiFloatingToolbarStyle = CouiFloatingToolbarDefaults.style(),
-    content: @Composable RowScope.() -> Unit,
-) {
-    ToolbarSurface(modifier, visible, backdrop, renderer, style, rememberToolbarAnimation(), null, content)
-}
 
 @RequiresApi(34)
 @Composable
@@ -88,13 +70,12 @@ internal fun ToolbarSurface(
     renderer: CouiFloatingRenderer,
     style: CouiFloatingToolbarStyle,
     animation: ToolbarAnimation,
-    listBatch: ToolbarItems?,
-    content: @Composable RowScope.() -> Unit,
+    batch: ToolbarItems,
+    content: @Composable () -> Unit,
 ) {
     var width by remember { mutableFloatStateOf(0f) }
     var height by remember { mutableIntStateOf(0) }
-    var measuredCount by remember { mutableIntStateOf(0) }
-    val single = (listBatch?.target?.size ?: measuredCount) == 1
+    val single = batch.target.size == 1
     val shape = if (single && style.shape === CouiCapsuleShape) {
         CouiShape(CouiFloatingToolbarDefaults.height / 2, 2f)
     } else style.shape
@@ -125,8 +106,7 @@ internal fun ToolbarSurface(
             override val minimumTouchTargetSize = DpSize.Zero
         }
     }
-    // 编辑器负责导航栏和 IME 的避让。此处只保留工具区自身的高度。
-    Layout(modifier = modifier.height(76.dp), content = {
+    Layout(modifier = modifier.height(CouiFloatingToolbarDefaults.height), content = {
         Box(Modifier.then(input).then(if (visible) Modifier else Modifier.clearAndSetSemantics {}
             .focusProperties { canFocus = false }.onPreviewKeyEvent { true })
             // 增删时胶囊边缘会落在像素之间。材质仍采样下层投影与光晕，只将可见前景叠回页面。
@@ -139,7 +119,7 @@ internal fun ToolbarSurface(
                 bounds = Rect(x, y, x + width, y + height),
                 scaleX = (motion.scaleX.value + press.scale.value - 1f) * visibility.scale.value,
                 scaleY = (motion.scaleY.value + press.scale.value - 1f) * visibility.scale.value,
-                cornerWeight = (shape as? CouiShape)?.cornerWeight ?: if (measuredCount == 1) 2f else 1f,
+                cornerWeight = (shape as? CouiShape)?.cornerWeight ?: if (single) 2f else 1f,
                 cornerRadius = cornerRadius,
                 alpha = visibility.alpha.value.coerceIn(0f, 1f),
                 visible = visibility.isPresent && width > 0f,
@@ -149,7 +129,6 @@ internal fun ToolbarSurface(
                 LocalCouiFloatingToolbarStyle provides style,
                 LocalToolbarSingle provides single,
                 LocalToolbarInteractive provides visible,
-                LocalToolbarAnimation provides animation,
                 LocalViewConfiguration provides buttonConfiguration,
             ) {
                 ToolbarLayout(
@@ -168,11 +147,10 @@ internal fun ToolbarSurface(
                         }
                         .clip(shape).drawBehind { drawLight?.invoke(this) },
                     animation = animation,
-                    listBatch = listBatch,
-                    onGeometry = { w, h, n ->
+                    batch = batch,
+                    onGeometry = { w, h ->
                         width = w
                         height = h
-                        measuredCount = n
                     },
                     content = content,
                 )
@@ -192,21 +170,6 @@ internal fun ToolbarSurface(
             }
         }
     }
-}
-
-/** 操作项保留在槽中时，切换 visible 可播放入场与退出动画。 */
-@Composable
-fun FloatingToolbarItem(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    enabled: Boolean = true,
-    visible: Boolean = true,
-    content: @Composable () -> Unit,
-) {
-    val id = remember { Any() }
-    val batch = LocalToolbarAnimation.current?.batch
-    val exiting = batch != null && id in batch.old && id !in batch.target
-    ToolbarButton(modifier.toolbarItem(id, visible), onClick, enabled, visible && !exiting, content)
 }
 
 @Composable

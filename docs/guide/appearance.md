@@ -103,7 +103,7 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 | `BottomSheet`（API 33+ `material != null`） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint` 基准色，或传 `Color.Transparent` 关闭；顶部按钮采面板底图不二次染色 |
 | `Menu`（有 `backdrop` 时） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 直接传入 `Menu(..., themeTint = ...)` 或覆盖 `CouiMenuStyle.themeTint`；`Color.Transparent` 关闭 |
 | `NavigationBar`（API 34+） | 透明（不染色） | 中间胶囊和默认透明附件使用宿主 `surface` 基准色染色 | 中间胶囊显式传入 `themeTint`，附件各自通过 `style.material.themeTint` 设置 |
-| `FloatingToolbar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 通过 `CouiFloatingToolbarDefaults.style(themeTint = ...)` 设置，或通过局部 `CouiTheme` 的 `materialTint` 设置 |
+| `FloatingToolbar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`（同步作用于溢出菜单）或通过 `CouiFloatingToolbarDefaults.style(themeTint = ...)` 设置；`Color.Transparent` 关闭 |
 | `SearchBar`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；API 31–33 降级不透明背景不受影响 |
 | `TopAppBarButton` / `TopAppBarSearch` / `TopAppBarSearchButton`（API 34+） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 默认从 `CouiTopAppBarButtonDefaults.style()` 继承；传具体 `themeTint` 覆盖 `style`，传 `Color.Unspecified` 沿用 `style` |
 | `MessageInputBar`（API 34+ 且开启系统模糊） | 透明（不染色） | 使用宿主 `surface` 基准色染色 | 显式传入 `themeTint`；系统模糊关闭退回不透明底色时自动关闭染色 |
@@ -117,7 +117,7 @@ CouiTheme(darkTheme = dark, colorScheme = colors) {
 
 ## 内容插槽与最小交互尺寸
 
-- **M3 插槽 Local 桥接**：启用 `CouiMaterial3Style` 后，`TopAppBarButton`、搜索表面、`ChipTab`、`Fab` 与 `FloatingToolbar` 操作项的内容插槽会自动提供 M3 内容 Local，直接放置 M3 `Text`、`Icon` 即可继承颜色与文字样式。
+- **M3 插槽 Local 桥接**：启用 `CouiMaterial3Style` 后，`TopAppBarButton`、搜索表面、`ChipTab` 与 `Fab` 的内容插槽会自动提供 M3 内容 Local，直接放置 M3 `Text`、`Icon` 即可继承颜色与文字样式。
   - 组件局部 `TextStyle` 按 M3 `ProvideTextStyle` 顺序与宿主 ambient 样式合并；`CouiTheme` 的完整基线则会替换外层样式。
   - 子 `Text` 的显式颜色/样式、子 `Icon` 的 `tint` 以及内层 Local 始终优先。
   - 未启用 `coui-material3` 却在纯原生插槽中使用 M3 `Text`/`Icon` 时，需由宿主自行桥接 M3 内容 Local。
