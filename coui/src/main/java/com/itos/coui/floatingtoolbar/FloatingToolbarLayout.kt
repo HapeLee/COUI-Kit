@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlin.math.roundToInt
 
@@ -130,9 +129,13 @@ internal fun ToolbarLayout(
         val plain = measurables.indices.filter { slots[it].id == null }.mapTo(mutableSetOf()) { ids[it] }
         val buttons = if (plain.isEmpty()) null else batch.order.toSet() - plain
         val frame = batch.frame(widths.measured, rowSpacing, rowInset, progress, animation.gapFraction(batch),
-            layoutDirection == LayoutDirection.Rtl, buttons, 16.dp.roundToPx())
+            layoutDirection == LayoutDirection.Rtl, buttons)
         val width = constraints.constrainWidth(frame.width.roundToInt())
-        onGeometry(frame.width, height, batch.target.size)
+        val constrainedWidth = frame.width.coerceIn(
+            constraints.minWidth.toFloat(),
+            constraints.maxWidth.toFloat(),
+        )
+        onGeometry(constrainedWidth, height, batch.target.size)
         val lines = slots.mapIndexed { i, slot -> slot.line?.invoke(checkNotNull(children[i])) }
         val baseline = lines.filterNotNull().filter { it != AlignmentLine.Unspecified }.maxOrNull() ?: 0
         layout(width, height) {

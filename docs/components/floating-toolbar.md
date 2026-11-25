@@ -14,7 +14,7 @@ fun EditorActions(
     onAction: (String) -> Unit,
 ) {
     FloatingToolbar(
-        modifier = modifier,
+        modifier = modifier.navigationBarsPadding(),
         items = items,
         onItemClick = onAction,
         visible = visible,
@@ -24,7 +24,7 @@ fun EditorActions(
 
 每个动作提供唯一且稳定的 `value`、无障碍与菜单共用的 `label`、`ImageVector` 图标。显示顺序跟随列表。使用业务 ID 作为 `value`，删除前面的动作后，后续动作仍能沿用自己的身份。普通按钮和“更多”菜单都通过 `onItemClick` 提交该值。`enabled = false` 时两个入口都禁用。
 
-在 COUI Scaffold 的底栏槽中可直接使用此例。放在其他布局时，通过 `backdrop` 指定同页的不透明 SDR 背景源。“更多”菜单优先采样当前窗口，宿主没有提供窗口采样源时使用工具栏的 `backdrop`，此时采样范围应覆盖菜单弹出的区域。默认每个工具栏创建自己的绘制器，需要处理初始化失败时可显式传入 `CouiFloatingRenderer.standalone()`。[背景采样](../effects/backdrop.md)
+在 COUI `Scaffold` 的底栏槽中可直接使用此例：工具栏自身只保留 `76.dp` 工具区高度（收起整栏时仍保留该占位），需通过 `Modifier.navigationBarsPadding()` 处理底部系统栏安全区，编辑页键盘避让由宿主页容器统一处理。放在其他布局时，通过 `backdrop` 指定同页的不透明 SDR 背景源。“更多”菜单优先采样当前窗口，宿主没有提供窗口采样源时使用工具栏的 `backdrop`，此时采样范围应覆盖菜单弹出的区域。默认每个工具栏创建自己的绘制器，需要处理初始化失败时可显式传入 `CouiFloatingRenderer.standalone()`。[背景采样](../effects/backdrop.md)
 
 ## 收起整栏与增删动作
 

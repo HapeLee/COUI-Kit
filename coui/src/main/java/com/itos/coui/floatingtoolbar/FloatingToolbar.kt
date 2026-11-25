@@ -65,26 +65,12 @@ private val LocalToolbarSingle = compositionLocalOf { false }
 private val LocalToolbarInteractive = compositionLocalOf { true }
 private val LocalToolbarAnimation = compositionLocalOf<ToolbarAnimation?> { null }
 
-/** 自定义内容槽。需要按动作 ID 增删、自动收纳时使用接收 items 的重载。 */
+/** 自定义内容槽。保持组合并切换 visible 时，整栏使用与导航底栏相同的缩放显隐效果；按动作 ID 增删和自动收纳请使用接收 items 的重载。 */
 @RequiresApi(34)
 @Composable
 fun FloatingToolbar(
     modifier: Modifier = Modifier,
-    backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) { "悬浮操作栏需要页面背景源" },
-    dark: Boolean = CouiTheme.isDark,
-    style: CouiFloatingToolbarStyle = CouiFloatingToolbarDefaults.style(dark),
-    renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
-    content: @Composable RowScope.() -> Unit,
-) {
-    FloatingToolbar(modifier, visible = true, backdrop = backdrop, renderer = renderer, style = style, content = content)
-}
-
-/** 保持组合并切换 visible，整栏使用与导航底栏相同的缩放显隐效果。 */
-@RequiresApi(34)
-@Composable
-fun FloatingToolbar(
-    modifier: Modifier = Modifier,
-    visible: Boolean,
+    visible: Boolean = true,
     backdrop: CouiBackdrop = checkNotNull(LocalCouiBackdrop.current) { "悬浮操作栏需要页面背景源" },
     renderer: CouiFloatingRenderer = remember { CouiFloatingRenderer.standalone() },
     style: CouiFloatingToolbarStyle = CouiFloatingToolbarDefaults.style(),
@@ -115,7 +101,7 @@ internal fun ToolbarSurface(
     val cornerRadius = with(LocalDensity.current) { (shape as? CouiShape)?.radius?.toPx() }
     val visibility = rememberCouiScaleVisibility(visible)
     val inputSession by rememberUpdatedState(if (visible) remember { Any() } else null)
-    // 手势从按下所属的显示周期开始，期间收起过，即使已经重显也不能提交旧手势。
+    // 手势从按下所属的显示周期开始，期间收起过，即使已经重显也不能提交旧手势；退场期新触摸不拦截。
     val input = Modifier.pointerInput(Unit) {
         awaitPointerEventScope {
             var pressed = false
@@ -123,7 +109,7 @@ internal fun ToolbarSurface(
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
                 if (!pressed) session = inputSession
-                if (session == null || session !== inputSession) event.changes.forEach { it.consume() }
+                if (session != null && session !== inputSession) event.changes.forEach { it.consume() }
                 pressed = event.changes.any { it.pressed }
             }
         }
@@ -143,8 +129,10 @@ internal fun ToolbarSurface(
     Layout(modifier = modifier.height(76.dp), content = {
         Box(Modifier.then(input).then(if (visible) Modifier else Modifier.clearAndSetSemantics {}
             .focusProperties { canFocus = false }.onPreviewKeyEvent { true })
+            // 增删时胶囊边缘会落在像素之间。材质仍采样下层投影与光晕，只将可见前景叠回页面。
             .couiFloatingSurface(backdrop, renderer, style.material, style.shadow, shape,
-            contentLayer, style.contourGlowEnabled) {
+                contentLayer, style.contourGlowEnabled, foregroundComposition = true, beforeContent = null,
+                useMenuLightEdge = false, sampleDrawnSurfaces = true) {
             val x = motion.translationX.value
             val y = motion.translationY.value
             CouiFloatingSurface(

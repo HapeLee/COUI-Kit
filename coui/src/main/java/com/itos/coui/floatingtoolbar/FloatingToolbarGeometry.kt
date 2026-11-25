@@ -30,7 +30,6 @@ internal fun ToolbarItems.frame(
     gap: Float,
     rtl: Boolean,
     buttons: Set<Any>? = null,
-    menuPadding: Int = 0,
 ): ToolbarFrame {
     if (order.isEmpty()) return ToolbarFrame(0f, emptyMap())
     fun edge(group: ToolbarGroup) = if (group.hasInset) inset else 0
@@ -48,7 +47,7 @@ internal fun ToolbarItems.frame(
     val lastChanged = before.lastOrNull() != after.lastOrNull()
     val firstButton = buttons?.let { ids -> ordered.firstOrNull { it in ids } }
     val lastButton = buttons?.let { ids -> ordered.lastOrNull { it in ids } }
-    var advance = menuPadding + edge - spacing * signedGap * (old.size - 1) / 2
+    var advance = edge - spacing * signedGap * (old.size - 1) / 2
     var left = 0f
     var right = 0f
     val placements = LinkedHashMap<Any, ToolbarPlacement>(order.size)

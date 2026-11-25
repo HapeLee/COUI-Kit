@@ -1,7 +1,5 @@
 package com.itos.coui.floatingtoolbar
 
-import android.util.DisplayMetrics
-import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -21,8 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -89,19 +85,16 @@ fun <T : Any> FloatingToolbar(
     style: CouiFloatingToolbarStyle = CouiFloatingToolbarDefaults.style(),
 ) {
     require(items.distinctBy { it.value }.size == items.size) { "悬浮操作栏的 value 必须唯一" }
-    val context = LocalContext.current
-    val screenHeight = remember(context, LocalConfiguration.current) {
-        val metrics = DisplayMetrics()
-        @Suppress("DEPRECATION")
-        context.getSystemService(WindowManager::class.java).defaultDisplay.getMetrics(metrics)
-        metrics.heightPixels
-    }
+    val window = LocalWindowInfo.current.containerDpSize
     BoxWithConstraints(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        val direct = with(LocalDensity.current) {
-            val margin = toolbarMarginDp(maxWidth.value, screenHeight / density).dp
+        val density = LocalDensity.current
+        val marginPx = with(density) {
+            toolbarMarginDp(window.width.value, window.height.value).dp.roundToPx()
+        }
+        val direct = with(density) {
             val inset = if (items.size > 1) CouiFloatingToolbarDefaults.edgeInset.roundToPx() else 0
             // 外层测量菜单时先加回菜单自身的透明 padding，两处相抵。
-            val available = constraints.maxWidth - 2 * (margin.toPx().toInt() + inset)
+            val available = constraints.maxWidth - 2 * (marginPx + inset)
             toolbarDirectCount(items.size, available, CouiFloatingToolbarDefaults.itemSize.roundToPx(),
                 CouiFloatingToolbarDefaults.itemSpacing.roundToPx())
         }
@@ -118,7 +111,7 @@ fun <T : Any> FloatingToolbar(
             addAll(directItems)
             if (overflow.isNotEmpty()) add(OverflowKey)
         }, items.size > 1)
-        val animation = rememberToolbarAnimation()
+        val animation = rememberToolbarAnimation(group)
         val batch = animation.batch
         SideEffect { animation.submit(group) }
         ToolbarSurface(Modifier.fillMaxWidth(), visible, backdrop, renderer, style, animation, batch) {
@@ -131,7 +124,7 @@ fun <T : Any> FloatingToolbar(
                             tint = if (item.enabled) item.iconTint ?: CouiTheme.contentColor else CouiTheme.contentColor)
                     }
                 } else {
-                    ToolbarOverflowButton(overflow, active, backdrop, onItemClick)
+                    ToolbarOverflowButton(overflow, active, marginPx, backdrop, onItemClick)
                 }
             }
         }
@@ -142,10 +135,13 @@ fun <T : Any> FloatingToolbar(
 private fun <T : Any> ToolbarOverflowButton(
     items: List<CouiFloatingToolbarItem<T>>,
     active: Boolean,
+    marginPx: Int,
     backdrop: CouiBackdrop,
     onItemClick: (T) -> Unit,
 ) {
     var open by remember { mutableStateOf(false) }
+    var menuItems by remember { mutableStateOf(items) }
+    if (items.isNotEmpty()) menuItems = items
     val label = stringResource(R.string.coui_toolbar_more)
     ToolbarButton(Modifier.toolbarItem(OverflowKey, true), { open = true }, true, active) {
         val color = CouiTheme.contentColor
@@ -155,28 +151,22 @@ private fun <T : Any> ToolbarOverflowButton(
                 drawCircle(color, 1.75f * unit, Offset(12f * unit, (4.875f + index * 7.125f) * unit))
             }
         }
-        if (active) {
-            val view = LocalView.current
-            val window = LocalWindowInfo.current.containerDpSize
-            val margin = with(LocalDensity.current) {
-                toolbarMarginDp(window.width.value, window.height.value).dp.roundToPx()
-            }
-            val anchor = remember(view, margin) { CouiMenuAnchor(view, editorButtonMarginPx = margin) }
-            ProvideCouiMenuBackdrop(rememberCouiWindowBackdrop() ?: backdrop) {
-                Menu(
-                    expanded = open,
-                    style = CouiMenuDefaults.style(LocalCouiFloatingToolbarStyle.current.dark),
-                    anchor = anchor,
-                    onDismissRequest = { open = false },
-                    items = items.map {
-                        CouiMenuItem(it.value, it.label, it.icon, enabled = it.enabled, iconTint = it.iconTint)
-                    },
-                    onItemClick = {
-                        open = false
-                        onItemClick(it.value)
-                    },
-                )
-            }
+        val view = LocalView.current
+        val anchor = remember(view, marginPx) { CouiMenuAnchor(view, editorButtonMarginPx = marginPx) }
+        ProvideCouiMenuBackdrop(rememberCouiWindowBackdrop() ?: backdrop) {
+            Menu(
+                expanded = open && active,
+                style = CouiMenuDefaults.style(LocalCouiFloatingToolbarStyle.current.dark),
+                anchor = anchor,
+                onDismissRequest = { open = false },
+                items = menuItems.map {
+                    CouiMenuItem(it.value, it.label, it.icon, enabled = it.enabled, iconTint = it.iconTint)
+                },
+                onItemClick = {
+                    open = false
+                    onItemClick(it.value)
+                },
+            )
         }
     }
     if (!active && open) SideEffect { open = false }

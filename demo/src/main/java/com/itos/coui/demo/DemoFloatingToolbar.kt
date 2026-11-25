@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.itos.coui.dialog.CouiDialogAction
 import com.itos.coui.dialog.Dialog
 import com.itos.coui.effect.CouiFloatingRenderer
+import com.itos.coui.floatingtoolbar.CouiFloatingToolbarDefaults
 import com.itos.coui.floatingtoolbar.CouiFloatingToolbarItem
 import com.itos.coui.floatingtoolbar.FloatingToolbar
 import com.itos.coui.icons.CouiIcons
@@ -149,6 +150,7 @@ private fun ToolbarPreview(
                 visible = toolbarVisible,
                 backdrop = backdrop,
                 renderer = renderer,
+                style = CouiFloatingToolbarDefaults.style(dark),
             )
         } else {
             val failure = checkNotNull(rendering.exceptionOrNull())

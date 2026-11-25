@@ -16,11 +16,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-internal class ToolbarAnimation {
+internal class ToolbarAnimation(initial: ToolbarGroup? = null) {
     private val empty = ToolbarGroup(emptyList(), false)
     private val waiting = ArrayDeque<ToolbarGroup>()
-    private var requested: ToolbarGroup? = null
-    var batch by mutableStateOf(ToolbarItems(empty, empty))
+    private var requested: ToolbarGroup? = initial
+    var batch by mutableStateOf(ToolbarItems(initial ?: empty, initial ?: empty))
         private set
     val gap = Animatable(0f)
     val progress = CouiSpring(0f, minimumChange = 0.0001f)
@@ -63,8 +63,8 @@ internal class ToolbarAnimation {
 }
 
 @Composable
-internal fun rememberToolbarAnimation(): ToolbarAnimation {
-    val animation = remember { ToolbarAnimation() }
+internal fun rememberToolbarAnimation(initial: ToolbarGroup? = null): ToolbarAnimation {
+    val animation = remember { ToolbarAnimation(initial) }
     val batch = animation.batch
     LaunchedEffect(batch) { animation.play(batch) }
     DisposableEffect(animation) { onDispose { animation.dispose() } }
