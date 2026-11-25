@@ -1,7 +1,6 @@
 package com.itos.coui.textfield
 
 import android.graphics.Typeface
-import android.os.Build
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -11,9 +10,12 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itos.coui.layout.CouiPageDefaults
+import com.itos.coui.text.CouiTextKind
+import com.itos.coui.text.couiLineSpacing
 import com.itos.coui.text.couiTextStyle
 import com.itos.coui.theme.CouiTheme
 import kotlin.math.roundToInt
@@ -56,13 +58,13 @@ object CouiTextFieldDefaults {
     /** 与 [CouiPageDefaults.shape] 同一条平滑圆角，字段和分组卡片使用一致的轮廓。 */
     val shape: Shape = CouiPageDefaults.shape
 
-    /** 标签常驻时的字号；只在 [textStyle] 未指定字号时回退使用。 */
+    /** 默认正文及空态标签字号，也是相对字号的基准。 */
     val labelSize = 16.sp
 
     /** 标签浮动到输入上方的字号。 */
     val floatingLabelSize = 12.sp
 
-    /** 标签浮动时上移的距离。输入文字同步下移同一距离，卡片高度不变。 */
+    /** 标签空态位置的额外顶端留白，受卡片可用高度约束。 */
     val labelShift = 8.dp
 
     @Composable
@@ -85,9 +87,9 @@ object CouiTextFieldDefaults {
         return remember(configuration, density) {
             val weight = 400
             val typeface = Typeface.create(Typeface.create("sans-serif", Typeface.NORMAL), weight, false)
-            val pixels = with(density) { 16.sp.toPx().roundToInt().toFloat() }
-            couiTextStyle(typeface, weight, pixels,
-                if (Build.VERSION.SDK_INT >= 35) 1.158f else 1.05f, includeFontPadding = true, density = density)
+            val pixels = with(density) { labelSize.toPx().roundToInt().toFloat() }
+            couiTextStyle(typeface, weight, pixels, couiLineSpacing(CouiTextKind.ItemTitle),
+                includeFontPadding = true, density = density).copy(fontFamily = FontFamily.SansSerif)
         }
     }
 }

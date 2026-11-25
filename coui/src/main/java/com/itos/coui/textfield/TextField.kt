@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // 两个受控值重载保留 Foundation 的值与选区契约。
+
 package com.itos.coui.textfield
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -10,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
@@ -20,28 +21,40 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.OutputTransformation
-import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.toTextFieldBuffer
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.hintText
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.isUnspecified
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.offset
+import androidx.compose.ui.util.lerp as lerpInt
 import com.itos.coui.theme.CouiTheme
 
 /**
@@ -52,7 +65,8 @@ import com.itos.coui.theme.CouiTheme
  * 空态文案分两层：[label] 是字段标题，[placeholder] 是输入区提示。
  * 只传 label 时它先在输入位置当大字提示，有内容后上浮并缩小；同时传 placeholder 时标签停在卡片顶部，
  * 输入区由 placeholder 提示，有内容后 placeholder 消失。
- * `useLabelAsPlaceholder = true` 时标签自己当占位提示，有内容后整体隐藏，placeholder 不再参与。
+ * `useLabelAsPlaceholder = true` 时标签自己当占位提示，有内容后只隐藏视觉文案。
+ * 空态以显示变换后的文本为准。标签优先作为字段的无障碍提示，独立占位提示按有效行数上限显示。
  *
  * 聚焦不画描边、不改底色，也不改标签颜色：编辑态的线索只有光标，其余外观保持不变。
  *
@@ -78,7 +92,7 @@ fun TextField(
     colors: CouiTextFieldColors = CouiTextFieldDefaults.colors(dark),
     shape: Shape = CouiTextFieldDefaults.shape,
     contentPadding: PaddingValues = CouiTextFieldDefaults.contentPadding,
-    textStyle: TextStyle = CouiTextFieldDefaults.textStyle(),
+    textStyle: TextStyle = TextStyle.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -86,24 +100,25 @@ fun TextField(
     interactionSource: MutableInteractionSource? = null,
     cursorBrush: Brush = SolidColor(colors.cursor),
 ) {
-    requireTextFieldLines(singleLine, minLines, maxLines)
-    val currentOnValueChange by rememberUpdatedState(onValueChange)
-    val currentOnTextLayout by rememberUpdatedState(onTextLayout)
-    BasicTextField(value = value, onValueChange = currentOnValueChange,
-        modifier = modifier.couiTextFieldSurface(shape, colors.container),
+    val resolvedStyle = resolvedTextFieldStyle(textStyle)
+    BasicTextField(value = value, onValueChange = onValueChange,
+        modifier = modifier.couiTextFieldSurface(shape, colors.container, label, placeholder),
         enabled = enabled, readOnly = readOnly,
-        textStyle = textStyle.copy(color = if (enabled) colors.text else colors.disabled),
+        textStyle = resolvedStyle.copy(color = if (enabled) colors.text else colors.disabled),
         keyboardOptions = keyboardOptions, keyboardActions = keyboardActions,
-        singleLine = singleLine, minLines = if (singleLine) 1 else minLines,
-        maxLines = if (singleLine) 1 else maxLines,
-        visualTransformation = visualTransformation, onTextLayout = currentOnTextLayout,
+        singleLine = singleLine, minLines = minLines, maxLines = maxLines,
+        visualTransformation = visualTransformation, onTextLayout = onTextLayout,
         interactionSource = interactionSource, cursorBrush = cursorBrush,
         decorationBox = { inner ->
-            CouiTextFieldDecoration(label = label, valueIsEmpty = value.isEmpty(),
+            val visibleTextIsEmpty = if (visualTransformation == VisualTransformation.None) value.isEmpty()
+                else remember(value, visualTransformation) {
+                    visualTransformation.filter(AnnotatedString(value)).text.isEmpty()
+                }
+            CouiTextFieldDecoration(label = label, visibleTextIsEmpty = visibleTextIsEmpty,
                 useLabelAsPlaceholder = useLabelAsPlaceholder, placeholder = placeholder,
-                enabled = enabled, textStyle = textStyle, colors = colors,
+                enabled = enabled, textStyle = resolvedStyle, colors = colors,
                 leading = leading, trailing = trailing, contentPadding = contentPadding,
-                singleLine = singleLine, inner = inner)
+                singleLine = singleLine, maxLines = maxLines, inner = inner)
         })
 }
 
@@ -130,7 +145,7 @@ fun TextField(
     colors: CouiTextFieldColors = CouiTextFieldDefaults.colors(dark),
     shape: Shape = CouiTextFieldDefaults.shape,
     contentPadding: PaddingValues = CouiTextFieldDefaults.contentPadding,
-    textStyle: TextStyle = CouiTextFieldDefaults.textStyle(),
+    textStyle: TextStyle = TextStyle.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -138,24 +153,25 @@ fun TextField(
     interactionSource: MutableInteractionSource? = null,
     cursorBrush: Brush = SolidColor(colors.cursor),
 ) {
-    requireTextFieldLines(singleLine, minLines, maxLines)
-    val currentOnValueChange by rememberUpdatedState(onValueChange)
-    val currentOnTextLayout by rememberUpdatedState(onTextLayout)
-    BasicTextField(value = value, onValueChange = currentOnValueChange,
-        modifier = modifier.couiTextFieldSurface(shape, colors.container),
+    val resolvedStyle = resolvedTextFieldStyle(textStyle)
+    BasicTextField(value = value, onValueChange = onValueChange,
+        modifier = modifier.couiTextFieldSurface(shape, colors.container, label, placeholder),
         enabled = enabled, readOnly = readOnly,
-        textStyle = textStyle.copy(color = if (enabled) colors.text else colors.disabled),
+        textStyle = resolvedStyle.copy(color = if (enabled) colors.text else colors.disabled),
         keyboardOptions = keyboardOptions, keyboardActions = keyboardActions,
-        singleLine = singleLine, minLines = if (singleLine) 1 else minLines,
-        maxLines = if (singleLine) 1 else maxLines,
-        visualTransformation = visualTransformation, onTextLayout = currentOnTextLayout,
+        singleLine = singleLine, minLines = minLines, maxLines = maxLines,
+        visualTransformation = visualTransformation, onTextLayout = onTextLayout,
         interactionSource = interactionSource, cursorBrush = cursorBrush,
         decorationBox = { inner ->
-            CouiTextFieldDecoration(label = label, valueIsEmpty = value.text.isEmpty(),
+            val visibleTextIsEmpty = if (visualTransformation == VisualTransformation.None) value.text.isEmpty()
+                else remember(value, visualTransformation) {
+                    visualTransformation.filter(value.annotatedString).text.isEmpty()
+                }
+            CouiTextFieldDecoration(label = label, visibleTextIsEmpty = visibleTextIsEmpty,
                 useLabelAsPlaceholder = useLabelAsPlaceholder, placeholder = placeholder,
-                enabled = enabled, textStyle = textStyle, colors = colors,
+                enabled = enabled, textStyle = resolvedStyle, colors = colors,
                 leading = leading, trailing = trailing, contentPadding = contentPadding,
-                singleLine = singleLine, inner = inner)
+                singleLine = singleLine, maxLines = maxLines, inner = inner)
         })
 }
 
@@ -183,7 +199,7 @@ fun TextField(
     colors: CouiTextFieldColors = CouiTextFieldDefaults.colors(dark),
     shape: Shape = CouiTextFieldDefaults.shape,
     contentPadding: PaddingValues = CouiTextFieldDefaults.contentPadding,
-    textStyle: TextStyle = CouiTextFieldDefaults.textStyle(),
+    textStyle: TextStyle = TextStyle.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onKeyboardAction: KeyboardActionHandler? = null,
     inputTransformation: InputTransformation? = null,
@@ -193,53 +209,56 @@ fun TextField(
     interactionSource: MutableInteractionSource? = null,
     cursorBrush: Brush = SolidColor(colors.cursor),
 ) {
-    requireTextFieldLines(singleLine, minLines, maxLines)
-    val currentOnTextLayout by rememberUpdatedState(onTextLayout)
+    val resolvedStyle = resolvedTextFieldStyle(textStyle)
     BasicTextField(state = state,
-        modifier = modifier.couiTextFieldSurface(shape, colors.container),
+        modifier = modifier.couiTextFieldSurface(shape, colors.container, label, placeholder),
         enabled = enabled, readOnly = readOnly,
         inputTransformation = inputTransformation,
-        textStyle = textStyle.copy(color = if (enabled) colors.text else colors.disabled),
+        textStyle = resolvedStyle.copy(color = if (enabled) colors.text else colors.disabled),
         keyboardOptions = keyboardOptions, onKeyboardAction = onKeyboardAction,
         lineLimits = if (singleLine) TextFieldLineLimits.SingleLine
             else TextFieldLineLimits.MultiLine(minLines, maxLines),
-        onTextLayout = currentOnTextLayout, scrollState = scrollState,
+        onTextLayout = onTextLayout, scrollState = scrollState,
         interactionSource = interactionSource, cursorBrush = cursorBrush,
         outputTransformation = outputTransformation,
-        decorator = object : TextFieldDecorator {
-            @Composable
-            override fun Decoration(innerTextField: @Composable () -> Unit) {
-                CouiTextFieldDecoration(label = label, valueIsEmpty = state.text.isEmpty(),
-                    useLabelAsPlaceholder = useLabelAsPlaceholder, placeholder = placeholder,
-                    enabled = enabled, textStyle = textStyle, colors = colors,
-                    leading = leading, trailing = trailing, contentPadding = contentPadding,
-                    singleLine = singleLine, inner = innerTextField)
+        decorator = { inner ->
+            val visibleTextIsEmpty = if (outputTransformation == null) state.text.isEmpty() else {
+                val buffer = state.toTextFieldBuffer()
+                with(outputTransformation) { buffer.transformOutput() }
+                buffer.length == 0
             }
+            CouiTextFieldDecoration(label = label, visibleTextIsEmpty = visibleTextIsEmpty,
+                useLabelAsPlaceholder = useLabelAsPlaceholder, placeholder = placeholder,
+                enabled = enabled, textStyle = resolvedStyle, colors = colors,
+                leading = leading, trailing = trailing, contentPadding = contentPadding,
+                singleLine = singleLine, maxLines = maxLines, inner = inner)
         })
 }
 
-/** 卡片轮廓属于输入本体，命中区包含留白。 */
-private fun Modifier.couiTextFieldSurface(shape: Shape, color: Color): Modifier =
-    defaultMinSize(minHeight = CouiTextFieldDefaults.minHeight).clip(shape).background(color)
+@Composable
+private fun resolvedTextFieldStyle(textStyle: TextStyle): TextStyle {
+    val defaultStyle = CouiTextFieldDefaults.textStyle()
+    val style = defaultStyle.merge(textStyle)
+    if (!style.fontSize.isEm) return style
+    val size = with(LocalDensity.current) {
+        (defaultStyle.fontSize.toPx() * style.fontSize.value).toSp()
+    }
+    return style.copy(fontSize = size)
+}
 
-/**
- * 标签的落位。`Inline` 是空值且输入区没有自己的提示时，标签占据输入位置当大字提示；
- * `Anchored` 是有内容、或输入区已经由 [placeholder] 提供提示时，标签停在卡片顶部的小字位置。
- */
-private enum class CouiLabelState { Hidden, Inline, Anchored, Dismissed }
+private fun Modifier.couiTextFieldSurface(shape: Shape, color: Color, label: String?, placeholder: String?): Modifier {
+    val fieldName = label?.takeIf { it.isNotEmpty() } ?: placeholder?.takeIf { it.isNotEmpty() }
+    val surface = defaultMinSize(minHeight = CouiTextFieldDefaults.minHeight).clip(shape).background(color)
+    return if (fieldName == null) surface else surface.semantics { hintText = fieldName }
+}
 
-/** 标签浮动与输入下移共用的无回弹弹簧，参数与菜单按下指示一致。 */
+/** 浮动标签沿用 COUI 菜单按压指示的弹簧。 */
 private val LabelFloatSpec = spring<Float>(dampingRatio = 1f, stiffness = 1754.5962f)
 
-/**
- * 装饰也属于输入本体：图标槽与留白不拦截输入焦点，槽位内的可点击控件先行消费事件。
- * 标签与输入共用 [textStyle]；上浮只改字号和纵向偏移，不额外撑高卡片。
- * 占位提示与输入文字共用同一排版、同一条偏移；多行时图标与文字对齐首行。
- */
 @Composable
 private fun CouiTextFieldDecoration(
     label: String?,
-    valueIsEmpty: Boolean,
+    visibleTextIsEmpty: Boolean,
     useLabelAsPlaceholder: Boolean,
     placeholder: String?,
     enabled: Boolean,
@@ -249,64 +268,114 @@ private fun CouiTextFieldDecoration(
     trailing: (@Composable () -> Unit)?,
     contentPadding: PaddingValues,
     singleLine: Boolean,
+    maxLines: Int,
     inner: @Composable () -> Unit,
 ) {
-    val labelState = remember(label, valueIsEmpty, useLabelAsPlaceholder, placeholder) {
-        when {
-            label.isNullOrEmpty() -> CouiLabelState.Hidden
-            // 标签自己当提示：空值占输入位，有内容后整段隐藏，不与 placeholder 叠加。
-            useLabelAsPlaceholder -> if (valueIsEmpty) CouiLabelState.Inline else CouiLabelState.Dismissed
-            !valueIsEmpty -> CouiLabelState.Anchored
-            // 空值但输入区已有自己的提示，标签让位停在顶部，两层文案同时可见。
-            placeholder != null -> CouiLabelState.Anchored
-            else -> CouiLabelState.Inline
-        }
-    }
-    val float by animateFloatAsState(
-        targetValue = if (labelState == CouiLabelState.Anchored) 1f else 0f,
-        animationSpec = LabelFloatSpec,
-        label = "couiTextFieldLabelFloat",
-    )
+    val fieldLabel = label?.takeIf { it.isNotEmpty() }
+    val labelIsHint = useLabelAsPlaceholder && fieldLabel != null
+    val floatingLabel = fieldLabel.takeUnless { labelIsHint }
+    val inputHint = (if (labelIsHint) fieldLabel else placeholder)?.takeIf { it.isNotEmpty() }
     val labelColor = if (enabled) colors.label else colors.disabled
-    val labelText = when (labelState) {
-        CouiLabelState.Inline, CouiLabelState.Anchored -> label
-        else -> null
+    val hintColor = when {
+        labelIsHint -> labelColor
+        enabled -> colors.placeholder
+        else -> colors.disabled
     }
-    // 标签占据输入位时由它承担空态提示；其余情况 placeholder 只在空值出现，有内容即消失。
-    val showsPlaceholder = placeholder != null && valueIsEmpty && labelState != CouiLabelState.Inline
-    val shift = CouiTextFieldDefaults.labelShift * float
     Row(modifier = Modifier.padding(contentPadding),
         horizontalArrangement = Arrangement.spacedBy(CouiTextFieldDefaults.slotSpacing),
         verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top) {
         leading?.invoke()
-        Box(Modifier.weight(1f)) {
-            if (labelText != null) {
-                BasicText(labelText, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    style = textStyle.copy(color = labelColor, fontSize = lerp(labelFontSize(textStyle),
-                        CouiTextFieldDefaults.floatingLabelSize, float)),
-                    modifier = Modifier.offset(y = -shift))
-            }
-            // 提示与输入共用同一条偏移，标签停在顶部时二者一起下移，不会错行。
-            Box(Modifier.offset(y = shift)) {
-                if (showsPlaceholder) {
-                    BasicText(checkNotNull(placeholder), maxLines = if (singleLine) 1 else Int.MAX_VALUE,
-                        overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
-                        style = textStyle.copy(color = if (enabled) colors.placeholder else colors.disabled))
-                }
-                inner()
-            }
-        }
+        CouiTextFieldContent(Modifier.weight(1f), label = floatingLabel,
+            labelCanInline = inputHint == null,
+            labelAnchored = !visibleTextIsEmpty || inputHint != null,
+            hint = inputHint.takeIf { visibleTextIsEmpty },
+            hintHasOwnSemantics = fieldLabel != null && inputHint != fieldLabel,
+            textStyle = textStyle, labelColor = labelColor, hintColor = hintColor,
+            maxHintLines = if (singleLine || labelIsHint) 1 else maxLines, inner = inner)
         trailing?.invoke()
     }
 }
 
-/** 标签常态字号跟随输入排版；宿主传入未指定字号的 [TextStyle] 时回退到 Defaults。 */
-private fun labelFontSize(textStyle: TextStyle) =
-    if (textStyle.fontSize.isUnspecified) CouiTextFieldDefaults.labelSize else textStyle.fontSize
+@Composable
+private fun CouiTextFieldContent(
+    modifier: Modifier,
+    label: String?,
+    labelCanInline: Boolean,
+    labelAnchored: Boolean,
+    hint: String?,
+    hintHasOwnSemantics: Boolean,
+    textStyle: TextStyle,
+    labelColor: Color,
+    hintColor: Color,
+    maxHintLines: Int,
+    inner: @Composable () -> Unit,
+) {
+    val textMeasurer = if (label != null) rememberTextMeasurer(cacheSize = 3) else null
+    val progress = if (label != null && labelCanInline) {
+        animateFloatAsState(targetValue = if (labelAnchored) 1f else 0f,
+            animationSpec = LabelFloatSpec, label = "couiTextFieldLabelFloat").value.coerceIn(0f, 1f)
+    } else 1f
+    val floatingSize = CouiTextFieldDefaults.floatingLabelSize
+    Layout(modifier = modifier, content = {
+        Box { inner() }
+        if (hint != null) {
+            BasicText(hint, modifier = if (hintHasOwnSemantics) Modifier else Modifier.semantics { hideFromAccessibility() },
+                maxLines = maxHintLines, overflow = TextOverflow.Ellipsis, style = textStyle.copy(color = hintColor))
+        }
+        if (label != null) {
+            BasicText(label, modifier = Modifier.clipToBounds().semantics { hideFromAccessibility() },
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                style = textStyle.copy(color = labelColor, fontSize = lerp(textStyle.fontSize, floatingSize, progress)))
+        }
+    }) { measurables, constraints ->
+        val loose = constraints.copy(minWidth = 0, minHeight = 0)
+        var labelBand = 0
+        var inlineOffset = 0
+        if (label != null && textMeasurer != null) {
+            val editorLineHeight = textMeasurer.measure("", style = textStyle, maxLines = 1,
+                overflow = TextOverflow.Ellipsis, constraints = loose).size.height
+            val floatingHeight = textMeasurer.measure(label, style = textStyle.copy(fontSize = floatingSize),
+                maxLines = 1, overflow = TextOverflow.Ellipsis, constraints = loose).size.height
+            val available = (loose.maxHeight - editorLineHeight).coerceAtLeast(0)
+            labelBand = floatingHeight.coerceAtMost(available)
+            if (labelCanInline) {
+                // 按两个端点留出整行，使首字可以立即移入独立输入区。
+                val inlineHeight = textMeasurer.measure(label, style = textStyle, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis, constraints = loose).size.height
+                labelBand = maxOf(labelBand, inlineHeight).coerceAtMost(available)
+                inlineOffset = CouiTextFieldDefaults.labelShift.roundToPx().coerceAtMost(available - labelBand)
+                labelBand += inlineOffset
+            }
+        }
 
-/** 行数只在多行时生效，单行由 [singleLine] 决定高度。 */
-private fun requireTextFieldLines(singleLine: Boolean, minLines: Int, maxLines: Int) {
-    if (singleLine) return
-    require(minLines >= 1) { "minLines 必须大于零" }
-    require(maxLines >= minLines) { "maxLines 不能小于 minLines" }
+        val bodyConstraints = loose.offset(vertical = -labelBand)
+        val editor = measurables.first().measure(bodyConstraints)
+        val placeholder = if (hint == null) null else measurables[1].measure(bodyConstraints)
+        val title = if (label == null) null else measurables.last().measure(loose.copy(maxHeight = labelBand))
+        val editorBaseline = editor.firstBaseline()
+        val hintBaseline = placeholder?.firstBaseline() ?: 0
+        val bodyBaseline = maxOf(editorBaseline, hintBaseline)
+        val editorY = bodyBaseline - editorBaseline
+        val hintY = bodyBaseline - hintBaseline
+        val bodyHeight = maxOf(editorY + editor.height, hintY + (placeholder?.height ?: 0))
+        val titleBaseline = title?.firstBaseline() ?: 0
+        val inlineLabelTop = (inlineOffset + bodyBaseline - titleBaseline)
+            .coerceIn(0, labelBand - (title?.height ?: 0))
+        val inlineBodyTop = (inlineLabelTop + titleBaseline - bodyBaseline).coerceIn(0, labelBand)
+        val bodyTop = if (labelAnchored) labelBand else lerpInt(inlineBodyTop, labelBand, progress)
+        val width = constraints.constrainWidth(maxOf(editor.width, placeholder?.width ?: 0, title?.width ?: 0))
+        val height = constraints.constrainHeight(labelBand + bodyHeight)
+
+        layout(width, height, mapOf(FirstBaseline to bodyTop + bodyBaseline)) {
+            if (title != null) {
+                title.placeRelative(0, lerpInt(inlineLabelTop, 0, progress))
+            }
+            placeholder?.placeRelative(0, bodyTop + hintY)
+            editor.placeRelative(0, bodyTop + editorY)
+        }
+    }
+}
+
+private fun Placeable.firstBaseline(): Int = this[FirstBaseline].let {
+    if (it == AlignmentLine.Unspecified) height else it
 }

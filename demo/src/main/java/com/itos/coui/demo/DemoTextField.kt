@@ -55,8 +55,8 @@ internal fun TextFieldSample(dark: Boolean) {
     var address by rememberSaveable { mutableStateOf("") }
     var topic by rememberSaveable { mutableStateOf("") }
     var bare by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     var email by rememberSaveable { mutableStateOf("") }
     // 初始就有内容：占位提示在首帧就不会出现。
     var filled by rememberSaveable { mutableStateOf("ColorOS 17") }
@@ -66,7 +66,7 @@ internal fun TextFieldSample(dark: Boolean) {
     val note = rememberTextFieldState()
     Column(Modifier.fillMaxWidth().padding(top = CouiPageDefaults.groupSpacing),
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        // 无标签，只有占位提示：空值显示，有内容消失。
+        // 以地点为例展示独立尾部图标槽和普通占位提示。
         TextField(modifier = Modifier.fillMaxWidth().padding(horizontal = CouiPageDefaults.horizontalMargin),
             value = location, onValueChange = { location = it },
             placeholder = stringResource(R.string.text_field_location),
@@ -143,10 +143,10 @@ internal fun TextFieldSample(dark: Boolean) {
                 kind = CouiTextKind.GroupFooter, color = ErrorRed,
                 modifier = Modifier.fillMaxWidth().padding(start = CouiPageDefaults.rowPadding + 4.dp, top = 4.dp))
         }
-        // 多行：首行到 minLines 撑高，超过 maxLines 后内部滚动。
+        // 备注从一行开始，超过五行后在输入区内部滚动。
         TextField(modifier = Modifier.fillMaxWidth().padding(horizontal = CouiPageDefaults.horizontalMargin),
             state = note, placeholder = stringResource(R.string.text_field_note),
-            singleLine = false, minLines = 3, maxLines = 5)
+            singleLine = false, maxLines = 5)
         // 只读仍可聚焦、选择与复制；禁用停止输入并改用禁用色。
         TextField(modifier = Modifier.fillMaxWidth().padding(horizontal = CouiPageDefaults.horizontalMargin),
             value = stringResource(R.string.text_field_sample_value), onValueChange = {},
